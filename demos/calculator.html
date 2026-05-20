@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .pass { color: #059669; }
+        .fail { color: #dc2626; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card">
+            <h1>Calculator</h1>
+            <p class="lead">Thử hai hàm trong ví dụ unit test: add và divide.</p>
+
+            <div class="demo-block">
+                <p style="font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:8px">add(a, b)</p>
+                <div class="demo-row-2">
+                    <div class="demo-field" style="margin:0">
+                        <label for="a">a</label>
+                        <input type="number" id="a" value="5">
+                    </div>
+                    <div class="op">+</div>
+                    <div class="demo-field" style="margin:0">
+                        <label for="b">b</label>
+                        <input type="number" id="b" value="3">
+                    </div>
+                </div>
+                <button type="button" class="demo-btn secondary" id="btn-add" style="margin-top:8px">Chạy add()</button>
+            </div>
+
+            <div class="demo-block">
+                <p style="font-size:0.8rem;font-weight:600;color:#475569;margin-bottom:8px">divide(a, b)</p>
+                <div class="demo-row-2">
+                    <div class="demo-field" style="margin:0">
+                        <label for="c">a</label>
+                        <input type="number" id="c" value="10">
+                    </div>
+                    <div class="op">÷</div>
+                    <div class="demo-field" style="margin:0">
+                        <label for="d">b</label>
+                        <input type="number" id="d" value="0">
+                    </div>
+                </div>
+                <button type="button" class="demo-btn secondary" id="btn-div" style="margin-top:8px">Chạy divide()</button>
+            </div>
+
+            <div id="result" class="demo-result">Kết quả test hiển thị tại đây</div>
+        </div>
+    </div>
+    <script>
+        function add(a, b) { return a + b; }
+        function divide(a, b) {
+            if (b === 0) throw new Error('Cannot divide by zero');
+            return Math.floor(a / b);
+        }
+        var out = document.getElementById('result');
+        document.getElementById('btn-add').onclick = function () {
+            var a = +document.getElementById('a').value, b = +document.getElementById('b').value;
+            var r = add(a, b);
+            out.innerHTML = '<span class="pass">add(' + a + ', ' + b + ') = ' + r + ' ✓</span>';
+        };
+        document.getElementById('btn-div').onclick = function () {
+            var a = +document.getElementById('c').value, b = +document.getElementById('d').value;
+            try {
+                var r = divide(a, b);
+                out.innerHTML = '<span class="pass">divide(' + a + ', ' + b + ') = ' + r + '</span>';
+            } catch (e) {
+                out.innerHTML = '<span class="fail">divide(' + a + ', ' + b + ') → ' + e.message + ' (exception mong đợi) ✓</span>';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video 1: Manual vs Automation Testing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 600px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #ff79c6; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #764ba2;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #663a8b;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .narration-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-style: italic;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .speaker-icon {
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #667eea;
+            padding: 10px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            text-align: center;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .speaker-icon:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .warning {
+            background: #fff5e6;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+        }
+
+        .success {
+            background: #e6f9f0;
+            border-left: 4px solid #51cf66;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+    <link rel="stylesheet" href="course-ui-demos.css">
+</head>
+<body data-tts-page="video1">
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Video 1: Manual vs Automation Testing</h1>
+            <p>PHASE 1: Nền Tảng Automation Testing</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+                <!-- SLIDE 1: INTRO -->
+                <div class="slide active">
+                    <h2>👋 Xin Chào!</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 30px;">Đây là Video 1 của PHASE 1: Nền Tảng Automation Testing</p>
+                    
+                    <h3>Hôm nay chúng ta sẽ học:</h3>
+                    <ul>
+                        <li><span class="emoji">🔍</span>Manual Testing là gì</li>
+                        <li><span class="emoji">⚙️</span>Automation Testing là gì</li>
+                        <li><span class="emoji">⚔️</span>Khác biệt giữa chúng</li>
+                        <li><span class="emoji">✅</span>Ưu/nhược điểm</li>
+                        <li><span class="emoji">🎯</span>Khi nào dùng cái nào</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Xin chào các bạn, tôi rất vui được giảng dạy các bạn về Automation Testing. Nhưng trước khi chúng ta bắt đầu tìm hiểu cách tự động hóa, chúng ta cần phải hiểu rõ MANUAL TESTING là gì - đó chính là nền tảng để giúp chúng ta hiểu tại sao lại cần phải tự động hóa kiểm thử. Manual Testing có nghĩa là kiểm thử thủ công, đó là quá trình mà một người (chúng ta gọi là tester) tự tay thực hiện các test case mà không có sự trợ giúp của bất kỳ công cụ tự động nào. Ví dụ cụ thể nhất mà bạn có thể hình dung được là tôi yêu cầu bạn kiểm thử tính năng đăng nhập trên một website. Bạn sẽ phải làm những gì nhỉ? Đầu tiên bạn mở trình duyệt như Chrome, Firefox hay Safari tùy theo yêu cầu công ty, rồi bạn gõ URL https://example.com/login vào thanh địa chỉ, nhấn Enter để chờ trang tải. Sau khi trang đã tải xong, bạn sẽ nhìn vào màn hình để xác nhận rằng có đúng 2 trường để nhập dữ liệu không: trường username và trường password. Tiếp theo bạn click vào trường username, gõ vào email của mình như 'john@example.com', rồi bạn nhấn Tab để di chuyển sang trường password, gõ password 'password123'. Sau đó bạn nhấn Enter hoặc click nút 'Login', sau đó chờ trang tải xong. Bây giờ bạn cần kiểm tra các điều sau: thứ nhất, có thấy thông báo chào mừng 'Chào mừng bạn' không, thứ hai, URL có thay đổi thành /home không, thứ ba, có nút Logout xuất hiện không để chứng tỏ bạn đã đăng nhập thành công. Cuối cùng, bạn ghi lại kết quả vào một file Excel hoặc document nào đó với nội dung là 'Đăng nhập với credentials hợp lệ - PASSED'. Đó là một test case manual duy nhất và nó mất khoảng 5 đến 7 phút để hoàn thành. Bây giờ hãy tưởng tượng rằng công ty bạn có 100 user khác nhau và muốn kiểm thử đăng nhập của tất cả những users này, rồi lại kiểm thử trên 10 loại trình duyệt khác nhau, và lại kiểm thử trên 5 loại hệ điều hành khác nhau. Vậy tổng cộng sẽ là 100 nhân 10 nhân 5 bằng 5000 test cases. Nếu mỗi test mất 5 phút thì 5000 nhân 5 phút bằng 25000 phút, đó là 416 giờ, hay 52 ngày làm việc liên tục. Vậy là bạn sẽ phải làm việc không ngừng trong 2 tháng rưỡi chỉ để kiểm thử một tính năng đơn giản là đăng nhập. Đó chính là lý do tại sao manual testing không phải là một cách hiệu quả để kiểm thử khi có một lượng lớn test cases lặp lại."</div>
+                </div>
+
+                <!-- SLIDE 2: MANUAL TESTING DEFINITION -->
+                <div class="slide">
+                    <h2>🧑 Manual Testing Là Gì?</h2>
+                    
+                    <h3>Định Nghĩa</h3>
+                    <p>Manual testing hay kiểm thử thủ công là quá trình mà <span class="highlight">một con người (tester)</span> tự tay chạy các test case một cách thủ công.</p>
+
+                    <h3>Khi nói "tự tay", ý tôi là:</h3>
+                    <ul>
+                        <li>✋ Tester <span class="highlight">mở browser</span> bằng tay</li>
+                        <li>🖱️ <span class="highlight">Click chuột</span> vào các nút bấm</li>
+                        <li>⌨️ <span class="highlight">Gõ text</span> vào input fields</li>
+                        <li>👀 <span class="highlight">Kiểm tra kết quả</span> bằng mắt</li>
+                        <li>📝 <span class="highlight">Ghi lại</span> test results</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Xin chào các bạn, tôi rất vui được giảng dạy các bạn về Automation Testing. Nhưng trước khi chúng ta bắt đầu tìm hiểu cách tự động hóa, chúng ta cần phải hiểu rõ MANUAL TESTING là gì - đó chính là nền tảng để giúp chúng ta hiểu tại sao lại cần phải tự động hóa kiểm thử. Manual Testing có nghĩa là kiểm thử thủ công, đó là quá trình mà một người (chúng ta gọi là tester) tự tay thực hiện các test case mà không có sự trợ giúp của bất kỳ công cụ tự động nào. Ví dụ cụ thể nhất mà bạn có thể hình dung được là tôi yêu cầu bạn kiểm thử tính năng đăng nhập trên một website. Bạn sẽ phải làm những gì nhỉ? Đầu tiên bạn mở trình duyệt như Chrome, Firefox hay Safari tùy theo yêu cầu công ty, rồi bạn gõ URL https://example.com/login vào thanh địa chỉ, nhấn Enter để chờ trang tải. Sau khi trang đã tải xong, bạn sẽ nhìn vào màn hình để xác nhận rằng có đúng 2 trường để nhập dữ liệu không: trường username và trường password. Tiếp theo bạn click vào trường username, gõ vào email của mình như 'john@example.com', rồi bạn nhấn Tab để di chuyển sang trường password, gõ password 'password123'. Sau đó bạn nhấn Enter hoặc click nút 'Login', sau đó chờ trang tải xong. Bây giờ bạn cần kiểm tra các điều sau: thứ nhất, có thấy thông báo chào mừng 'Chào mừng bạn' không, thứ hai, URL có thay đổi thành /home không, thứ ba, có nút Logout xuất hiện không để chứng tỏ bạn đã đăng nhập thành công. Cuối cùng, bạn ghi lại kết quả vào một file Excel hoặc document nào đó với nội dung là 'Đăng nhập với credentials hợp lệ - PASSED'. Đó là một test case manual duy nhất và nó mất khoảng 5 đến 7 phút để hoàn thành. Bây giờ hãy tưởng tượng rằng công ty bạn có 100 user khác nhau và muốn kiểm thử đăng nhập của tất cả những users này, rồi lại kiểm thử trên 10 loại trình duyệt khác nhau, và lại kiểm thử trên 5 loại hệ điều hành khác nhau. Vậy tổng cộng sẽ là 100 nhân 10 nhân 5 bằng 5000 test cases. Nếu mỗi test mất 5 phút thì 5000 nhân 5 phút bằng 25000 phút, đó là 416 giờ, hay 52 ngày làm việc liên tục. Vậy là bạn sẽ phải làm việc không ngừng trong 2 tháng rưỡi chỉ để kiểm thử một tính năng đơn giản là đăng nhập. Đó chính là lý do tại sao manual testing không phải là một cách hiệu quả để kiểm thử khi có một lượng lớn test cases lặp lại."</div>
+                </div>
+
+                <!-- SLIDE 3: MANUAL TESTING EXAMPLE -->
+                <div class="slide">
+                    <h2>📋 Ví Dụ: Test Login Website</h2>
+                    
+                    <p><strong>Scenario:</strong> Kiểm tra login với username và password hợp lệ</p>
+
+                    <h3>13 Bước Manual:</h3>
+                    <ul>
+                        <li>Bước 1: Tester <span class="highlight">mở trình duyệt Chrome</span></li>
+                        <li>Bước 2: Nhập URL: www.example.com</li>
+                        <li>Bước 3: <span class="highlight">Nhấn Enter</span>, chờ trang load</li>
+                        <li>Bước 4: Thấy form login với 2 input fields</li>
+                        <li>Bước 5: <span class="highlight">Click vào Username field</span></li>
+                        <li>Bước 6: <span class="highlight">Gõ: "user123"</span></li>
+                        <li>Bước 7: Click vào Password field</li>
+                        <li>Bước 8: Gõ: "pass123"</li>
+                        <li>Bước 9: Click nút "Login"</li>
+                        <li>Bước 10: Chờ trang load</li>
+                        <li>Bước 11-12: Kiểm tra 3 điều: Có "Welcome"? URL đổi? Nút Logout có?</li>
+                        <li>Bước 13: Ghi vào Excel: "Login with valid credentials - PASS ✅"</li>
+                    </ul>
+
+                    <p style="margin-top: 20px;"><strong>Vậy tại sao gọi là "manual"?</strong></p>
+                    <p>Vì tất cả các bước trên đều được thực hiện bởi <span class="highlight">con người</span>. Con người là người quyết định chỉ thị, thực hiện hành động, quan sát kết quả, và đưa ra kết luận.</p>
+
+                    <div class="narration-box">🔊 "Xin chào các bạn, tôi rất vui được giảng dạy các bạn về Automation Testing. Nhưng trước khi chúng ta bắt đầu tìm hiểu cách tự động hóa, chúng ta cần phải hiểu rõ MANUAL TESTING là gì - đó chính là nền tảng để giúp chúng ta hiểu tại sao lại cần phải tự động hóa kiểm thử. Manual Testing có nghĩa là kiểm thử thủ công, đó là quá trình mà một người (chúng ta gọi là tester) tự tay thực hiện các test case mà không có sự trợ giúp của bất kỳ công cụ tự động nào. Ví dụ cụ thể nhất mà bạn có thể hình dung được là tôi yêu cầu bạn kiểm thử tính năng đăng nhập trên một website. Bạn sẽ phải làm những gì nhỉ? Đầu tiên bạn mở trình duyệt như Chrome, Firefox hay Safari tùy theo yêu cầu công ty, rồi bạn gõ URL https://example.com/login vào thanh địa chỉ, nhấn Enter để chờ trang tải. Sau khi trang đã tải xong, bạn sẽ nhìn vào màn hình để xác nhận rằng có đúng 2 trường để nhập dữ liệu không: trường username và trường password. Tiếp theo bạn click vào trường username, gõ vào email của mình như 'john@example.com', rồi bạn nhấn Tab để di chuyển sang trường password, gõ password 'password123'. Sau đó bạn nhấn Enter hoặc click nút 'Login', sau đó chờ trang tải xong. Bây giờ bạn cần kiểm tra các điều sau: thứ nhất, có thấy thông báo chào mừng 'Chào mừng bạn' không, thứ hai, URL có thay đổi thành /home không, thứ ba, có nút Logout xuất hiện không để chứng tỏ bạn đã đăng nhập thành công. Cuối cùng, bạn ghi lại kết quả vào một file Excel hoặc document nào đó với nội dung là 'Đăng nhập với credentials hợp lệ - PASSED'. Đó là một test case manual duy nhất và nó mất khoảng 5 đến 7 phút để hoàn thành. Bây giờ hãy tưởng tượng rằng công ty bạn có 100 user khác nhau và muốn kiểm thử đăng nhập của tất cả những users này, rồi lại kiểm thử trên 10 loại trình duyệt khác nhau, và lại kiểm thử trên 5 loại hệ điều hành khác nhau. Vậy tổng cộng sẽ là 100 nhân 10 nhân 5 bằng 5000 test cases. Nếu mỗi test mất 5 phút thì 5000 nhân 5 phút bằng 25000 phút, đó là 416 giờ, hay 52 ngày làm việc liên tục. Vậy là bạn sẽ phải làm việc không ngừng trong 2 tháng rưỡi chỉ để kiểm thử một tính năng đơn giản là đăng nhập. Đó chính là lý do tại sao manual testing không phải là một cách hiệu quả để kiểm thử khi có một lượng lớn test cases lặp lại."</div>
+                </div>
+
+                <!-- SLIDE 4: MANUAL TESTING PROBLEMS -->
+                <div class="slide">
+                    <h2>⚠️ Vấn Đề Của Manual Testing</h2>
+                    
+                    <h3>1️⃣ CHẬM</h3>
+                    <ul>
+                        <li>1 tester 1 lúc chỉ chạy 1 test case</li>
+                        <li>100 test cases → 100 lần (mất hơi 8 giờ!)</li>
+                        <li>Mỗi test case mất ~5 phút</li>
+                    </ul>
+
+                    <h3>2️⃣ DỄ CÓ LỖI</h3>
+                    <ul>
+                        <li>Tester là con người, dễ bị mệt</li>
+                        <li>Dễ bỏ qua chi tiết nhỏ</li>
+                        <li>Lần này PASS, lần kế tiếp FAIL (vì tester không tập trung)</li>
+                    </ul>
+
+                    <h3>3️⃣ KHÓ LẶP LẠI</h3>
+                    <ul>
+                        <li>Phát hiện bug → fix → phải test lại</li>
+                        <li>Phải chạy lại từ đầu (tốn thời gian)</li>
+                    </ul>
+
+                    <h3>4️⃣ KHÓ KIỂM TRA EDGE CASES</h3>
+                    <ul>
+                        <li>Test với 1000 users khác nhau? Không thực tế</li>
+                        <li>Test 1000 lần? Tester sẽ chết mệt</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Hãy cùng phân tích chi tiết những vấn đề chính của manual testing. Vấn đề đầu tiên là RẤT CHẬM. Manual testing không thể scale được, nghĩa là nó không thể mở rộng. Tại sao? Bởi vì khi bạn muốn kiểm thử nhiều test cases, bạn phải thuê rất nhiều tester. Mỗi tester chỉ có thể thực hiện một test case tại một thời điểm theo cách tuần tự. Nếu bạn có 100 test cases, thậm chí nếu bạn thuê 10 tester, mỗi tester sẽ phải làm 10 test cases, mất 50 phút, vẫn không thể chạy đồng thời. Vấn đề thứ hai là DỄ CÓ LỖI vì con người dễ bị mệt mỏi. Lần thứ nhất khi bạn test, bạn có thể thực hiện đầy đủ tất cả các bước, nhưng lần thứ hai bạn có thể quên một bước nào đó, hoặc bạn có thể nhìn nhầm kết quả vì bạn đã mệt. Các tester có thể bỏ qua những detail nhỏ mà chúng không thể nhìn thấy được vì tập trung không đủ. Vấn đề thứ ba là KHÓ LẶP LẠI. Khi developer fix được một bug, bạn phải test lại từ đầu, mất 5 phút, nếu có 50 bugs thì đó là 250 phút hay 4 giờ chỉ để test lại. Vấn đề thứ tư là KHÔNG CONSISTENT. Mỗi tester có thể test khác nhau. Tester A có thể bỏ qua step 1, tester B thực hiện đầy đủ tất cả các step, nên kết quả của họ sẽ khác nhau. Vấn đề cuối cùng là KHÓ KIỂM TRA EDGE CASES hay những điều kiện biên. Bạn có thể test username rỗng được, nhưng test 1000 usernames khác nhau là không thực tế. Test trên 1000 browsers là hoàn toàn không thể."</div>
+                </div>
+
+                <!-- SLIDE 5: AUTOMATION TESTING DEFINITION -->
+                <div class="slide">
+                    <h2>🤖 Automation Testing Là Gì?</h2>
+                    
+                    <h3>Định Nghĩa</h3>
+                    <p>Automation testing hay kiểm thử tự động là quá trình mà <span class="highlight">máy tính (chương trình)</span> tự động chạy các test case mà không cần con người can thiệp.</p>
+
+                    <h3>Khác với manual:</h3>
+                    <ul>
+                        <li>❌ Không cần mở browser (chương trình sẽ mở)</li>
+                        <li>❌ Không cần click chuột (chương trình sẽ click)</li>
+                        <li>❌ Không cần gõ text (chương trình sẽ gõ)</li>
+                        <li>❌ Không cần nhìn kết quả (chương trình sẽ check)</li>
+                    </ul>
+
+                    <h3>Thay vào đó:</h3>
+                    <p>Chúng ta <span class="highlight">viết CODE</span> để chương trình tự động làm tất cả.</p>
+
+                    <div class="narration-box">🔊 "Bây giờ hãy tưởng tượng rằng chúng ta có một 'Robot' - đó là một chương trình máy tính, mà nó có thể thực hiện những bước test tự động mà không cần can thiệp của con người. Robot này sẽ tự động mở trình duyệt, tự động gõ URL, tự động click vào các fields, tự động gõ dữ liệu, tự động nhấn nút, tự động kiểm tra kết quả, và tự động báo cáo xem test đó là PASSED hay FAILED. Và điều quan trọng nhất là gì? Robot có thể làm việc này không phải 5000 lần trong 52 ngày, mà trong chỉ 4 giờ. Tại sao vậy? Nếu mỗi test mất 3 giây (không cần chờ người), 5000 nhân 3 giây bằng 15000 giây, đó là 250 phút hay 4 giờ. Và thêm nữa, robot có thể chạy 24/7, thậm chí khi bạn đang ngủ, khi bạn đang làm việc khác, hoặc khi bạn đang uống cà phê. Điều này gọi là AUTOMATION TESTING."</div>
+                </div>
+
+                <!-- SLIDE 6: AUTOMATION TESTING CODE EXAMPLE -->
+                <div class="slide">
+                    <h2>💻 Ví Dụ: Automation Login</h2>
+                    
+                    <p>Cùng test case login, nhưng dùng Automation:</p>
+
+                    <div class="code-example">
+<span class="keyword">import</span> org.openqa.selenium.WebDriver;
+<span class="keyword">import</span> org.openqa.selenium.By;
+<span class="keyword">import</span> org.openqa.selenium.chrome.ChromeDriver;
+
+<span class="keyword">public class</span> LoginTest {
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="comment">// Bước 1: Khởi tạo WebDriver (Selenium)</span>
+        WebDriver driver = <span class="keyword">new</span> ChromeDriver();
+        
+        <span class="comment">// Bước 2: Mở website</span>
+        driver.get(<span class="string">"https://www.example.com"</span>);
+        
+        <span class="comment">// Bước 3: Tìm Username và gõ</span>
+        driver.findElement(By.id(<span class="string">"username"</span>))
+            .sendKeys(<span class="string">"user123"</span>);
+        
+        <span class="comment">// Bước 4: Tìm Password và gõ</span>
+        driver.findElement(By.id(<span class="string">"password"</span>))
+            .sendKeys(<span class="string">"pass123"</span>);
+        
+        <span class="comment">// Bước 5: Click Login</span>
+        driver.findElement(By.name(<span class="string">"login"</span>)).click();
+        
+        <span class="comment">// Bước 6: Kiểm tra kết quả</span>
+        String text = driver.findElement(By.id(<span class="string">"welcome"</span>))
+            .getText();
+        <span class="keyword">assert</span> text.contains(<span class="string">"Welcome"</span>);
+        
+        <span class="comment">// Bước 7: Đóng browser</span>
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>Chỉ 30 dòng code!</strong></p>
+                    <p>Nhưng nó sẽ tự động làm tất cả 13 bước ở trên.</p>
+
+                    <div class="narration-box">🔊 "Automation Testing một cách đơn giản nhất là viết CODE để một chương trình tự động chạy các test case. Thay vì một tester mở browser, click, gõ, xem kết quả theo cách thủ công, chúng ta viết code để làm tất cả những việc đó tự động. Và điều thay đổi cơ bản là gì? Thay vì phải thuê nhiều nhân công để test, chúng ta chỉ cần viết code một lần, mất khoảng 2-3 giờ, rồi chúng ta có thể chạy nó hàng ngàn lần, mỗi lần chỉ mất 3 giây. Khi ứng dụng thay đổi, chúng ta chỉ cần chạy lại code đó, không cần chi phí thêm. Hãy tính toán chi phí một chút. Nếu công ty bạn có 100 testers, mỗi tester lương 1000 USD một tháng, để test 5000 test cases mất 416 giờ, bạn cần 52 testers làm việc, chi phí là 52 nhân 1000 bằng 52000 USD một tháng. Nhưng nếu bạn dùng automation testing, bạn chỉ cần 1 automation engineer để setup mọi thứ, lương cao hơn một chút khoảng 1500 USD một tháng, bạn tiết kiệm được 50500 USD mỗi tháng. Đó chính là lý do tại sao công ty lớn đầu tư vào automation testing."</div>
+                </div>
+
+                <!-- SLIDE 7: TIME COMPARISON -->
+                <div class="slide">
+                    <h2>⏱️ So Sánh Thời Gian</h2>
+                    
+                    <h3>Test 1 lần:</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th></th>
+                            <th>Manual</th>
+                            <th>Automation</th>
+                        </tr>
+                        <tr>
+                            <td>Viết test</td>
+                            <td>❌ (chỉ click)</td>
+                            <td>⏰ 10 phút</td>
+                        </tr>
+                        <tr>
+                            <td>Chạy test lần 1</td>
+                            <td>⏰ 7 phút</td>
+                            <td>⚡ 3 giây</td>
+                        </tr>
+                        <tr>
+                            <td>Chạy test lần 2</td>
+                            <td>⏰ 7 phút</td>
+                            <td>⚡ 3 giây</td>
+                        </tr>
+                        <tr>
+                            <td>Chạy test lần 10</td>
+                            <td>⏰ 7 phút</td>
+                            <td>⚡ 3 giây</td>
+                        </tr>
+                    </table>
+
+                    <h3>Tổng cộng nếu chạy 10 lần:</h3>
+                    <ul>
+                        <li><strong>Manual:</strong> 10 × 7 phút = <span class="highlight">70 phút</span></li>
+                        <li><strong>Automation:</strong> 10 phút + (10 × 3 giây) = <span class="highlight">10 phút 30 giây</span></li>
+                    </ul>
+
+                    <p style="margin-top: 20px; font-size: 1.2em; color: #51cf66;"><strong>✅ Automation nhanh gấp 6-7 lần!</strong></p>
+
+                    <div class="narration-box">🔊 "Bây giờ hãy tưởng tượng rằng chúng ta có một 'Robot' - đó là một chương trình máy tính, mà nó có thể thực hiện những bước test tự động mà không cần can thiệp của con người. Robot này sẽ tự động mở trình duyệt, tự động gõ URL, tự động click vào các fields, tự động gõ dữ liệu, tự động nhấn nút, tự động kiểm tra kết quả, và tự động báo cáo xem test đó là PASSED hay FAILED. Và điều quan trọng nhất là gì? Robot có thể làm việc này không phải 5000 lần trong 52 ngày, mà trong chỉ 4 giờ. Tại sao vậy? Nếu mỗi test mất 3 giây (không cần chờ người), 5000 nhân 3 giây bằng 15000 giây, đó là 250 phút hay 4 giờ. Và thêm nữa, robot có thể chạy 24/7, thậm chí khi bạn đang ngủ, khi bạn đang làm việc khác, hoặc khi bạn đang uống cà phê. Điều này gọi là AUTOMATION TESTING."</div>
+                </div>
+
+                <!-- SLIDE 8: ADVANTAGES OF AUTOMATION -->
+                <div class="slide">
+                    <h2>✅ Ưu Điểm Automation Testing</h2>
+                    
+                    <h3>1️⃣ NHANH</h3>
+                    <ul>
+                        <li>Test case chạy trong milliseconds (milli giây)</li>
+                        <li>100 test cases trong 1 phút</li>
+                    </ul>
+
+                    <h3>2️⃣ CHÍNH XÁC</h3>
+                    <ul>
+                        <li>Máy tính không bao giờ bỏ qua chi tiết</li>
+                        <li>Lần này PASS, lần kế tiếp cũng PASS</li>
+                    </ul>
+
+                    <h3>3️⃣ ĐÁNG TIN CẬY</h3>
+                    <ul>
+                        <li>Có thể chạy lặp đi lặp lại</li>
+                        <li>Kết quả luôn nhất quán</li>
+                    </ul>
+
+                    <h3>4️⃣ KIỂM TRA NHIỀU CASES</h3>
+                    <ul>
+                        <li>Test với 1000 users khác nhau</li>
+                        <li>Test 100 browsers khác nhau</li>
+                    </ul>
+
+                    <h3>5️⃣ TIẾT KIỆM CHÍ PHÍ DỰA TRÊN LONG-TERM</h3>
+                    <ul>
+                        <li>Viết code một lần: 10 giờ</li>
+                        <li>Chạy hàng ngàn lần: < 1 phút</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Automation Testing một cách đơn giản nhất là viết CODE để một chương trình tự động chạy các test case. Thay vì một tester mở browser, click, gõ, xem kết quả theo cách thủ công, chúng ta viết code để làm tất cả những việc đó tự động. Và điều thay đổi cơ bản là gì? Thay vì phải thuê nhiều nhân công để test, chúng ta chỉ cần viết code một lần, mất khoảng 2-3 giờ, rồi chúng ta có thể chạy nó hàng ngàn lần, mỗi lần chỉ mất 3 giây. Khi ứng dụng thay đổi, chúng ta chỉ cần chạy lại code đó, không cần chi phí thêm. Hãy tính toán chi phí một chút. Nếu công ty bạn có 100 testers, mỗi tester lương 1000 USD một tháng, để test 5000 test cases mất 416 giờ, bạn cần 52 testers làm việc, chi phí là 52 nhân 1000 bằng 52000 USD một tháng. Nhưng nếu bạn dùng automation testing, bạn chỉ cần 1 automation engineer để setup mọi thứ, lương cao hơn một chút khoảng 1500 USD một tháng, bạn tiết kiệm được 50500 USD mỗi tháng. Đó chính là lý do tại sao công ty lớn đầu tư vào automation testing."</div>
+                </div>
+
+                <!-- SLIDE 9: DISADVANTAGES OF AUTOMATION -->
+                <div class="slide">
+                    <h2>❌ Nhược Điểm Automation Testing</h2>
+                    
+                    <h3>1️⃣ VIẾT CODE MẤT THỜI GIAN</h3>
+                    <ul>
+                        <li>Cần phải viết code (10+ giờ)</li>
+                        <li>Cần phải biết lập trình</li>
+                    </ul>
+
+                    <h3>2️⃣ KHÓ KIỂM TRA UX/VISUAL</h3>
+                    <ul>
+                        <li>Máy tính: "Button exists?" → Yes/No</li>
+                        <li>Máy tính không thể: "Button đẹp không?"</li>
+                    </ul>
+
+                    <h3>3️⃣ FLAKY TESTS (Tests không ổn định)</h3>
+                    <ul>
+                        <li>Test fail vì timing issues</li>
+                        <li>Network slow → element load chậm</li>
+                    </ul>
+
+                    <h3>4️⃣ SETUP PHỨC TẠP</h3>
+                    <ul>
+                        <li>Cài đặt tools (Selenium, TestNG...)</li>
+                        <li>Setup test environment</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Tuy nhiên, automation testing cũng có những nhược điểm. Nhược điểm đầu tiên là VIẾT CODE MẤT THỜI GIAN. Để setup Selenium, một tool để tự động hóa browser, cần mất khoảng 2 giờ. Để viết code cho 1 test case mất khoảng 30 phút. Vậy test case đầu tiên mất tổng 2.5 giờ. Nhưng test case thứ 2 chỉ mất 20 phút vì bạn có thể tái sử dụng code. Nhược điểm thứ hai là KHÓ TEST UX VÀ VISUAL. Code có thể kiểm tra 'Button này có tồn tại không?' và trả lời yes hoặc no, nhưng code không thể kiểm tra 'Button này có đẹp không?' vì đó là chủ quan. Bạn vẫn cần manual testing cho UX. Nhược điểm thứ ba là FLAKY TESTS hay những test không ổn định. Nếu network chậm, element sẽ load chậm, code sẽ timeout và test sẽ fail. Nhưng đó không phải lỗi của ứng dụng, mà lỗi của môi trường. Chúng ta sẽ học cách xử lý vấn đề này sau. Nhược điểm cuối cùng là KHI UI THAY ĐỔI, BẠN PHẢI MODIFY CODE. Nếu button ID thay đổi, code của bạn sẽ không tìm thấy button nữa. Vì vậy cần phải có một good practice gọi là Page Object Model mà chúng ta sẽ học sau."</div>
+                </div>
+
+                <!-- SLIDE 10: WHEN TO USE MANUAL VS AUTOMATION -->
+                <div class="slide">
+                    <h2>🎯 Khi Nào Dùng Cái Nào?</h2>
+                    
+                    <h3>✅ NÊN AUTOMATION khi:</h3>
+                    <ul>
+                        <li>✓ Test case chạy lặp đi lặp lại (mỗi release mới)</li>
+                        <li>✓ Có nhiều data variations (users khác nhau, browsers khác nhau)</li>
+                        <li>✓ Business logic phức tạp</li>
+                        <li>✓ Testing thủ công tốn quá nhiều thời gian</li>
+                    </ul>
+
+                    <h3>❌ KHÔNG NÊN AUTOMATION khi:</h3>
+                    <ul>
+                        <li>✗ Test case chỉ chạy 1 lần duy nhất (one-time feature)</li>
+                        <li>✗ UI thay đổi liên tục → phải sửa code liên tục</li>
+                        <li>✗ Cần visual testing (kiểm tra giao diện đẹp không)</li>
+                        <li>✗ Test quá phức tạp, khó viết code, khó maintain</li>
+                    </ul>
+
+                    <h3>✅ NÊN MANUAL khi:</h3>
+                    <ul>
+                        <li>✓ Exploratory Testing (tester tự khám phá features)</li>
+                        <li>✓ UX Testing (kiểm tra dễ dùng không)</li>
+                        <li>✓ Visual Testing (kiểm tra màu sắc, layout, font)</li>
+                        <li>✓ Testing features mới lần đầu tiên</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Mặc dù manual testing có rất nhiều vấn đề, nhưng nó vẫn không phải là xấu hoàn toàn. Manual testing vẫn rất cần thiết trong một số trường hợp nhất định. Thứ nhất là EXPLORATORY TESTING, khi mà tester không có test cases cụ thể, họ tự do khám phá ứng dụng để tìm kiếm các lỗi không mong đợi. Thứ hai là UX TESTING, nó là việc kiểm tra xem ứng dụng có dễ sử dụng không, giao diện có trực quan không, user experience có tốt không. Thứ ba là VISUAL TESTING, cần kiểm tra xem các màu sắc có đúng không, layout có đúng không, các animation có chạy đúng không. Thứ tư là TEST LẦN ĐẦU cho những feature mới. Trước khi bạn có thể automate một test, bạn cần phải hiểu rõ feature đó hoạt động như thế nào. Vì vậy, manual testing là một phần quan trọng của quá trình kiểm thử tổng thể, nhưng nó không phải là toàn bộ quá trình."</div>
+                </div>
+
+                <!-- SLIDE 11: SUMMARY TABLE -->
+                <div class="slide">
+                    <h2>📊 Tóm Tắt: Manual vs Automation</h2>
+                    
+                    <table class="comparison-table">
+                        <tr>
+                            <th style="width: 25%;">Tiêu Chí</th>
+                            <th style="width: 37.5%;">Manual Testing</th>
+                            <th style="width: 37.5%;">Automation Testing</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Tốc Độ</strong></td>
+                            <td>Chậm (phút/test)</td>
+                            <td>Nhanh (giây/test)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chi Phí Ban Đầu</strong></td>
+                            <td>Thấp</td>
+                            <td>Cao (phải viết code)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chi Phí Dài Hạn</strong></td>
+                            <td>Cao (phải thuê nhiều testers)</td>
+                            <td>Thấp (chạy tự động)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chính Xác</strong></td>
+                            <td>Dễ sai (con người mệt)</td>
+                            <td>Chính xác (máy tính không bao giờ sai)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>UX Testing</strong></td>
+                            <td>✅ Tốt</td>
+                            <td>❌ Kém</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scalability</strong></td>
+                            <td>❌ Kém (khó scale up)</td>
+                            <td>✅ Tốt (dễ chạy nhiều tests)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Repeatability</strong></td>
+                            <td>Khó (manual lặp lại dễ khác)</td>
+                            <td>Dễ (cùng code, kết quả giống)</td>
+                        </tr>
+                    </table>
+
+                    <div class="narration-box">🔊 "Kết luận là automation testing không phải để thay thế manual testing hoàn toàn. Chúng là COMPLEMENT - bổ sung cho nhau. Workflow ideal của một tester chuyên nghiệp sẽ như thế này. Đầu tiên, MANUAL TEST - tester khám phá feature mới, đảm bảo nó hoạt động, hiểu rõ behavior. Thứ hai, AUTOMATION TEST - automation engineer automate những test case lặp lại, những test case critical. Thứ ba, MANUAL TEST LẠI - tester khám phá edge cases, test UX, test visual, những thứ mà code không thể làm được. Thứ tư, AUTOMATION TEST LẠI - chạy automation test 24/7 để phát hiện những regression bugs hay những lỗi cũ quay trở lại. Đó là cách các công ty lớn như Google, Amazon, Facebook làm việc ngày nay. Chúng ta đã hoàn thành bài học về Manual vs Automation Testing. Trong bài tiếp theo, chúng ta sẽ tìm hiểu 4 loại khác nhau của automation testing."</div>
+                </div>
+
+                <!-- SLIDE 12: CONCLUSION -->
+                <div class="slide">
+                    <h2>🎬 Kết Luận</h2>
+                    
+                    <h3>Key Takeaways:</h3>
+                    <ul>
+                        <li><span class="emoji">🧑</span><strong>Manual Testing:</strong> Con người chạy tests thủ công → Chậm, dễ sai, khó scale</li>
+                        <li><span class="emoji">🤖</span><strong>Automation Testing:</strong> Máy tính chạy tests tự động → Nhanh, chính xác, dễ scale</li>
+                        <li><span class="emoji">⚙️</span><strong>Kết Hợp:</strong> KHÔNG phải chọn 1 loại → Dùng cả 2 để làm phụ trợ nhau</li>
+                    </ul>
+
+                    <h3>Workflow Ideal:</h3>
+                    <ul>
+                        <li>1️⃣ Developer viết unit tests (automation)</li>
+                        <li>2️⃣ QA chạy integration tests (automation)</li>
+                        <li>3️⃣ QA chạy exploratory testing (manual)</li>
+                        <li>4️⃣ QA kiểm tra UX/visual (manual)</li>
+                        <li>5️⃣ Automation test chạy nightly (automation)</li>
+                    </ul>
+
+                    <div class="success">
+                        ✅ <strong>Cả hai loại testing đều quan trọng!</strong><br>
+                        Không có automation testing mà không có manual testing là không đủ.<br>
+                        Không có manual testing mà chỉ có automation testing cũng không đủ.
+                    </div>
+
+                    <h3 style="margin-top: 25px;">Video Tiếp Theo:</h3>
+                    <p>Video 2 chúng ta sẽ học <strong>4 loại Test Automation</strong>:</p>
+                    <ul>
+                        <li>Unit Testing</li>
+                        <li>Integration Testing</li>
+                        <li>End-to-End (E2E) Testing</li>
+                        <li>API Testing</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Kết luận là automation testing không phải để thay thế manual testing hoàn toàn. Chúng là COMPLEMENT - bổ sung cho nhau. Workflow ideal của một tester chuyên nghiệp sẽ như thế này. Đầu tiên, MANUAL TEST - tester khám phá feature mới, đảm bảo nó hoạt động, hiểu rõ behavior. Thứ hai, AUTOMATION TEST - automation engineer automate những test case lặp lại, những test case critical. Thứ ba, MANUAL TEST LẠI - tester khám phá edge cases, test UX, test visual, những thứ mà code không thể làm được. Thứ tư, AUTOMATION TEST LẠI - chạy automation test 24/7 để phát hiện những regression bugs hay những lỗi cũ quay trở lại. Đó là cách các công ty lớn như Google, Amazon, Facebook làm việc ngày nay. Chúng ta đã hoàn thành bài học về Manual vs Automation Testing. Trong bài tiếp theo, chúng ta sẽ tìm hiểu 4 loại khác nhau của automation testing."</div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Previous</button>
+                    <button class="btn-primary" id="nextBtn">Next ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="slide-counter">
+                        <div id="slideCount">1 / 12</div>
+                    </div>
+                    <div class="progress-bar" style="margin: 20px 0;">
+                        <div class="progress-fill" id="sidebarProgress" style="width: 8.33%;"></div>
+                    </div>
+                </div>
+
+                                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links" style="list-style: none; font-size: 0.9em;">
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(0)" style="color: #667eea; text-decoration: none;">1. Intro</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(1)" style="color: #667eea; text-decoration: none;">2. Manual Định Nghĩa</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(2)" style="color: #667eea; text-decoration: none;">3. Manual Ví Dụ</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(3)" style="color: #667eea; text-decoration: none;">4. Manual Vấn Đề</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(4)" style="color: #667eea; text-decoration: none;">5. Automation Định Nghĩa</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(5)" style="color: #667eea; text-decoration: none;">6. Automation Code</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(6)" style="color: #667eea; text-decoration: none;">7. So Sánh Thời Gian</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(7)" style="color: #667eea; text-decoration: none;">8. Ưu Điểm</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(8)" style="color: #667eea; text-decoration: none;">9. Nhược Điểm</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(9)" style="color: #667eea; text-decoration: none;">10. Khi Nào Dùng</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(10)" style="color: #667eea; text-decoration: none;">11. Tóm Tắt</a></li>
+                        <li style="padding: 5px 0;"><a href="#" onclick="goToSlide(11)" style="color: #667eea; text-decoration: none;">12. Kết Luận</a></li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.9em; color: #666; text-align: center;">
+                        ⏱️ Thời lượng: ~30 phút<br>
+                        📚 PHASE 1 - Video 1<br>
+                        🎓 Automation Testing
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Automation Testing Tutorial | PHASE 1: Nền Tảng | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js"></script>
+    <script src="course-ui-demos.js"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlide();
+            return false;
+        }
+
+        const ttsPage = document.body.dataset.ttsPage;
+
+        function speak() {
+            const slide = slides[currentSlide];
+            if (!slide.querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+
+        function reset() {
+            currentSlide = 0;
+            updateSlide();
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        stopSpeakBtn.addEventListener('click', function () {
+            VietnameseTTS.stop();
+        });
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

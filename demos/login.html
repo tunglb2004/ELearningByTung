@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .brand { font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card" id="login-form">
+            <p class="brand">example.com</p>
+            <h1>Đăng nhập</h1>
+            <p class="lead">Nhập thông tin rồi bấm đăng nhập — giống bước test trong slide.</p>
+            <div class="demo-field">
+                <label for="username">Tên đăng nhập</label>
+                <input type="text" id="username" placeholder="user123" autocomplete="username">
+            </div>
+            <div class="demo-field">
+                <label for="password">Mật khẩu</label>
+                <input type="password" id="password" name="pass" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button type="button" class="demo-btn" id="login-btn" name="login">Đăng nhập</button>
+            <div id="error-msg" class="demo-msg err" role="alert"></div>
+            <div id="welcome-msg" class="demo-msg ok" role="status"></div>
+            <span id="welcome" class="sr-only"></span>
+            <p class="demo-foot">Gợi ý: user123 / pass123</p>
+        </div>
+    </div>
+    <script>
+        const users = {
+            user123: { pass: 'pass123', name: 'User 123' },
+            'john@example.com': { pass: 'password', name: 'John' }
+        };
+        const err = document.getElementById('error-msg');
+        const ok = document.getElementById('welcome-msg');
+        const welcomeHidden = document.getElementById('welcome');
+
+        document.getElementById('login-btn').onclick = function () {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            err.textContent = '';
+            ok.textContent = '';
+            welcomeHidden.textContent = '';
+            const acc = users[u];
+            if (acc && acc.pass === p) {
+                const msg = 'Welcome, ' + acc.name + '!';
+                ok.textContent = msg;
+                welcomeHidden.textContent = msg;
+            } else {
+                err.textContent = 'Sai tên đăng nhập hoặc mật khẩu.';
+            }
+        };
+    </script>
+</body>
+</html>

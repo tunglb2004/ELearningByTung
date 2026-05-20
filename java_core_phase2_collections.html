@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Core — Phần 2: Collections</title>
+    <style>
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 750px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-top: 22px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 280px;
+            border-left: 4px solid #2a5298;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #2a5298;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #138496;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c4a6e;
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2a5298;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffe8e8;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 0.95em;
+        }
+
+        .locator-example {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #2a5298;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .concept-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+</head>
+<body data-tts-page="java2">
+    <div class="container">
+        <div class="header">
+            <h1>☕ Java Core — Phần 2: Collections</h1>
+            <p>List · Set · Map — Collections Framework</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+<div class="slide active">
+
+                    <div class="intro-box-inner"><h2>👋 Collections Framework</h2>
+                <p>Collections giúp bạn lưu trữ và manipulate tập hợp các objects. Thay vì arrays cố định kích thước, Collections cho phép dynamic size. Framework cung cấp 3 interface chính: List, Set, Map, mỗi loại có multiple implementations.</p></div>
+                    <div class="learning-objectives"><h3>📚 Mục Tiêu Học Tập</h3>
+                <ul>
+                    <li>Hiểu List - Ordered, có index, cho phép duplicate</li>
+                    <li>Học Set - Unordered, unique values</li>
+                    <li>Nắm Map - Key-value pairs, fast lookup</li>
+                    <li>Biết khi nào dùng cái nào</li>
+                    <li>Áp dụng trong automation testing</li>
+                </ul></div>
+
+                    <div class="narration-box">🔊 "Chào mừng đến với phần Collections trong Java Core. Collections Framework giúp bạn lưu trữ và xử lý tập hợp dữ liệu linh hoạt hơn mảng cố định. Trong bài này chúng ta học List cho dữ liệu có thứ tự, Set cho giá trị duy nhất, và Map cho cặp khóa-giá trị."</div>
+                </div>
+
+                <div class="slide">
+<h2 >📋 List - Danh Sách Có Thứ Tự</h2>
+                <div class="section-body">
+                    <p><strong>List</strong> là ordered collection, có thể truy cập qua index (0-based), cho phép duplicate values.</p>
+                    
+                    <div class="concept-box">
+                        <strong>Implementation chính:</strong>
+                        <ul>
+                            <li><strong>ArrayList:</strong> Dynamic array, fast access by index O(1)</li>
+                            <li><strong>LinkedList:</strong> Linked list, fast insert/delete O(1), slow access O(n)</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>Phương thức chính:</strong></p>
+                    <div class="code-example">
+List&lt;String&gt; list = new ArrayList&lt;&gt;();
+list.add("Item1");           // Thêm element
+list.add(0, "Item0");        // Chèn tại index
+list.get(0);                 // Lấy element tại index
+list.remove("Item1");        // Xóa element
+list.size();                 // Lấy số elements
+list.contains("Item1");      // Kiểm tra có chứa
+list.clear();                // Xóa tất cả
+
+// Loop
+for (String item : list) { }
+for (int i = 0; i < list.size(); i++) { }
+                    </div>
+
+                    <p><strong>Khi dùng List:</strong> Test data tuần tự, test cases phải chạy theo thứ tự, results cần preserve thứ tự.</p>
+                </div>
+                    <div class="narration-box">🔊 "List là collection có thứ tự, truy cập theo index và cho phép trùng lặp. ArrayList phù hợp truy cập nhanh theo index, LinkedList phù hợp chèn xóa nhiều."</div>
+                </div>
+
+                <div class="slide">
+<h2 >🎯 Set - Tập Hợp Unique Values</h2>
+                <div class="section-body">
+                    <p><strong>Set</strong> là unordered collection, không cho phép duplicate, dùng để kiểm tra unique values nhanh.</p>
+                    
+                    <div class="concept-box">
+                        <strong>Implementation chính:</strong>
+                        <ul>
+                            <li><strong>HashSet:</strong> Hash table, O(1) lookup, unordered</li>
+                            <li><strong>TreeSet:</strong> Sorted set, O(log n) lookup, ordered</li>
+                            <li><strong>LinkedHashSet:</strong> Preserve insertion order</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>Phương thức chính:</strong></p>
+                    <div class="code-example">
+Set&lt;String&gt; set = new HashSet&lt;&gt;();
+set.add("Chrome");          // Return true nếu thêm được, false nếu duplicate
+set.remove("Chrome");       // Xóa element
+set.size();                 // Lấy số elements
+set.contains("Chrome");     // Kiểm tra có chứa
+set.clear();                // Xóa tất cả
+
+// Set operations
+set.addAll(otherSet);       // Union
+set.retainAll(otherSet);    // Intersection
+set.removeAll(otherSet);    // Difference
+                    </div>
+
+                    <p><strong>Khi dùng Set:</strong> Unique browsers, unique test IDs, unique usernames, ensure không có duplicates.</p>
+                </div>
+                    <div class="narration-box">🔊 "Set không cho phép phần tử trùng. Dùng Set khi cần danh sách browser duy nhất, test ID không trùng, hoặc kiểm tra nhanh phần tử đã tồn tại."</div>
+                </div>
+
+                <div class="slide">
+<h2 >🗝️ Map - Key-Value Pairs</h2>
+                <div class="section-body">
+                    <p><strong>Map</strong> lưu key-value pairs, keys unique, values có thể duplicate, O(1) lookup by key.</p>
+                    
+                    <div class="concept-box">
+                        <strong>Implementation chính:</strong>
+                        <ul>
+                            <li><strong>HashMap:</strong> Hash table, O(1) lookup, unordered</li>
+                            <li><strong>TreeMap:</strong> Sorted by key, O(log n) lookup</li>
+                            <li><strong>LinkedHashMap:</strong> Preserve insertion order</li>
+                        </ul>
+                    </div>
+
+                    <p><strong>Phương thức chính:</strong></p>
+                    <div class="code-example">
+Map&lt;String, Integer&gt; map = new HashMap&lt;&gt;();
+map.put("key", value);           // Thêm/update entry
+map.get("key");                  // Lấy value (null nếu không có)
+map.getOrDefault("key", 0);      // Get hoặc default value
+map.remove("key");               // Xóa entry
+map.size();                      // Lấy số entries
+map.containsKey("key");          // Kiểm tra key
+map.containsValue(value);        // Kiểm tra value
+map.keySet();                    // Lấy tất cả keys
+map.values();                    // Lấy tất cả values
+map.entrySet();                  // Lấy tất cả key-value pairs
+
+// Loop through Map
+for (Map.Entry&lt;String, Integer&gt; entry : map.entrySet()) {
+    String key = entry.getKey();
+    Integer value = entry.getValue();
+}
+                    </div>
+
+                    <p><strong>Khi dùng Map:</strong> Test data (username => password), locators (button => By.id), test results (testname => status), configuration.</p>
+                </div>
+                    <div class="narration-box">🔊 "Map lưu cặp key-value với key duy nhất. HashMap tra cứu O(1) phù hợp lưu locator, cấu hình username-password, hoặc map tên test sang trạng thái."</div>
+                </div>
+
+                <div class="slide">
+<h2 >⚖️ So Sánh List vs Set vs Map</h2>
+                <div class="section-body">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>Đặc điểm</th>
+                                <th>List</th>
+                                <th>Set</th>
+                                <th>Map</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Thứ tự</strong></td>
+                                <td>✅ Có (Ordered)</td>
+                                <td>❌ Không (Unordered)</td>
+                                <td>❌ Không</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Duplicate</strong></td>
+                                <td>✅ Cho phép</td>
+                                <td>❌ Không</td>
+                                <td>❌ Keys unique, values OK</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Truy cập</strong></td>
+                                <td>By index</td>
+                                <td>By object</td>
+                                <td>By key</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Performance</strong></td>
+                                <td>Get: O(1), Add/Remove middle: O(n)</td>
+                                <td>Add/Remove/Contains: O(1)</td>
+                                <td>Get/Put/Remove: O(1)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dùng khi</strong></td>
+                                <td>Cần thứ tự, sequential data</td>
+                                <td>Cần unique, cần fast lookup</td>
+                                <td>Cần key-value pairs, fast lookup</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3 style="margin-top: 30px; color: #667eea; font-size: 1.2em;">💡 Ví Dụ Thực Tế Trong Automation Testing</h3>
+                    <div class="code-example">
+// Test data
+List&lt;Map&lt;String, String&gt;&gt; testCases = new ArrayList&lt;&gt;();
+testCases.add(new HashMap&lt;&gt;() {{
+    put("username", "john");
+    put("password", "pass123");
+    put("expected", "Login Success");
+}});
+
+// Browsers to test
+Set&lt;String&gt; browsers = new HashSet&lt;&gt;();
+browsers.add("Chrome");
+browsers.add("Firefox");
+browsers.add("Safari");
+
+// Page locators
+Map&lt;String, String&gt; locators = new HashMap&lt;&gt;();
+locators.put("loginButton", "By.id('login')");
+locators.put("usernameInput", "By.name('username')");
+locators.put("passwordInput", "By.name('password')");
+
+// Test results
+Map&lt;String, String&gt; results = new HashMap&lt;&gt;();
+for (Map&lt;String, String&gt; testCase : testCases) {
+    for (String browser : browsers) {
+        String testName = testCase.get("username") + "_" + browser;
+        String result = runTest(testCase, browser, locators);
+        results.put(testName, result); // "john_Chrome" => "PASS"
+    }
+}
+                    </div>
+                </div>
+                    <div class="narration-box">🔊 "So sánh List, Set và Map: List có thứ tự và cho duplicate; Set unique; Map tra cứu theo key. Trong framework test, thường kết hợp cả ba."</div>
+                </div>
+
+                <div class="slide">
+                    <div class="recap-box"><h3 style="color: #667eea; margin-bottom: 10px;">🎓 Recap</h3>
+                <p>List, Set, Map là 3 collections chính. Chọn đúng cái cho đúng situation: List cho ordered data, Set cho unique values, Map cho key-value lookups. Trong automation testing, combine cả 3: List lưu test cases, Set lưu unique browsers, Map lưu locators và results.</p></div>
+                    <div class="narration-box">🔊 "Tóm lại, chọn đúng collection cho đúng bài toán. Tiếp theo học Exception Handling và Streams ở phần 3-4."</div>
+                </div>
+            </div>
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Trước</button>
+                    <button class="btn-primary" id="nextBtn">Tiếp ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Đặt lại</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 6</div>
+                </div>
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress"></div>
+                </div>
+                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. Giới thiệu</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. List</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. Set</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. Map</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. So sánh</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. Tóm tắt</a></li>
+                    </ul>
+                </div>
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~40 phút<br>
+                        📚 Java Core — Phần 2<br>
+                        📦 Collections
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2025 Automation Testing & Java Core | Java Core — Phần 2: Collections | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js?v=5"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); }
+            return false;
+        }
+        function speak() {
+            if (!slides[currentSlide].querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+        function reset() { currentSlide = 0; updateSlide(); }
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        updateSlide();
+    </script>
+</body>
+</html>

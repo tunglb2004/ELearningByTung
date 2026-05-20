@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Alert & Frame</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .btn-row button { flex: 1; min-width: 100px; padding: 9px 10px; border: none; border-radius: 8px; background: #4f46e5; color: #fff; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+        iframe { width: 100%; height: 100px; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; }
+        #status { font-size: 0.8rem; color: #64748b; margin-top: 10px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card">
+            <h1>Alert & iframe</h1>
+            <p class="lead">Mô phỏng switchTo().alert() và switchTo().frame().</p>
+            <div class="btn-row">
+                <button type="button" id="btn-alert">Alert</button>
+                <button type="button" id="btn-confirm">Confirm</button>
+            </div>
+            <p style="font-size:0.8rem;color:#475569;margin-bottom:6px">Khung thanh toán (iframe):</p>
+            <iframe id="payment-frame" title="payment" srcdoc="&lt;!DOCTYPE html&gt;&lt;body style='font-family:sans-serif;padding:10px;margin:0'&gt;&lt;p style='margin:0 0 8px;font-size:13px'&gt;Thanh toán&lt;/p&gt;&lt;button id='pay-btn' style='padding:6px 12px'&gt;Xác nhận&lt;/button&gt;&lt;/body&gt;"></iframe>
+            <p id="status">Chọn thao tác phía trên</p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('btn-alert').onclick = function () {
+            alert('Đây là hộp thoại Alert');
+            document.getElementById('status').textContent = 'Alert đã được đóng (accept)';
+        };
+        document.getElementById('btn-confirm').onclick = function () {
+            var ok = confirm('Bạn có chắc muốn tiếp tục?');
+            document.getElementById('status').textContent = ok ? 'Đã chọn OK' : 'Đã chọn Cancel';
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Thao tác nâng cao</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .demo-shell { max-width: 420px; }
+        .mini { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .mini-item { padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .mini-item h2 { font-size: 0.78rem; color: #64748b; margin-bottom: 8px; font-weight: 600; }
+        #dropdown { position: relative; display: inline-block; }
+        #dropdown-btn { padding: 8px 14px; background: #334155; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+        #submenu { display: none; position: absolute; top: 100%; left: 0; margin-top: 4px; background: #fff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px 12px; box-shadow: 0 4px 12px rgba(0,0,0,.1); font-size: 0.85rem; z-index: 2; }
+        #dropdown:hover #submenu { display: block; }
+        .drag-area { display: flex; gap: 12px; align-items: center; justify-content: center; }
+        #box1, #box2 { width: 72px; height: 72px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; text-align: center; font-weight: 600; }
+        #box1 { background: #fef3c7; border: 2px dashed #f59e0b; cursor: grab; }
+        #box2 { background: #dbeafe; border: 2px dashed #3b82f6; }
+        #element { padding: 8px 12px; background: #e0e7ff; border-radius: 6px; font-size: 0.85rem; display: inline-block; user-select: none; }
+        #ctx-msg { font-size: 0.75rem; color: #64748b; margin-top: 6px; min-height: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card" style="padding:16px">
+            <h1>Thao tác UI nâng cao</h1>
+            <p class="lead" style="margin-bottom:12px">Hover, kéo-thả, chuột phải — như Actions trong Selenium.</p>
+            <div class="mini">
+                <div class="mini-item">
+                    <h2>Menu (hover)</h2>
+                    <div id="dropdown">
+                        <button type="button" id="dropdown-btn">Mở menu ▼</button>
+                        <div id="submenu"><div id="submenu-item">Tùy chọn A</div></div>
+                    </div>
+                </div>
+                <div class="mini-item">
+                    <h2>Kéo & thả</h2>
+                    <div class="drag-area">
+                        <div id="box1" draggable="true">Kéo</div>
+                        <div id="box2">Thả</div>
+                    </div>
+                </div>
+                <div class="mini-item">
+                    <h2>Chuột phải</h2>
+                    <div id="element">Nhấn chuột phải</div>
+                    <p id="ctx-msg"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var b1 = document.getElementById('box1'), b2 = document.getElementById('box2');
+        b1.ondragstart = function (e) { e.dataTransfer.setData('text', '1'); };
+        b2.ondragover = function (e) { e.preventDefault(); };
+        b2.ondrop = function (e) {
+            e.preventDefault();
+            b2.appendChild(b1);
+            b2.textContent = 'OK';
+        };
+        document.getElementById('element').oncontextmenu = function (e) {
+            e.preventDefault();
+            document.getElementById('ctx-msg').textContent = 'Đã mở menu ngữ cảnh';
+        };
+    </script>
+</body>
+</html>

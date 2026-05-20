@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing — Tuần 3-4: Auth & Security</title>
+    <style>
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 750px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-top: 22px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 280px;
+            border-left: 4px solid #2a5298;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #2a5298;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #138496;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c4a6e;
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2a5298;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffe8e8;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 0.95em;
+        }
+
+        .locator-example {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #2a5298;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .concept-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .learning-objectives {
+            background: #f0f8ff;
+            border: 2px solid #2a5298;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .learning-objectives h4 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+        .learning-objectives ul {
+            margin-left: 20px;
+        }
+        .recap-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .intro-box-inner {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .slide h4 {
+            color: #2a5298;
+            font-size: 1.15em;
+            margin-top: 16px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+</head>
+<body data-tts-page="api2">
+    <div class="container">
+        <div class="header">
+            <h1>🔐 API Testing — Tuần 3-4</h1>
+            <p>Authentication · Authorization · JWT · Security Testing</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+<!-- SLIDE 1: INTRODUCTION & OBJECTIVES -->
+            <div class="slide active">
+                <h2>🎯 Tuần 3-4: Advanced API Testing Techniques</h2>
+                
+                <h3>Bài Học Hôm Nay - Buổi 9 (5 giờ): Authentication Methods</h3>
+                <p>Sau 10 năm làm QA testing API, tôi nhận ra: <span class="highlight-term">phần lớn bugs liên quan security đều ở authentication & authorization</span>. Buổi hôm nay chúng ta sẽ đi sâu vào điều này.</p>
+
+                <div class="learning-objectives">
+                    <h4>📚 Learning Objectives:</h4>
+                    <ul>
+                        <li><span class="emoji">✅</span>Hiểu rõ sự khác biệt giữa Authentication & Authorization</li>
+                        <li><span class="emoji">✅</span>Nắm 4 loại authentication methods (Basic, Bearer, API Key, OAuth)</li>
+                        <li><span class="emoji">✅</span>Thiết kế comprehensive test cases cho auth scenarios</li>
+                        <li><span class="emoji">✅</span>Hiểu JWT structure & token validation</li>
+                        <li><span class="emoji">✅</span>Test token expiration, refresh, & revocation</li>
+                        <li><span class="emoji">✅</span>Identify common authentication vulnerabilities</li>
+                    </ul>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Quan Trọng:</strong> Hầu hết developers chỉ test happy path của authentication. Các security bugs thường nằm ở:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Token không validate thực sự</li>
+                        <li>Token không check expiration</li>
+                        <li>Authorization bypass (401/403 confusion)</li>
+                        <li>Token được cache mãi không reset</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Chào mọi người! Hôm nay chúng ta bắt đầu Tuần 3-4 - phần ADVANCED API Testing. Tôi biết tuần 1-2 chúng ta đã học nền tảng. Nhưng hôm nay sẽ khác - sẽ là những kỹ thuật advanced, những bugs thực tế mà chúng ta gặp trong production projects. Cụ thể, hôm nay chúng ta tập trung vào: Authentication Methods . Tại sao quan trọng? Vì mỗi API request đều cần auth. Nếu authentication sai, thì cả security của hệ thống sai. Mình đã work 10 năm, đã find được hàng trăm bugs liên quan auth. Và pattern chúng thường giống nhau. Hôm nay chúng ta sẽ học: 1️⃣ Authentication vs Authorization - khác nhau thế nào? 2️⃣ 4 loại auth methods - each cách hoạt động 3️⃣ Cách test thực tế - production level 4️⃣ Common vulnerabilities - bugs bạn sẽ find Sau buổi này, bạn sẽ có confidence test bất cứ auth scenario nào. Let's go!"</div>
+
+                <div class="timestamp">
+                    ⏱️ Thời gian buổi: 5 giờ | Slide: 1/35 (Beginner → Advanced)
+                </div>
+            </div>
+
+                <!-- SLIDE 2: AUTHENTICATION vs AUTHORIZATION -->
+            <div class="slide">
+                <h2>🔑 Authentication vs Authorization</h2>
+                
+                <h3>Khái Niệm Cơ Bản</h3>
+                <p>Đây là concept MỤC TIÊU của buổi. Phải hiểu sâu. Rất nhiều engineers confuse hai cái này.</p>
+
+                <div class="diagram">
+┌─────────────────────────────────────────────────────────────┐
+│ AUTHENTICATION (Xác Thực - "WHO are you?")                  │
+├─────────────────────────────────────────────────────────────┤
+│ ✓ Prove your identity                                        │
+│ ✓ Using credentials: username/password, token, biometric    │
+│ ✓ Example: Login → prove you're John, not someone else      │
+│ ✓ Once authenticated → server gives you TOKEN               │
+│ ✓ HTTP Response: 401 Unauthorized (if auth fails)           │
+│ ✓ Question: "Are you really John?"                          │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ AUTHORIZATION (Phân Quyền - "What can you do?")             │
+├─────────────────────────────────────────────────────────────┤
+│ ✓ Check if authenticated user has permission                │
+│ ✓ Based on roles: admin, user, guest, moderator             │
+│ ✓ Example: John (user role) tries accessing /admin/reports  │
+│ ✓ Even if authenticated, may NOT be authorized              │
+│ ✓ HTTP Response: 403 Forbidden (if not authorized)          │
+│ ✓ Question: "Is John allowed to do this?"                   │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│ REAL WORLD ANALOGY (Dễ Hiểu)                                │
+├─────────────────────────────────────────────────────────────┤
+│ Airport Security:                                            │
+│                                                              │
+│ Authentication: Officer checks your ID & passport           │
+│   "Bạn là John Smith không?" → "Có, đây là ID của tôi"     │
+│                                                              │
+│ Authorization: Officer looks at your visa/boarding pass     │
+│   "Bạn có phép bay đến New York không?" → "Có, đây là..."  │
+│                                                              │
+│ Result:                                                      │
+│ - Authenticated ✓ + Authorized ✓ → Have access             │
+│ - Authenticated ✓ + NOT Authorized ✗ → No access (403)      │
+│ - NOT Authenticated ✗ → No access (401)                      │
+└─────────────────────────────────────────────────────────────┘
+                </div>
+
+                <h3>401 vs 403 - Sự Khác Biệt Quan Trọng</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>HTTP Status</th>
+                        <th>Tên Gọi</th>
+                        <th>Ý Nghĩa</th>
+                        <th>Nguyên Nhân</th>
+                        <th>Ví Dụ</th>
+                    </tr>
+                    <tr>
+                        <td><strong>401</strong></td>
+                        <td>Unauthorized</td>
+                        <td>Xác thực thất bại</td>
+                        <td>Không có token, token sai, token hết hạn</td>
+                        <td>GET /api/users (no Authorization header)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>403</strong></td>
+                        <td>Forbidden</td>
+                        <td>Không có quyền</td>
+                        <td>Đã authenticate nhưng không có permission</td>
+                        <td>GET /api/admin/logs (user role)</td>
+                    </tr>
+                </table>
+
+                <div class="success-box">
+                    <strong>💡 Pro Tip:</strong> Khi testing, luôn kiểm tra:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>401 scenarios:</strong> Không có token, invalid token, expired token</li>
+                        <li><strong>403 scenarios:</strong> Authenticated nhưng role không match</li>
+                        <li><strong>200 scenarios:</strong> Authenticated & authorized ✓</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Okay, concept đầu tiên: Authentication vs Authorization. Cái này rất important vì 70% testers confuse hai concept này. Authentication - nó về IDENTITY . Câu hỏi là: 'WHO ARE YOU?'. Bạn prove rằng bạn là John bằng cách provide credentials - email/password. Server verify credentials, nếu đúng → give you token. Token này giống như ID card của bạn - prove bạn đã authenticate. Authorization - nó về PERMISSION . Câu hỏi là: 'WHAT CAN YOU DO?'. Bạn đã prove bạn là John. Nhưng can you access /admin/logs? Đó là authorization check. Server look at John's role - nếu user role, không có permission → 403 Forbidden. Real world example: Airport. Officer check ID (authentication) - 'bạn là John Smith không?' Bạn show ID. Officer verify, okay John bạn authenticate rồi. Nhưng sau đó officer check boarding pass (authorization). 'Bạn có phép fly to New York không?' Nếu boarding pass là New York, okay ✓ bạn authorized. Nếu boarding pass là Tokyo, sorry - 403 bạn không authorized. Result của hai concept này: - Authenticated ✓ + Authorized ✓ = 200 OK, access granted - NOT Authenticated ✗ = 401 Unauthorized, please login first - Authenticated ✓ nhưng NOT Authorized ✗ = 403 Forbidden, you can't access this Rất important distinguish 401 vs 403. Vì bugs often là ở 403 - authorization bypass. Attacker authenticate successful, nhưng bypass authorization."</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 2/35 | Phần 1: 10 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 3: AUTHENTICATION FLOW -->
+            <div class="slide">
+                <h2>🔄 Authentication Flow - Behind The Scenes</h2>
+                
+                <h3>User Login Process (Step-by-Step)</h3>
+                <p>Đây là flow thực tế. Mỗi step này là một test point.</p>
+
+                <div class="diagram">
+STEP 1: Client sends credentials
+┌─────────────────────────────────────┐
+│ POST /api/auth/login                │
+│ {                                   │
+│   "email": "john@example.com",      │
+│   "password": "MyPassword123"       │
+│ }                                   │
+└────────────┬────────────────────────┘
+             │
+             ▼
+STEP 2: Server validates credentials
+┌─────────────────────────────────────┐
+│ 1. Check if email exists in DB      │
+│ 2. Hash incoming password           │
+│ 3. Compare with stored hash         │
+│ 4. Create token (JWT)               │
+│ 5. Store token in DB (optional)     │
+└────────────┬────────────────────────┘
+             │
+             ▼
+STEP 3: Server returns response
+┌─────────────────────────────────────┐
+│ HTTP 200 OK                         │
+│ {                                   │
+│   "token": "eyJhbGci...",           │
+│   "expiresIn": 3600,                │
+│   "user": {id: 1, name: "John"}     │
+│ }                                   │
+└────────────┬────────────────────────┘
+             │
+             ▼
+STEP 4: Client stores token securely
+┌─────────────────────────────────────┐
+│ localStorage (web)                  │
+│ sessionStorage                      │
+│ Keychain (iOS)                      │
+│ Keystore (Android)                  │
+└────────────┬────────────────────────┘
+             │
+             ▼
+STEP 5: Client uses token in next requests
+┌─────────────────────────────────────┐
+│ GET /api/users/me                   │
+│ Authorization: Bearer eyJhbGci...   │
+└────────────┬────────────────────────┘
+             │
+             ▼
+STEP 6: Server validates token
+┌─────────────────────────────────────┐
+│ 1. Extract token from header        │
+│ 2. Verify signature (using secret)  │
+│ 3. Check expiration (exp claim)     │
+│ 4. Load user from token             │
+│ 5. Proceed with request             │
+└────────────┬────────────────────────┘
+             │
+             ▼
+STEP 7: Return authenticated response
+┌─────────────────────────────────────┐
+│ HTTP 200 OK                         │
+│ {id: 1, name: "John", email: "..."} │
+└─────────────────────────────────────┘
+                </div>
+
+                <h3>Token Expiration & Refresh Flow</h3>
+                <div class="diagram">
+CLIENT REQUEST WITH EXPIRED TOKEN:
+  GET /api/users/me
+  Authorization: Bearer expired_token_3_days_ago
+
+SERVER VALIDATION:
+  Parse token → Check expiration → EXPIRED!
+  
+SERVER RESPONSE:
+  HTTP 401 Unauthorized
+  {
+    "error": "Token expired",
+    "error_code": "TOKEN_EXPIRED",
+    "message": "Please refresh your token"
+  }
+
+CLIENT REFRESH TOKEN:
+  POST /api/auth/refresh
+  { "refresh_token": "..." }
+
+SERVER GENERATES NEW TOKEN:
+  HTTP 200 OK
+  { 
+    "token": "new_jwt_token",
+    "expiresIn": 3600
+  }
+
+CLIENT RETRIES WITH NEW TOKEN:
+  GET /api/users/me
+  Authorization: Bearer new_jwt_token
+  → Success!
+                </div>
+
+                <div class="success-box">
+                    <strong>✅ Test Cases mỗi step:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Step 1:</strong> Test credentials validation (valid, invalid, missing)</li>
+                        <li><strong>Step 2:</strong> Test password hashing (must not be plaintext)</li>
+                        <li><strong>Step 3:</strong> Verify response contains token</li>
+                        <li><strong>Step 4:</strong> Verify client can store token</li>
+                        <li><strong>Step 5:</strong> Verify Authorization header format</li>
+                        <li><strong>Step 6:</strong> Verify token validation logic</li>
+                        <li><strong>Step 7:</strong> Verify user data returned correctly</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Ngay đây là authentication flow - quá quan trọng. Từ lúc user login cho đến lúc request data. Mỗi step đều là potential bug point. Step 1: Client send email + password. Simple. Nhưng test case ở đây: what if password wrong? Email không exist? Email null? These are our test cases. Step 2: Server validate. Very important step - nơi mà authentication logic nằm. Server check email exist. Then hash incoming password and compare with stored hash. WHY hash? Vì password tidak boleh disimpan plaintext. Ini adalah security requirement. Test case: verify password di database adalah hashed, tidak plaintext. Step 3: Server return token. Token này sẽ digunakan untuk all future requests. Ini adalah proof of authentication. Response should contain token, user info, expiration time. Test: verify token di response, verify user data correct, verify expiresIn value reasonable (not 0, not 999 years). Step 4: Client store token. Secure storage important. Not localStorage jika app sensitive data. Test: verify token dapat disimpan, dapat diakses, tidak corrupted. Step 5: Client use token. Format correct? 'Authorization: Bearer token'. Bukan 'Authorization: token'. Format must be exact. Test: wrong format, missing Bearer keyword, malformed token. Step 6: Server validate token. Signature validation - verify token tidak di-tamper. Expiration check - very important! Banyak bug di sini. Timestamp checking harus correct. Test: expired token, tampered token, token dengan invalid signature. Step 7: Return response. User data match what we expect? Tidak ada data leak? Test: verify correct user returned, verify no sensitive data exposed. Token expiration sangat important. Access token biasanya short-lived (1 hour). Refresh token longer-lived (7 days). When access token expired, client use refresh token untuk get new access token. Test: expired token behavior, refresh token logic, what if refresh token juga expired?"</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 3/35 | Phần 1: 15 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 4: BASIC AUTHENTICATION -->
+            <div class="slide">
+                <h2>🔐 LOẠI 1: Basic Authentication</h2>
+                
+                <h3>Khái Niệm</h3>
+                <p>Basic Auth: encode email:password menjadi Base64, send di header. <span class="highlight-term">Simple tapi NOT secure!</span></p>
+
+                <div class="diagram">
+CLIENT PREPARATION:
+  email:password = "john@example.com:MyPassword123"
+
+BASE64 ENCODING:
+  Base64(john@example.com:MyPassword123)
+  = am9obkBleGFtcGxlLmNvbTpNeVBhc3N3b3JkMTIz
+
+HTTP REQUEST:
+  GET /api/users
+  Authorization: Basic am9obkBleGFtcGxlLmNvbTpNeVBhc3N3b3JkMTIz
+
+SERVER VALIDATION:
+  1. Extract header value
+  2. Decode Base64
+  3. Split by colon: email = john@example.com, password = MyPassword123
+  4. Verify email exists
+  5. Hash incoming password, compare with DB
+  6. Return 200 OK or 401
+
+RESPONSE:
+  HTTP 200 OK
+  { data: [...] }
+                </div>
+
+                <h3>❌ Kelemahan Basic Auth</h3>
+                <div class="danger-box">
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Base64 is ENCODING, not ENCRYPTION!</strong> Sangat mudah decode. Tidak secure.</li>
+                        <li><strong>Password dikirim SETIAP REQUEST.</strong> Jika tanpa HTTPS → dapat di-sniff.</li>
+                        <li><strong>Password di-expose di HTTP header.</strong> Browser history, proxy logs, semua bisa lihat.</li>
+                        <li><strong>Tidak ada token expiration.</strong> Credentials valid selamanya sampai password di-change.</li>
+                        <li><strong>No permission granularity.</strong> Hanya semua-atau-nothing access.</li>
+                        <li><strong>Cache issue:</strong> Credentials mungkin di-cache browser, tidak aman.</li>
+                    </ul>
+                </div>
+
+                <h3>Test Cases untuk Basic Auth</h3>
+
+                <div class="test-case">
+TC_BASIC_001: Valid credentials
+  Request: GET /api/users
+           Authorization: Basic am9obkBleGFtcGxlLmNvbTpNeVBhc3N3b3JkMTIz
+  Expected: 200 OK, return data
+  Purpose: Happy path - verify auth works
+                </div>
+
+                <div class="test-case">
+TC_BASIC_002: Invalid password
+  Request: GET /api/users
+           Authorization: Basic am9obkBleGFtcGxlLmNvbTpXcm9uZ1Bhc3N3b3Jk
+  Expected: 401 Unauthorized
+           { "error": "Invalid credentials" }
+  Purpose: Wrong password should reject
+                </div>
+
+                <div class="test-case">
+TC_BASIC_003: User tidak exist
+  Request: GET /api/users
+           Authorization: Basic bm9ib2R5QGV4YW1wbGUuY29tOlBhc3N3b3JkMTIz
+  Expected: 401 Unauthorized
+           { "error": "Invalid credentials" }
+  Purpose: Non-existent user should reject (don't reveal user not found)
+                </div>
+
+                <div class="test-case">
+TC_BASIC_004: Missing Authorization header
+  Request: GET /api/users (no Authorization header)
+  Expected: 401 Unauthorized
+           { "error": "Missing authentication credentials" }
+  Purpose: Request tanpa auth harus reject
+                </div>
+
+                <div class="test-case">
+TC_BASIC_005: Malformed Basic auth (invalid Base64)
+  Request: GET /api/users
+           Authorization: Basic !!!invalid-base64!!!
+  Expected: 400 Bad Request atau 401 Unauthorized
+           { "error": "Invalid auth format" }
+  Purpose: Verify server validate Base64 format
+                </div>
+
+                <div class="test-case">
+TC_BASIC_006: Wrong Basic prefix
+  Request: GET /api/users
+           Authorization: Bearer am9obkBleGFtcGxlLmNvbTpNeVBhc3N3b3JkMTIz
+  Expected: 401 Unauthorized
+  Purpose: Format harus "Basic ", bukan "Bearer"
+                </div>
+
+                <div class="test-case">
+TC_BASIC_007: Empty email
+  Request: GET /api/users
+           Authorization: Basic Ojp0ZXN0 (Base64 of ":test")
+  Expected: 401 Unauthorized
+  Purpose: Email cannot be empty
+                </div>
+
+                <div class="test-case">
+TC_BASIC_008: Empty password
+  Request: GET /api/users
+           Authorization: Basic am9obkBleGFtcGxlLmNvbQ== (Base64 of "john@example.com:")
+  Expected: 401 Unauthorized atau 400 Bad Request
+  Purpose: Password cannot be empty
+                </div>
+
+                <h3>✅ Kapan Gunakan Basic Auth?</h3>
+                <div class="info-box">
+                    <ul style="margin-left: 20px;">
+                        <li>✓ Testing/Development environments saja</li>
+                        <li>✓ Internal APIs (tidak public)</li>
+                        <li>✓ Automated scripts yang tidak bisa handle tokens</li>
+                        <li>✓ HARUS pakai HTTPS (non-negotiable)</li>
+                    </ul>
+                </div>
+
+                <h3>❌ Kapan JANGAN Gunakan?</h3>
+                <div class="danger-box">
+                    <ul style="margin-left: 20px;">
+                        <li>✗ Production APIs</li>
+                        <li>✗ Mobile apps</li>
+                        <li>✗ Public APIs</li>
+                        <li>✗ Tanpa HTTPS</li>
+                        <li>✗ Sensitive data</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Basic Authentication - paling simple tapi also paling dangerous. Cuma encode email:password jadi Base64, send di header. Selesai. Tapi kenapa dangerous? Tiga reasons: 1️⃣ Base64 BUKAN encryption. Siapa saja bisa decode. Minta ke user email + password setiap request. Jika tanpa HTTPS, attacker bisa intercept di network. PASSWORD LEAK! 2️⃣ Password dikirim setiap request. Contrast with tokens - tokens generated server, tidak perlu send password ulang. Dengan basic auth, password di-expose setiap request. 3️⃣ Tidak ada expiration. Jika device dicuri dengan password tersimpan, attacker bisa access forever sampai password di-change. Test cases? - Valid credentials → 200 OK - Invalid password → 401 - User tidak exist → 401 (jangan reveal apakah user exist atau tidak) - Missing auth header → 401 - Malformed Base64 → 400/401 - Wrong auth type (Bearer instead of Basic) → 401 - Empty email atau password → 401 Kapan pakai? Hanya development, internal APIs, automated scripts. HARUS pakai HTTPS. Production? TIDAK BOLEH."</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 4/35 | Phần 2: 20 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 5: BEARER TOKEN (JWT) - PART 1 -->
+            <div class="slide">
+                <h2>🎫 LOẠI 2: Bearer Token Authentication (JWT)</h2>
+                
+                <h3>Konsep Utama</h3>
+                <p><span class="highlight-term">MOST COMMON authentication method</span> di modern APIs. Token generated server, client send di Authorization header.</p>
+
+                <h3>Login Process dengan Bearer Token</h3>
+                <div class="diagram">
+CLIENT LOGIN:
+  POST /api/auth/login
+  {
+    "email": "john@example.com",
+    "password": "MyPassword123"
+  }
+
+SERVER VALIDATES & CREATES JWT:
+  1. Validate credentials (check DB)
+  2. Generate JWT token dengan claims
+  3. Return token to client
+
+RESPONSE:
+  HTTP 200 OK
+  {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+              eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9l...",
+    "expiresIn": 3600,
+    "user": {id: 1, name: "John", email: "john@example.com"}
+  }
+
+CLIENT STORES TOKEN:
+  Save token in localStorage/sessionStorage/secure storage
+
+CLIENT MAKES REQUESTS WITH TOKEN:
+  GET /api/users/me
+  Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+
+SERVER VALIDATES TOKEN:
+  1. Extract token from header
+  2. Verify signature (using secret key)
+  3. Check expiration (exp claim)
+  4. Extract user info (sub claim)
+  5. Proceed with request
+
+RESPONSE:
+  HTTP 200 OK
+  {id: 1, name: "John", email: "john@example.com", ...}
+                </div>
+
+                <h3>JWT Structure (3 Parts)</h3>
+                <p>JWT format: <strong>Header.Payload.Signature</strong></p>
+
+                <div class="example-block">
+<strong>PART 1: HEADER (Algorithm & Type)</strong>
+Base64 Encoded:
+{
+  "alg": "HS256",    // Signing algorithm
+  "typ": "JWT"       // Token type
+}
+Encoded: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+
+<strong>PART 2: PAYLOAD (Claims - User Data)</strong>
+Base64 Encoded:
+{
+  "sub": "1234567890",          // Subject (user ID) - critical
+  "name": "John Doe",           // User name
+  "email": "john@example.com",  // User email
+  "role": "user",               // User role - important for auth
+  "iat": 1516239022,            // Issued at (timestamp)
+  "exp": 1516242622             // Expiration (timestamp) - critical
+}
+Encoded: eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lI...
+
+<strong>PART 3: SIGNATURE (Verification)</strong>
+HMACSHA256(
+  Base64Url(header) + "." + Base64Url(payload),
+  "your_secret_key_here"  // Server secret
+)
+Result: SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+<strong>FINAL JWT:</strong>
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lI...
+SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+                </div>
+
+                <h3>⭐ Critical Claims dalam JWT</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Claim</th>
+                        <th>Nama Panjang</th>
+                        <th>Purpose</th>
+                        <th>Test Focus</th>
+                    </tr>
+                    <tr>
+                        <td><strong>sub</strong></td>
+                        <td>Subject</td>
+                        <td>User ID (who is this token for?)</td>
+                        <td>Verify user ID correct, verify user retrieved correctly</td>
+                    </tr>
+                    <tr>
+                        <td><strong>exp</strong></td>
+                        <td>Expiration Time</td>
+                        <td>Unix timestamp ketika token expired</td>
+                        <td>Verify expired token rejected, verify reasonable TTL</td>
+                    </tr>
+                    <tr>
+                        <td><strong>iat</strong></td>
+                        <td>Issued At</td>
+                        <td>Unix timestamp ketika token created</td>
+                        <td>Verify timestamp is recent, verify correct ordering</td>
+                    </tr>
+                    <tr>
+                        <td><strong>role</strong></td>
+                        <td>User Role</td>
+                        <td>User role (admin, user, guest)</td>
+                        <td>Verify role based access control, verify role not tampered</td>
+                    </tr>
+                    <tr>
+                        <td><strong>aud</strong></td>
+                        <td>Audience</td>
+                        <td>API yang menerima token (api.example.com)</td>
+                        <td>Verify token valid hanya untuk API yang dituju</td>
+                    </tr>
+                </table>
+
+                <div class="success-box">
+                    <strong>💡 Pro Tip untuk Testing:</strong> Decode JWT token menggunakan jwt.io (online tool) untuk melihat payload claims. Verify:
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>✓ User ID (sub) match login user</li>
+                        <li>✓ Expiration time reasonable (1 jam, bukan 1 detik atau 1 tahun)</li>
+                        <li>✓ Role claim present & correct</li>
+                        <li>✓ Tidak ada sensitive data (password, credit card)</li>
+                        <li>✓ Signature is valid (jwt.io akan show green checkmark)</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Bagus! Sekarang Bearer Token - yang paling modern dan secure dibanding Basic Auth. Login flow mirip Basic Auth - kirim email + password. Tapi perbedaannya: server jangan langsung ask password lagi untuk setiap request. Instead, server generate token (JWT). Token ini adalah bukti authentication. Client simpan token, dan pakai untuk semua future requests. JWT structure: tiga parts - Header.Payload.Signature. Header: metadata tentang token - algorithm (HS256, RS256), type (JWT). Simple. Payload: THE MOST IMPORTANT - ini adalah user data dan claims. Claims itu custom fields. Standard claims: - 'sub' (subject) = user ID - critical untuk identify user - 'exp' (expiration) = token expired kapan. Timestamp format. HARUS check ini saat validate. - 'iat' (issued at) = token dibuat kapan - 'role' = user role, important untuk authorization Signature: Ini verify token tidak di-tamper. Server sign token dengan secret key. Jika attacker ubah payload, signature akan invalid. So when validating, server verify signature using secret key. If signature invalid → reject. Very important: Base64 encoding tidak encryption! Attacker bisa decode payload online di jwt.io. So jangan put sensitive data di JWT - no password, no credit card, no SSN. User bisa decode dan lihat. Advantage dibanding Basic Auth? 1️⃣ Password tidak dikirim setiap request - more secure 2️⃣ Token dapat di-expire - jika token leaked, akses hanya temporary 3️⃣ Token payload contain user info - no need query DB setiap request 4️⃣ Stateless - server tidak perlu store session Test untuk JWT: - Valid token → 200 - Expired token → 401 - Tampered token (modified payload) → 401 - Invalid signature → 401 - Token dengan wrong secret key → 401 "</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 5/35 | Phần 2: 25 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 6: JWT TEST CASES -->
+            <div class="slide">
+                <h2>🧪 JWT Test Cases - Production Level</h2>
+                
+                <h3>Comprehensive Test Cases untuk Bearer Token</h3>
+
+                <div class="test-case">
+TC_JWT_001: Valid token
+  Setup: User login, obtain valid token
+  Request: GET /api/users/me
+           Authorization: Bearer eyJhbGciOiJIUzI1NiI...
+  Expected: 200 OK
+           { id: 1, name: "John", email: "john@example.com" }
+  Purpose: Happy path - verify auth works with valid token
+  SQL: SELECT * FROM users WHERE id = 1 → verify data match response
+                </div>
+
+                <div class="test-case">
+TC_JWT_002: Missing Authorization header
+  Request: GET /api/users/me (no Authorization header)
+  Expected: 401 Unauthorized
+           { "error": "Missing authentication token" }
+  Purpose: Request tanpa token harus reject
+  SQL: Query harus tidak execute (early reject)
+                </div>
+
+                <div class="test-case">
+TC_JWT_003: Missing Bearer prefix
+  Setup: Obtain valid token = "eyJhbGciOiJIUzI1NiI..."
+  Request: GET /api/users/me
+           Authorization: eyJhbGciOiJIUzI1NiI...
+  Expected: 401 Unauthorized
+  Purpose: Format harus "Bearer token", bukan hanya token
+                </div>
+
+                <div class="test-case">
+TC_JWT_004: Wrong Bearer prefix
+  Setup: Obtain valid token
+  Request: GET /api/users/me
+           Authorization: Basic eyJhbGciOiJIUzI1NiI...
+  Expected: 401 Unauthorized
+  Purpose: Harus Bearer, bukan Basic, harus exact case sensitive
+                </div>
+
+                <div class="test-case">
+TC_JWT_005: Expired token
+  Setup: Use token yang sudah expired (check exp claim < current time)
+  Request: GET /api/users/me
+           Authorization: Bearer eyJhbGciOiJIUzI1NiI... (expired)
+  Expected: 401 Unauthorized
+           { "error": "Token has expired", "error_code": "TOKEN_EXPIRED" }
+  Purpose: Verify expiration validation works
+  Advanced: Check server compares exp claim with current timestamp correctly
+                </div>
+
+                <div class="test-case">
+TC_JWT_006: Tampered token (modified payload)
+  Setup: Get valid token
+          Decode & modify payload: change role from "user" to "admin"
+          Re-encode token (TAPI signature akan invalid karena payload changed)
+  Request: GET /api/users/me
+           Authorization: Bearer tampered_token
+  Expected: 401 Unauthorized
+           { "error": "Invalid token signature" }
+  Purpose: Verify signature validation prevents tampering
+  Critical: This is MAJOR security test. Prevent privilege escalation.
+                </div>
+
+                <div class="test-case">
+TC_JWT_007: Token dengan invalid signature
+  Setup: Generate token dengan different secret key
+         Server use "secret1" untuk sign, use "secret2" untuk verify
+  Request: GET /api/users/me
+           Authorization: Bearer token_with_wrong_secret
+  Expected: 401 Unauthorized
+           { "error": "Invalid token signature" }
+  Purpose: Verify signature validation with correct secret key
+                </div>
+
+                <div class="test-case">
+TC_JWT_008: Malformed token (invalid Base64)
+  Setup: Modify token dengan random characters
+  Request: GET /api/users/me
+           Authorization: Bearer !!!invalid!!!token!!!
+  Expected: 400 Bad Request atau 401 Unauthorized
+           { "error": "Invalid token format" }
+  Purpose: Graceful error handling untuk malformed tokens
+                </div>
+
+                <div class="test-case">
+TC_JWT_009: Token tanpa required claims
+  Setup: Create JWT tanpa "sub" claim (user ID)
+  Request: GET /api/users/me
+           Authorization: Bearer token_without_sub
+  Expected: 401 Unauthorized atau 500 Internal Server Error
+  Purpose: Verify required claims presence
+                </div>
+
+                <div class="test-case">
+TC_JWT_010: Token dengan future iat (issued at dalam masa depan)
+  Setup: Create JWT dengan iat > current_time
+  Request: GET /api/users/me
+           Authorization: Bearer token_future_iat
+  Expected: 401 Unauthorized (atau 200 - tergantung requirement)
+  Purpose: Edge case - token belum valid?
+  Note: Tergantung business requirement - some allow, some reject
+                </div>
+
+                <div class="test-case">
+TC_JWT_011: Multiple tokens dari same user
+  Setup: User login twice, dapat 2 tokens (token1, token2)
+  Request 1: GET /api/users/me
+             Authorization: Bearer token1
+  Request 2: GET /api/users/me
+             Authorization: Bearer token2
+  Expected: Both 200 OK
+  Purpose: Verify multiple active tokens supported (atau not, tergantung requirement)
+                </div>
+
+                <div class="test-case">
+TC_JWT_012: Token dari different user
+  Setup: User A login, get tokenA
+         User B login, get tokenB
+         User A try use tokenB
+  Request: GET /api/users/A_profile
+           Authorization: Bearer tokenB
+  Expected: 200 OK but return user B data (NOT user A)
+           OR 403 Forbidden (access denied)
+  Purpose: Verify token identify correct user, prevent access other users
+                </div>
+
+                <div class="test-case">
+TC_JWT_013: Token dari deleted user
+  Setup: User login, get token
+         Admin delete user dari database
+         Try use token
+  Request: GET /api/users/me
+           Authorization: Bearer token_from_deleted_user
+  Expected: 401 Unauthorized OR 404 Not Found
+  Purpose: Verify system handle deleted user properly
+                </div>
+
+                <h3>Advanced JWT Testing</h3>
+                <div class="warning-box">
+                    <strong>🔍 Security Testing - Common Vulnerabilities:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>None algorithm:</strong> Attacker modify alg from HS256 to "none", server tidak verify signature. Test this!</li>
+                        <li><strong>JWT algorithm confusion:</strong> Mix asymmetric (RS256) with symmetric (HS256) keys</li>
+                        <li><strong>Claims missing validation:</strong> Server tidak validate all claims</li>
+                        <li><strong>Timing attack:</strong> Signature comparison menggunakan string comparison instead of constant-time</li>
+                        <li><strong>Key leakage:</strong> Secret key exposed (check GitHub, logs, etc)</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Okay, sekarang test cases untuk JWT - ini penting banget. 13 test cases, dari simple sampai complex. First 4 cases - format validation: - Valid token → 200, should work - Missing header → 401 - Missing Bearer prefix → 401 - Wrong prefix (Basic instead Bearer) → 401 Next 4 cases - token validation: - Expired token → 401 CRITICAL. Server MUST check exp claim. Many developers forget this! - Tampered token (modify payload, signature invalid) → 401. THIS IS SECURITY CRITICAL. If not validated, attacker bisa claim role admin! - Invalid signature (different secret key) → 401 - Malformed Base64 → 400/401 Next few cases - claims validation: - Missing required claims like 'sub' → error - Future iat (issued at waktu depan) → tergantung requirement Edge cases: - Multiple tokens from same user → should both work - Token from different user → must return correct user data, prevent cross-user access - Token from deleted user → must reject atau return 404 Very important: Expiration checking dan signature validation . Ini dua hal paling sering buggy. Dan security testing? Check untuk algo confusion, claims missing validation, etc. These vulnerabilities bisa cause privilege escalation atau unauthorized access. Sangat dangerous!"</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 6/35 | Phần 2: 30 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 7: AUTHORIZATION TESTING -->
+            <div class="slide">
+                <h2>🛡️ AUTHORIZATION TESTING - The Forgotten Part</h2>
+                
+                <h3>Masalah Umum</h3>
+                <p><span class="highlight-term">70% bugs pada authorization, bukan authentication!</span> Developers sering lupa implement authorization check.</p>
+
+                <h3>Authorization Framework (3 Step)</h3>
+                <div class="diagram">
+FOR EVERY PROTECTED ENDPOINT:
+
+STEP 1: Is user authenticated?
+  - Check Authorization header
+  - Validate token
+  - Extract user info
+  Result: 401 if failed
+
+STEP 2: Does user have required role?
+  - Check user.role against endpoint requirement
+  - Example: endpoint require role="admin", user.role="user"
+  Result: 403 if failed
+
+STEP 3: Does user have required permission?
+  - Check granular permissions
+  - Example: user can only modify own profile, not others
+  - Example: user can only view documents assigned to them
+  Result: 403 if failed
+
+EXAMPLE: PUT /api/users/{id}
+
+Requirement:
+- Authentication: REQUIRED (401 if missing)
+- Role: admin OR (user AND own_user)
+- Permission: Can modify own user OR admin can modify any user
+- Data validation: New data must be valid
+
+TEST MATRIX:
+
+┌──────────────────────────────────────┬──────────────┐
+│ Scenario                             │ Expected     │
+├──────────────────────────────────────┼──────────────┤
+│ No auth header                       │ 401          │
+│ Invalid token                        │ 401          │
+│ User role, modify own profile        │ 200 OK       │
+│ User role, modify other user profile │ 403 Forbidden│
+│ Admin role, modify any user          │ 200 OK       │
+│ Guest role, any modify               │ 403 Forbidden│
+└──────────────────────────────────────┴──────────────┘
+                </div>
+
+                <h3>Role-Based Access Control (RBAC)</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Role</th>
+                        <th>Permissions</th>
+                        <th>Test Focus</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Admin</strong></td>
+                        <td>All endpoints, all data, delete users, view logs</td>
+                        <td>Verify admin can access all protected endpoints. Verify admin can modify other users data.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>User</strong></td>
+                        <td>Own profile, own orders, not admin endpoints</td>
+                        <td>Verify user can access own data. Verify user CANNOT access other users data (403). Verify user CANNOT access admin endpoints (403).</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Guest/Public</strong></td>
+                        <td>Limited endpoints, read-only, no data modification</td>
+                        <td>Verify guest cannot create/modify/delete. Verify guest cannot access protected data.</td>
+                    </tr>
+                </table>
+
+                <h3>Cross-User Access Prevention (Critical!)</h3>
+                <div class="danger-box">
+                    <strong>🚨 MAJOR VULNERABILITY PATTERN:</strong> User A dapat access User B data
+                    <div style="margin-top: 10px;">
+User A token (sub: 1, role: "user")
+  GET /api/users/2/profile  ← trying to access User B's profile
+  
+Server check:
+  ❌ BAD: Just check authenticated (token valid)
+  ✓ GOOD: Check authenticated AND user.id == requested_user_id
+  
+Expected: 403 Forbidden
+  { "error": "Cannot access other user's profile" }
+                    </div>
+                </div>
+
+                <h3>Authorization Test Cases</h3>
+
+                <div class="test-case">
+TC_AUTH_001: No authentication - should reject
+  Request: DELETE /api/users/1 (no Authorization header)
+  Expected: 401 Unauthorized
+  Purpose: Protected endpoint must require auth
+                </div>
+
+                <div class="test-case">
+TC_AUTH_002: Authenticated but insufficient role
+  Setup: User with role="user"
+  Request: GET /api/admin/logs
+           Authorization: Bearer user_token
+  Expected: 403 Forbidden
+           { "error": "Insufficient permissions" }
+  Purpose: Verify role-based access control
+                </div>
+
+                <div class="test-case">
+TC_AUTH_003: Cross-user access prevention
+  Setup: User A login, get tokenA (user.id = 1)
+  Request: GET /api/users/2/profile
+           Authorization: Bearer tokenA
+  Expected: 403 Forbidden
+           { "error": "Cannot access other user's profile" }
+  Purpose: CRITICAL - prevent users accessing each other's data
+  SQL: Verify query not executed (early authorization check)
+                </div>
+
+                <div class="test-case">
+TC_AUTH_004: Own data access allowed
+  Setup: User A login, get tokenA (user.id = 1)
+  Request: GET /api/users/1/profile
+           Authorization: Bearer tokenA
+  Expected: 200 OK
+           { id: 1, name: "John", email: "john@example.com" }
+  Purpose: User dapat access own profile
+                </div>
+
+                <div class="test-case">
+TC_AUTH_005: Admin access - any user data
+  Setup: Admin login, get admin_token
+  Request: GET /api/users/2/profile
+           Authorization: Bearer admin_token
+  Expected: 200 OK
+           { id: 2, name: "Jane", ... }
+  Purpose: Admin can access any user's data
+                </div>
+
+                <div class="test-case">
+TC_AUTH_006: Admin deletion - any user
+  Setup: Admin login
+  Request: DELETE /api/users/2
+           Authorization: Bearer admin_token
+  Expected: 204 No Content
+  SQL: SELECT * FROM users WHERE id = 2 → NULL (deleted)
+  Purpose: Admin can delete any user
+                </div>
+
+                <div class="test-case">
+TC_AUTH_007: User deletion - self only
+  Setup: User login with id=1
+  Request: DELETE /api/users/1
+           Authorization: Bearer user_token
+  Expected: 204 No Content (can delete own account)
+  Purpose: User can delete self account
+                </div>
+
+                <div class="test-case">
+TC_AUTH_008: User deletion - others forbidden
+  Setup: User login with id=1
+  Request: DELETE /api/users/2
+           Authorization: Bearer user_token
+  Expected: 403 Forbidden
+           { "error": "Cannot delete other users" }
+  Purpose: User cannot delete other users
+                </div>
+
+                <div class="test-case">
+TC_AUTH_009: Permission hierarchy - higher role bypasses lower
+  Setup: Admin request user endpoint
+  Request: GET /api/users/1/profile (user endpoint)
+           Authorization: Bearer admin_token
+  Expected: 200 OK
+  Purpose: Admin can access user endpoints (hierarchical permission)
+                </div>
+
+                <div class="test-case">
+TC_AUTH_010: Privilege escalation attempt
+  Setup: User try to change own role to admin
+  Request: PUT /api/users/1
+           Authorization: Bearer user_token
+           Body: { "name": "John", "role": "admin" }
+  Expected: 403 Forbidden OR field ignored
+  Purpose: User cannot escalate own privilege
+  Advanced: Verify role field not updated if not admin
+                </div>
+
+                <div class="test-case">
+TC_AUTH_011: Role-based endpoint access
+  Setup: Guest user login (if allow)
+  Request: POST /api/users/{id}/orders (requires user+ role)
+           Authorization: Bearer guest_token
+  Expected: 403 Forbidden
+  Purpose: Guest cannot create orders
+                </div>
+
+                <div class="test-case">
+TC_AUTH_012: Permission per resource
+  Setup: User A, User B - both users
+         Task 1 assigned to User A
+         Task 2 assigned to User B
+  Request: GET /api/tasks/2 (Task assigned to User B)
+           Authorization: Bearer token_userA
+  Expected: 404 Not Found (not visible) OR 403 Forbidden
+  Purpose: User can only access assigned resources
+                </div>
+
+                <div class="test-case">
+TC_AUTH_013: Concurrent requests - authorization consistency
+  Setup: 2 simultaneous requests from same user
+  Request 1: GET /api/users/1
+  Request 2: GET /api/users/2
+           (both from User A token)
+  Expected: Request 1 → 200, Request 2 → 403
+  Purpose: Verify authorization checked per request, not cached
+                </div>
+
+                <div class="narration-box">🔊 "Okay, sekarang authorization - bagian yang most developers lupakan. Authorization itu bukan tentang 'apakah user authenticate' - itu authentication. Authorization itu tentang 'apakah authenticated user boleh do action X on resource Y'. Framework yang simple: Step 1: Is user authenticated? Check token. If invalid → 401. Step 2: Does user have right role? Check role claim in token. If no match → 403. Step 3: Does user have permission untuk resource ini? Check granular permissions. If not → 403. Example: PUT /api/users/2 - user want modify user 2's profile. Step 1: Check auth header &amp; token → valid ✓ Step 2: User role? 'user' role. Need admin or own user. Check if user.id == 2? No, user.id = 1. → 403 Most important test: Cross-user access prevention . This is THE critical vulnerability. User A mencoba access User B data. If not proper check, User A bisa modify/delete User B data! This is data breach. How to test cross-user? Simple: 1. User A login, get token, note user.id = 1 2. User A try GET /api/users/2/profile 3. Expected: 403 Forbidden (not 200 OK!) Privilege escalation? User try change role dari 'user' ke 'admin' dalam PUT request body. Server should: - Reject dengan 403 - Or silently ignore field (tidak update role) - Never trust role dari request body! Role harus from token! This section sangat important untuk interview. When asked 'how do you test authorization?' answer itu harus include: 1. Role-based access control 2. Cross-user access prevention 3. Permission hierarchy 4. Privilege escalation attempts "</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 7/35 | Phần 3: 45 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 8: DATABASE VERIFICATION -->
+            <div class="slide">
+                <h2>💾 Database Verification - The Secret Weapon</h2>
+                
+                <h3>API Response ≠ Actual Data Saved</h3>
+                <p><span class="highlight-term">CRITICAL MINDSET:</span> API return 201 Created doesn't mean data actually saved in database!</p>
+
+                <div class="example-block">
+REAL BUG EXAMPLE:
+
+API REQUEST:
+  POST /api/users
+  { "name": "Jane", "email": "jane@example.com" }
+
+API RESPONSE:
+  HTTP 201 Created
+  { "id": 100, "name": "Jane", "email": "jane@example.com", "createdAt": "2024-01-01T10:00:00Z" }
+
+TESTER CHECK (incorrect):
+  ✓ Status code 201? YES
+  ✓ Response contain id, name, email? YES
+  Conclusion: Test PASSED ✓
+
+DATABASE CHECK (what should do):
+  SELECT * FROM users WHERE id = 100
+
+RESULT: EMPTY! (no rows)
+
+BUG FOUND: Data NOT saved to database!
+Possible causes:
+- Transaction not committed
+- Database connection lost
+- Write permission missing
+- Constraints violation (silent failure)
+- Side-effect failed (audit log, etc)
+                </div>
+
+                <h3>3-Step Database Verification</h3>
+                <div class="diagram">
+STEP 1: MAKE API REQUEST
+  POST /api/users
+  Request body: { name: "Jane", email: "jane@example.com" }
+  Response: 201 Created
+           { id: 100, name: "Jane", email: "jane@example.com", createdAt: "..." }
+  Extract: id = 100
+
+STEP 2: QUERY DATABASE
+  SELECT * FROM users WHERE id = 100
+  
+  Expected result:
+  ├─ Row exist
+  ├─ name = "Jane"
+  ├─ email = "jane@example.com"
+  ├─ created_at ≈ response.createdAt (within 1 second)
+  ├─ updated_at = NULL or recent
+  └─ Other fields match or default values
+
+STEP 3: VERIFY CONSISTENCY
+  Response.name == DB.name ✓
+  Response.email == DB.email ✓
+  Response.createdAt ≈ DB.created_at ✓ (±1 second acceptable)
+  Response.id == DB.id ✓
+                </div>
+
+                <h3>Database Test Cases</h3>
+
+                <div class="test-case">
+TC_DB_001: Verify CREATE data persistence
+  API Request: POST /api/users
+               { "name": "John", "email": "john@example.com" }
+  API Response: 201 Created
+               { "id": 1, "name": "John", "email": "john@example.com", "createdAt": "2024-01-01T10:00:00Z" }
+  Extract: user_id = 1
+  
+  DB Query: SELECT * FROM users WHERE id = 1
+  Expected:
+    id: 1
+    name: "John"
+    email: "john@example.com"
+    created_at: "2024-01-01T10:00:00Z" (±1 second)
+  
+  Verify:
+    ✓ Row exists
+    ✓ All fields match response
+    ✓ Timestamp within 1 second
+                </div>
+
+                <div class="test-case">
+TC_DB_002: Verify UPDATE data changes
+  API Request: PUT /api/users/1
+               { "name": "Jane", "email": "jane@example.com" }
+  API Response: 200 OK
+               { "id": 1, "name": "Jane", "email": "jane@example.com", "updatedAt": "2024-01-01T11:00:00Z" }
+  Extract: updated_time = 2024-01-01T11:00:00Z
+  
+  DB Query: SELECT * FROM users WHERE id = 1
+  Expected:
+    name: "Jane" (changed from "John")
+    email: "jane@example.com" (changed from "john@example.com")
+    updated_at: "2024-01-01T11:00:00Z" (±1 second, updated)
+    created_at: "2024-01-01T10:00:00Z" (unchanged)
+  
+  Verify:
+    ✓ Fields updated correctly
+    ✓ updated_at changed
+    ✓ created_at NOT changed
+                </div>
+
+                <div class="test-case">
+TC_DB_003: Verify DELETE data removed
+  Before DELETE:
+    DB Query: SELECT COUNT(*) FROM users WHERE id = 1
+    Result: 1 row
+  
+  API Request: DELETE /api/users/1
+  API Response: 204 No Content
+  
+  After DELETE:
+    DB Query: SELECT COUNT(*) FROM users WHERE id = 1
+    Result: 0 rows
+  
+  Verify:
+    ✓ User completely removed
+    ✓ No orphan record exists
+                </div>
+
+                <div class="test-case">
+TC_DB_004: Verify CASCADE DELETE
+  Requirement: Delete user → All user's orders deleted
+  
+  Setup:
+    DB: User 1 has 5 orders in orders table
+    SELECT COUNT(*) FROM orders WHERE user_id = 1
+    Result: 5
+  
+  API Request: DELETE /api/users/1
+  API Response: 204 No Content
+  
+  After DELETE:
+    DB Query: SELECT COUNT(*) FROM users WHERE id = 1
+    Result: 0 rows ✓
+    
+    DB Query: SELECT COUNT(*) FROM orders WHERE user_id = 1
+    Result: 0 rows ✓ (cascade deleted)
+  
+  Verify:
+    ✓ User deleted
+    ✓ All orders cascade deleted
+    ✓ No orphan records
+                </div>
+
+                <div class="test-case">
+TC_DB_005: Verify Data Type Correctness
+  API Request: POST /api/products
+               { "name": "Laptop", "price": 999.99, "quantity": 10 }
+  API Response: 201 Created
+               { "id": 1, "name": "Laptop", "price": 999.99, "quantity": 10 }
+  
+  DB Query: SELECT * FROM products WHERE id = 1
+  Expected:
+    name: "Laptop" (STRING type)
+    price: 999.99 (DECIMAL/FLOAT, not STRING "999.99")
+    quantity: 10 (INTEGER, not "10")
+  
+  Verify:
+    ✓ Correct data types in database
+    ✓ Not stored as string
+    ✓ Can do arithmetic (price * quantity)
+                </div>
+
+                <div class="test-case">
+TC_DB_006: Verify Constraints Enforced
+  Requirement: email unique constraint
+  
+  Setup: User 1 dengan email "john@example.com"
+  
+  API Request: POST /api/users
+               { "name": "Jane", "email": "john@example.com" }
+  Expected: 400 Bad Request atau 409 Conflict
+           { "error": "Email already exists" }
+  
+  DB Query: SELECT COUNT(*) FROM users WHERE email = "john@example.com"
+  Result: 1 (tidak 2, constraint enforced)
+  
+  Verify:
+    ✓ Duplicate not inserted
+    ✓ Constraint violation caught
+                </div>
+
+                <div class="test-case">
+TC_DB_007: Verify Default Values
+  API Request: POST /api/users
+               { "name": "John", "email": "john@example.com" }
+               (no "status" field)
+  API Response: 201 Created
+               { "id": 1, "name": "John", "status": "active" }
+  
+  DB Query: SELECT status FROM users WHERE id = 1
+  Result: "active" (default value applied)
+  
+  Verify:
+    ✓ Default value applied from database
+    ✓ Not NULL, has correct default
+                </div>
+
+                <div class="test-case">
+TC_DB_008: Verify Transaction - All or Nothing
+  Requirement: Transfer money (atomic operation)
+  
+  Scenario:
+    Account A: $1000
+    Account B: $500
+    Transfer: A -> B $200
+  
+  API Request: POST /api/transfers
+               { "from_id": A, "to_id": B, "amount": 200 }
+  
+  If transaction commit:
+    DB: Account A = $800, Account B = $700 ✓
+  
+  If transaction fail (network error, etc):
+    DB: Account A = $1000, Account B = $500 ✓
+  
+  (Not: A = $800, B = $500 - inconsistent!)
+  
+  Verify:
+    ✓ Both updates success OR both fail
+    ✓ No partial updates
+                </div>
+
+                <div class="test-case">
+TC_DB_009: Verify Audit Log Created
+  Requirement: Every user modification logged
+  
+  API Request: PUT /api/users/1
+               { "name": "Jane" }
+  
+  DB Query: SELECT * FROM audit_logs WHERE user_id = 1 ORDER BY created_at DESC LIMIT 1
+  Expected:
+    action: "UPDATE"
+    entity: "users"
+    entity_id: 1
+    old_value: { "name": "John" }
+    new_value: { "name": "Jane" }
+    changed_by: current_user_id
+    timestamp: recent
+  
+  Verify:
+    ✓ Log entry created
+    ✓ Correct action type
+    ✓ Old and new values correct
+    ✓ Timestamp recent
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ Common Database Issues Found by Testing:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Data not saved at all (transaction not committed)</li>
+                        <li>Data saved with wrong values</li>
+                        <li>Relationships not created (foreign keys)</li>
+                        <li>Constraints not enforced</li>
+                        <li>Side effects not executed (audit logs, notifications)</li>
+                        <li>Timestamp not created/updated</li>
+                        <li>Default values not applied</li>
+                        <li>Cascade deletes not working (orphan records)</li>
+                        <li>Transactions not atomic (partial updates)</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Ini adalah secret weapon dari testers yang bagus. Database verification. Banyak testers skip ini. Mereka hanya check API response - 201 Created? Okay test passed. Tapi data tidak ada di database! Real bug contoh terjadi banyak kali: - API response 201 Created, data returned - But query database → empty! Why? Maybe: - Transaction not committed - Write permission missing - Constraint validation happen after response sent - Side effect failed (like audit log) Testing approach simple - 3 steps: 1. Make API request, extract ID dari response 2. Query database dengan ID 3. Compare response dengan database Must verify: - Semua fields ada dan correct - Data types correct (tidak string ketika integer) - Timestamp realistic (dalam 1 detik dari request) - Default values applied - Constraints enforced - Relationships created - Audit logs created Special attention untuk: - Cascade deletes (delete user → all orders deleted) - Transactions (transfer money - both account updated atau both not) - Side effects (notification sent, audit log created) Ini adalah skill yang separate you dari junior testers. Junior check API response sahaja. Senior testers always verify database. That's why companies hire senior testers - find more bugs."</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 8/35 | Phần 4: 60 phút (End of Buoi 9)
+                </div>
+            </div>
+
+                <!-- SLIDE 9: SUMMARY & WRAP UP -->
+            <div class="slide">
+                <h2>📋 Summary - Buổi 9: Key Takeaways</h2>
+                
+                <h3>Concepts Learned</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Concept</th>
+                        <th>Definition</th>
+                        <th>Test Focus</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Authentication</strong></td>
+                        <td>"WHO are you" - Verify identity</td>
+                        <td>Valid/invalid credentials, token validation, expiration</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Authorization</strong></td>
+                        <td>"WHAT can you do" - Check permission</td>
+                        <td>Role-based access, cross-user prevention, privilege escalation</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JWT Structure</strong></td>
+                        <td>Header.Payload.Signature</td>
+                        <td>Signature validation, claim validation, token tampering</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Database Verification</strong></td>
+                        <td>Verify data actually saved</td>
+                        <td>Compare API response with DB data, cascade deletes, transactions</td>
+                    </tr>
+                </table>
+
+                <h3>401 vs 403 - Never Confuse</h3>
+                <div class="success-box">
+                    <strong>✅ 401 Unauthorized:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>Missing authentication</li>
+                        <li>Invalid/expired token</li>
+                        <li>Wrong credentials</li>
+                        <li>Test: Request without token, wrong token, expired token</li>
+                    </ul>
+                </div>
+                
+                <div class="danger-box">
+                    <strong>❌ 403 Forbidden:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>User authenticated but not authorized</li>
+                        <li>Role/permission mismatch</li>
+                        <li>Cannot access other user's data</li>
+                        <li>Test: User role accessing admin endpoint, cross-user access</li>
+                    </ul>
+                </div>
+
+                <h3>4 Authentication Methods Learned</h3>
+                <div class="example-block">
+1️⃣ <strong>Basic Auth</strong>
+   Format: Authorization: Basic Base64(email:password)
+   Security: LOW (password sent every request)
+   Use: Development only
+
+2️⃣ <strong>Bearer Token (JWT)</strong>
+   Format: Authorization: Bearer eyJhbGciOiJIUzI1NiI...
+   Security: MEDIUM-HIGH (token-based, can expire)
+   Use: Production APIs (most common)
+
+3️⃣ <strong>API Key</strong>
+   Format: Authorization: ApiKey abc123xyz
+   or: X-API-Key: abc123xyz
+   Security: MEDIUM (simple, no expiration)
+   Use: Public APIs, internal services
+
+4️⃣ <strong>OAuth 2.0</strong>
+   Format: Authorization: Bearer access_token
+   Security: HIGH (delegated authentication)
+   Use: Third-party integrations
+                </div>
+
+                <h3>Test Case Checklist</h3>
+                <div class="learning-objectives">
+                    <h4>For EVERY Protected Endpoint:</h4>
+                    <ul>
+                        <li>☐ Test without authentication (401)</li>
+                        <li>☐ Test with invalid token (401)</li>
+                        <li>☐ Test with expired token (401)</li>
+                        <li>☐ Test with valid token but insufficient role (403)</li>
+                        <li>☐ Test cross-user access attempt (403)</li>
+                        <li>☐ Test with valid token + valid role (200)</li>
+                        <li>☐ Verify database data after create/update/delete</li>
+                        <li>☐ Verify cascade deletes working</li>
+                        <li>☐ Verify transaction atomicity</li>
+                        <li>☐ Verify audit logs created</li>
+                    </ul>
+                </div>
+
+                <h3>Interview Cheat Sheet</h3>
+                <div class="warning-box">
+                    <strong>🔥 STATEMENTS TO IMPRESS INTERVIEWERS:</strong>
+                    <div style="margin-top: 10px;">
+                        1. "I test 401 and 403 separately - authentication vs authorization"<br>
+                        2. "I always verify database after API POST/PUT/DELETE - API response ≠ actual save"<br>
+                        3. "I test cross-user access prevention - critical security"<br>
+                        4. "I verify token expiration is working - many apps forget this"<br>
+                        5. "I test cascade deletes to prevent orphan records"<br>
+                        6. "I verify audit logs created for all modifications"<br>
+                        7. "I check JWT signature validation - prevent tampering"<br>
+                        8. "I test role hierarchy and permission matrix"<br>
+                    </div>
+                </div>
+
+                <h3>Next Steps</h3>
+                <div class="info-box">
+                    <strong>🎯 Buổi 10 (Next Week):</strong><br>
+                    - API Key Authentication<br>
+                    - OAuth 2.0 flows<br>
+                    - Rate limiting & throttling<br>
+                    - Security vulnerabilities (SQL injection, XSS, CSRF)<br>
+                    - Real project scenarios & hands-on testing<br><br>
+                    
+                    <strong>🏠 Homework:</strong><br>
+                    1. Decode JWT tokens using jwt.io<br>
+                    2. Design test cases for your current project<br>
+                    3. Practice database queries for verification<br>
+                    4. Review authentication section from course materials
+                </div>
+
+                <div class="narration-box">🔊 "Okay! Kita selesai buổi 9. Banyak yang learned - authentication, authorization, JWT, database verification. Key takeaways: 1️⃣ Authentication = WHO, Authorization = WHAT 2️⃣ 401 vs 403 very different - test both 3️⃣ JWT = most common, learn signature validation 4️⃣ Always verify database - API response ≠ actual data 5️⃣ Cross-user access = critical security vulnerability For homework, decode real JWT tokens. Practice write test cases. Practice database queries. Buổi tới, kita cover API Key, OAuth, rate limiting, security vulnerabilities. Plus real project scenarios. Get ready! Questions? Yang mana part confusing? Yang mana want deep dive? Tanya sekarang! Good work everyone. Sampai buổi tới!"</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 9/35 | Wrap Up: 5 phút | Total: 65 phút
+                </div>
+            </div>
+
+                <!-- SLIDE 10: INTERVIEW PREPARATION -->
+            <div class="slide">
+                <h2>🎓 Interview Preparation - Advanced Auth Testing</h2>
+                
+                <h3>Common Interview Questions & Answers</h3>
+
+                <div class="example-block">
+<strong>Q1: "How do you test authentication?"</strong>
+
+<strong>Model Answer:</strong>
+"I test authentication at multiple levels:
+
+1. Format validation:
+   - Missing Authorization header → 401
+   - Invalid token format → 401
+   - Wrong auth type (Basic vs Bearer) → 401
+
+2. Token validation:
+   - Valid token → 200
+   - Expired token → 401
+   - Invalid signature (tampered token) → 401
+
+3. Credential validation:
+   - Valid credentials → 200 with token
+   - Invalid password → 401
+   - Non-existent user → 401 (don't reveal user existence)
+
+4. Token expiration lifecycle:
+   - Token valid until exp timestamp
+   - When expired, refresh token needed
+   - Test refresh token logic
+   - Test token revocation
+
+5. Database verification:
+   - After successful login, verify token stored correctly
+   - Verify token claims match user data
+   - Verify token issued_at timestamp reasonable"
+                </div>
+
+                <div class="example-block">
+<strong>Q2: "How would you test a role-based authorization system?"</strong>
+
+<strong>Model Answer:</strong>
+"I create a test matrix covering:
+
+1. Role hierarchy:
+   - Admin role → can access all endpoints
+   - User role → can access user endpoints only
+   - Guest role → limited read-only access
+
+2. For each endpoint, test 4 scenarios:
+   a) No authentication → 401
+   b) Authenticated but insufficient role → 403
+   c) Authenticated with correct role → 200/201
+   d) Cross-user access attempt → 403
+
+3. Permission matrix:
+   - Create operations → requires admin or owning user
+   - Read operations → requires admin or owning user
+   - Update operations → same restrictions
+   - Delete operations → requires admin only
+
+4. Privilege escalation:
+   - User tries change own role to admin → rejected
+   - User tries access admin endpoints → 403
+   - Ensure role comes from token, not request body
+
+5. Database verification:
+   - Verify user's role in DB matches token
+   - Verify audit log shows who accessed what
+   - Verify no data leaked to unauthorized users"
+                </div>
+
+                <div class="example-block">
+<strong>Q3: "You find that API returns 200 OK but data is not in database. What's your approach?"</strong>
+
+<strong>Model Answer:</strong>
+"This is common issue. My approach:
+
+1. Identify the problem:
+   - API response successful (201 Created)
+   - But database query returns empty
+   - Possible causes: transaction not committed, constraint violation, permission issue
+
+2. Test cases to isolate:
+   - Make API request → note returned ID
+   - Immediately query database → is data there?
+   - If not immediately → check 5 seconds later (timing issue?)
+   - Check database logs for errors
+   - Check application logs for errors
+
+3. Root cause analysis:
+   - Check if transaction committed (SELECT with uncommitted transaction)
+   - Check for database constraints (unique, foreign key)
+   - Check database permissions (write access)
+   - Check database triggers (if trigger fail, insert might fail)
+   - Check application connection pool (connection might close)
+
+4. Verification:
+   - Compare API response field by field with database
+   - Verify data types correct
+   - Verify relationships created (foreign keys)
+   - Verify side effects executed (audit logs, notifications)
+   - Test with different users (permission issue?)
+
+5. Report:
+   - Screenshot of API response
+   - Screenshot of database query result
+   - Steps to reproduce
+   - Possible root cause"
+                </div>
+
+                <div class="example-block">
+<strong>Q4: "How do you test API security related to authentication?"</strong>
+
+<strong>Model Answer:</strong>
+"I test several security aspects:
+
+1. Token security:
+   - Token cannot be decoded without secret key → 401
+   - Token signature verification working
+   - Token cannot be forged
+   - Old tokens rejected after expiration
+
+2. Credential security:
+   - Password not stored plaintext in database
+   - Password not returned in API response
+   - Password not logged in audit trails
+   - Password hashing using strong algorithm (bcrypt, not MD5)
+
+3. Token transmission:
+   - HTTPS required (not HTTP)
+   - Token in Authorization header (not URL parameter)
+   - Token not in logs
+   - Token not cached in browser history
+
+4. Authorization security:
+   - User cannot access other users' data
+   - User cannot escalate own role
+   - User cannot bypass authorization checks
+   - Rate limiting prevents brute force attacks
+
+5. Common vulnerabilities:
+   - JWT with algorithm='none' → should reject
+   - Malformed token → should reject gracefully
+   - Expired token still accepted → BUG
+   - Missing authorization check → BUG
+   - Password in request body → logged (security issue)"
+                </div>
+
+                <h3>Red Flags in Interview</h3>
+                <div class="danger-box">
+                    <strong>❌ DON'T SAY THESE:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>"I only test API response status code"</li>
+                        <li>"I don't test database, that's not my job"</li>
+                        <li>"401 and 403 are same thing"</li>
+                        <li>"I don't understand JWT, too complex"</li>
+                        <li>"I assume the server is secure"</li>
+                        <li>"I don't test cross-user access, never thought of it"</li>
+                    </ul>
+                </div>
+
+                <h3>Green Flags in Interview</h3>
+                <div class="success-box">
+                    <strong>✅ DO SAY THESE:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>"I always verify database after POST/PUT/DELETE operations"</li>
+                        <li>"I test 401 (authentication) and 403 (authorization) separately"</li>
+                        <li>"I test cross-user access prevention - critical security issue"</li>
+                        <li>"I verify token expiration is actually enforced"</li>
+                        <li>"I understand JWT structure and signature validation"</li>
+                        <li>"I design comprehensive test matrices covering all scenarios"</li>
+                        <li>"I test both happy path and negative scenarios"</li>
+                        <li>"I look for security vulnerabilities, not just functional bugs"</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Jika bạn dalam interview dan ditanya tentang auth testing, answer harus comprehensive. Jangan hanya "I test login works". Harus show understanding tentang: 1. Authentication vs Authorization - understand sering-sering ditanya 2. 401 vs 403 - critical distinction 3. Database verification - show senior level thinking 4. Security testing - show you think about security 5. Test design - show structured approach Best strategy: Use real examples dari projects you tested. Say 'Di project X, I found bug Y because I verified database'. That shows real experience. Jika ditanya question you don't know, be honest: 'I haven't tested that scenario, but my approach would be...' Then explain logical approach. Much better than make up answer."</div>
+
+                <div class="timestamp">
+                    ⏱️ Slide: 10/35 | Bonus Content
+                </div>
+            </div>
+
+            </div>
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Trước</button>
+                    <button class="btn-primary" id="nextBtn">Tiếp ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Đặt lại</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 10</div>
+                </div>
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress"></div>
+                </div>
+                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. INTRODUCTION & OBJECTIVES</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. AUTHENTICATION vs AUTHORIZATION</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. AUTHENTICATION FLOW</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. BASIC AUTHENTICATION</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. BEARER TOKEN (JWT) - PART 1</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. JWT TEST CASES</a></li>
+                        <li><a href="#" onclick="return goToSlide(6)">6. AUTHORIZATION TESTING</a></li>
+                        <li><a href="#" onclick="return goToSlide(7)">7. DATABASE VERIFICATION</a></li>
+                        <li><a href="#" onclick="return goToSlide(8)">8. SUMMARY & WRAP UP</a></li>
+                        <li><a href="#" onclick="return goToSlide(9)">9. INTERVIEW PREPARATION</a></li>
+                    </ul>
+                </div>
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~4 giờ<br>
+                        📚 API Testing · Tuần 3-4<br>
+                        🛡️ Auth & Security
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2025 Automation Testing & Java Core | API Testing — Tuần 3-4: Advanced | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js?v=4"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); }
+            return false;
+        }
+        function speak() {
+            if (!slides[currentSlide].querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+        function reset() { currentSlide = 0; updateSlide(); }
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        updateSlide();
+    </script>
+</body>
+</html>

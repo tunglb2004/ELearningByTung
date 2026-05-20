@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASE 2: Selenium WebDriver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 750px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-top: 22px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 280px;
+            border-left: 4px solid #2a5298;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #2a5298;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #138496;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c4a6e;
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2a5298;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffe8e8;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 0.95em;
+        }
+
+        .locator-example {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #2a5298;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .concept-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+<link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+    <link rel="stylesheet" href="course-ui-demos.css">
+</head>
+<body data-tts-page="phase2">
+    <div class="container">
+        <div class="header">
+            <h1>🌐 PHASE 2: Selenium WebDriver</h1>
+            <p>Automation Testing - Web UI Automation với Selenium</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+                <!-- SLIDE 0: INTRO -->
+                <div class="slide active">
+                    <h2>👋 Xin Chào PHASE 2!</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 30px;">Selenium WebDriver - Web UI Automation</p>
+                    
+                    <h3>Ở PHASE 1 chúng ta đã học:</h3>
+                    <ul>
+                        <li>✅ Manual vs Automation Testing</li>
+                        <li>✅ 4 Loại Test Automation (Unit, Integration, E2E, API)</li>
+                    </ul>
+
+                    <h3>PHASE 2 chúng ta sẽ học:</h3>
+                    <ul>
+                        <li><span class="emoji">🔧</span>Selenium Setup & WebDriver</li>
+                        <li><span class="emoji">🔍</span>Locators (8 cách tìm elements)</li>
+                        <li><span class="emoji">👆</span>Element Interactions (Click, SendKeys, Submit)</li>
+                        <li><span class="emoji">⏳</span>Waits (Implicit, Explicit, Fluent)</li>
+                        <li><span class="emoji">🎯</span>Advanced Actions (Hover, Drag & Drop)</li>
+                        <li><span class="emoji">🪟</span>Window Handling</li>
+                        <li><span class="emoji">💻</span>Real-world Examples</li>
+                    </ul>
+
+                    <h3>Mục Tiêu:</h3>
+                    <p>Sau PHASE 2, bạn sẽ có thể <span class="highlight">viết automation tests để test web UI</span> một cách chuyên nghiệp.</p>
+
+                    <div class="narration-box">🔊 "Xin chào các bạn, chúng ta bây giờ vào PHASE 2 - Selenium WebDriver. Ở PHASE 1 chúng ta đã hiểu tại sao cần automation testing và 4 loại tests khác nhau. Bây giờ chúng ta sẽ học công cụ cụ thể để tự động hóa browser cho E2E testing, đó chính là Selenium WebDriver. Selenium WebDriver là một công cụ open-source, tức là miễn phí, giúp bạn tự động hóa các tương tác với web browsers. Nó có thể control Chrome, Firefox, Safari, Edge - hầu hết các browsers hiện đại. Kiến trúc của Selenium rất đơn giản. Ở layer đầu tiên là TEST CODE - đó là code mà chúng ta viết. Ở layer thứ hai là SELENIUM WEBDRIVER API - đó là library mà Selenium cung cấp, có các methods như findElement(), click(), sendKeys(), v.v. Ở layer thứ ba là BROWSER DRIVER - đó là chương trình nhỏ cụ thể cho mỗi browser. Ví dụ, Chrome dùng ChromeDriver, Firefox dùng GeckoDriver. Driver này là cầu nối giữa code và browser. Ở layer cuối cùng là BROWSER - đó là Chrome, Firefox, Safari, v.v. Khi bạn viết code để click một button, TEST CODE gọi selenium.click(), Selenium WebDriver dịch sang command, gửi đến BROWSER DRIVER, driver gửi đến Chrome, Chrome thực hiện click. Đó là flow của Selenium."</div>
+                </div>
+
+                <!-- SLIDE 1: WHAT IS SELENIUM -->
+                <div class="slide">
+                    <h2>🔧 Selenium WebDriver Là Gì?</h2>
+                    
+                    <h3>Selenium = Công Cụ Tự Động Điều Khiển Browser</h3>
+                    <p>Selenium WebDriver cho phép bạn viết code để <span class="highlight">tự động điều khiển browser</span> (Chrome, Firefox, Safari, Edge).</p>
+
+                    <h3>Mà Không Cần Người Can Thiệp</h3>
+                    <p>WebDriver sẽ:</p>
+                    <ul>
+                        <li>✅ Mở browser tự động</li>
+                        <li>✅ Navigate tới websites</li>
+                        <li>✅ Tìm elements trên page</li>
+                        <li>✅ Tương tác với elements (click, type, submit)</li>
+                        <li>✅ Kiểm tra kết quả</li>
+                        <li>✅ Đóng browser</li>
+                    </ul>
+
+                    <h3>Kiến Trúc Selenium</h3>
+                    <div class="diagram">
+Test Code (Java)
+      ↓
+Selenium WebDriver
+      ↓
+Browser Driver (ChromeDriver, GeckoDriver, etc.)
+      ↓
+Browser (Chrome, Firefox, Safari)
+                    </div>
+
+                    <h3>Tại Sao Dùng Selenium?</h3>
+                    <ul>
+                        <li>✅ <strong>Open Source:</strong> Miễn phí, code mở</li>
+                        <li>✅ <strong>Multi-Language:</strong> Java, Python, C#, JavaScript</li>
+                        <li>✅ <strong>Multi-Browser:</strong> Chrome, Firefox, Safari, Edge</li>
+                        <li>✅ <strong>Popular:</strong> Dùng bởi hàng triệu testers</li>
+                        <li>✅ <strong>Powerful:</strong> Có thể automate hầu hết UI interactions</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Để setup Selenium, bạn cần 3 thứ. Thứ nhất là JAVA (hoặc ngôn ngữ khác nếu bạn dùng Selenium Python hay JavaScript). Thứ hai là SELENIUM JAR FILES - thư viện. Thứ ba là BROWSER DRIVERS - ChromeDriver, GeckoDriver, v.v. Bạn download Selenium JAR từ selenium.dev. Bạn add vào project, thường là trong folder called 'lib' hoặc nếu dùng Maven, bạn add dependency vào pom.xml. Dependency sẽ có groupId là 'org.seleniumhq.selenium', artifactId là 'selenium-java', version là version mới nhất. Maven sẽ tự động download Selenium từ internet. Tiếp theo bạn download ChromeDriver từ chromedriver.chromium.org. ChromeDriver version phải match với Chrome version trên máy bạn. Ví dụ nếu Chrome 125.0, bạn download ChromeDriver 125.0. Bạn extract file và đặt trong một folder, ví dụ 'drivers' folder. Trong code, bạn cần tell Selenium ở đâu tìm ChromeDriver. Bạn dùng System.setProperty('webdriver.chrome.driver', '/path/to/chromedriver'). Sau đó bạn tạo WebDriver instance bằng new ChromeDriver(). Bây giờ Selenium sẵn sàng để control Chrome browser."</div>
+                </div>
+
+                <!-- SLIDE 2: SETUP SELENIUM -->
+                <div class="slide">
+                    <h2>🚀 Setup Selenium</h2>
+                    
+                    <h3>Step 1: Cài Maven & Add Dependency</h3>
+                    <p>Thêm vào <code style="background: #f0f0f0; padding: 2px 6px;">pom.xml</code>:</p>
+                    <div class="code-example">
+<span class="keyword">&lt;dependency&gt;</span>
+    <span class="keyword">&lt;groupId&gt;</span>org.seleniumhq.selenium<span class="keyword">&lt;/groupId&gt;</span>
+    <span class="keyword">&lt;artifactId&gt;</span>selenium-java<span class="keyword">&lt;/artifactId&gt;</span>
+    <span class="keyword">&lt;version&gt;</span>4.15.0<span class="keyword">&lt;/version&gt;</span>
+<span class="keyword">&lt;/dependency&gt;</span>
+                    </div>
+
+                    <h3>Step 2: Download ChromeDriver</h3>
+                    <p>Tải từ: <code style="background: #f0f0f0; padding: 2px 6px;">https://chromedriver.chromium.org/</code></p>
+                    <p>Chọn version match với Chrome browser của bạn.</p>
+
+                    <h3>Step 3: Đặt ChromeDriver Path</h3>
+                    <div class="code-example">
+<span class="comment">// Cách 1: Set System Property</span>
+System.setProperty(
+    <span class="string">"webdriver.chrome.driver"</span>,
+    <span class="string">"/path/to/chromedriver"</span>
+);
+
+<span class="comment">// Cách 2: Đặt trong PATH environment (dễ hơn)</span>
+<span class="comment">// Thêm folder chứa chromedriver vào PATH</span>
+                    </div>
+
+                    <h3>Step 4: Tạo WebDriver Instance</h3>
+                    <div class="code-example">
+<span class="keyword">import</span> org.openqa.selenium.WebDriver;
+<span class="keyword">import</span> org.openqa.selenium.chrome.ChromeDriver;
+
+<span class="keyword">public class</span> FirstTest {
+    <span class="keyword">public static void</span> main(String[] args) {
+        <span class="comment">// Khởi tạo ChromeDriver</span>
+        WebDriver driver = <span class="keyword">new</span> ChromeDriver();
+        
+        <span class="comment">// Mở website</span>
+        driver.get(<span class="string">"https://www.google.com"</span>);
+        
+        <span class="comment">// In ra title</span>
+        System.out.println(<span class="string">"Title: "</span> + driver.getTitle());
+        
+        <span class="comment">// Đóng browser</span>
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+Title: Google
+[ChromeDriver] Started ChromeDriver session
+[Browser opened] https://www.google.com
+[Browser closed]
+                    </div>
+
+                    <div class="tip">
+                        💡 <strong>Tip:</strong> Nếu chromedriver ở PATH, không cần set System Property. Selenium sẽ tự tìm!
+                    </div>
+
+                    <div class="narration-box">🔊 "Hãy viết code Selenium đầu tiên. Import WebDriver từ org.openqa.selenium. Import ChromeDriver từ org.openqa.selenium.chrome. Viết public class SimpleSeleniumTest. Trong main method, set property webdriver.chrome.driver để tell JVM ở đâu tìm ChromeDriver. Tạo WebDriver instance bằng new ChromeDriver() - cái này sẽ tự động mở Chrome browser. Gọi driver.get('https://example.com') - cái này sẽ điều hướng đến URL. Chạy code, bạn sẽ thấy Chrome window mở, trang example.com load. Bạn chờ vài giây, sau đó gọi driver.quit() để close browser. Đó là Selenium code đơn giản nhất - mở browser, navigate, close. Nếu bạn muốn browser không tự động close, bạn bỏ driver.quit() line. Browser sẽ stay open cho đến khi bạn đóng nó bằng tay hoặc kết thúc program."</div>
+                </div>
+
+                <!-- SLIDE 3: LOCATORS INTRO -->
+                <div class="slide">
+                    <h2>🔍 Locators - Cách Tìm Elements</h2>
+                    
+                    <h3>Locator Là Gì?</h3>
+                    <p>Locator = <span class="highlight">cách để Selenium tìm elements trên page</span></p>
+                    <p>Ví dụ: Tìm cái textbox "search" để gõ dữ liệu vào</p>
+
+                    <h3>8 Loại Locators</h3>
+                    <ul>
+                        <li>1️⃣ <strong>ID</strong> - By.id("element_id")</li>
+                        <li>2️⃣ <strong>Name</strong> - By.name("element_name")</li>
+                        <li>3️⃣ <strong>Class Name</strong> - By.className("element_class")</li>
+                        <li>4️⃣ <strong>Tag Name</strong> - By.tagName("button")</li>
+                        <li>5️⃣ <strong>CSS Selector</strong> - By.cssSelector("div.button")</li>
+                        <li>6️⃣ <strong>XPath</strong> - By.xpath("//button[@id='submit']")</li>
+                        <li>7️⃣ <strong>Link Text</strong> - By.linkText("Click Here")</li>
+                        <li>8️⃣ <strong>Partial Link Text</strong> - By.partialLinkText("Click")</li>
+                    </ul>
+
+                    <h3>Thứ Tự Ưu Tiên</h3>
+                    <ol>
+                        <li>🥇 <strong>ID</strong> (nhanh, unique)</li>
+                        <li>🥈 <strong>Name</strong> (tốt nếu element có name)</li>
+                        <li>🥉 <strong>CSS Selector</strong> (mạnh, dễ maintain)</li>
+                        <li>❌ <strong>XPath</strong> (cuối cùng, dễ break)</li>
+                    </ol>
+
+                    <div class="tip">
+                        💡 <strong>Best Practice:</strong> Dùng ID nếu có. Nếu không có ID, dùng CSS Selector. XPath là last resort.
+                    </div>
+
+                    <div class="narration-box">🔊 "Mở website chỉ là step đầu tiên. Tiếp theo bạn cần tìm các elements như button, input field, text, v.v. Selenium cung cấp method findElement() để tìm element. Nhưng tìm bằng cách nào? Có 8 loại locators. Locator thứ nhất là ID. Nếu element có id='submit-btn', bạn dùng By.id('submit-btn'). ID là locator tốt nhất vì ID phải unique - chỉ có 1 element có ID đó. Locator thứ hai là NAME. Nếu input field có name='username', bạn dùng By.name('username'). Loại thứ ba là CLASS_NAME. Nếu element có class='btn btn-primary', bạn dùng By.className('btn-primary'). Loại thứ tư là TAG_NAME. Nếu bạn muốn tìm tất cả button elements, dùng By.tagName('button'). Loại thứ năm là CSS_SELECTOR. CSS selector là powerful, ví dụ By.cssSelector('div.container &gt; button.submit'). Loại thứ sáu là XPATH - X Path expression, rất powerful nhưng complex, ví dụ By.xpath('//button[@id="submit"]'). Loại thứ bảy là LINK_TEXT. Nếu bạn muốn tìm link bằng text, dùng By.linkText('Click here'). Loại thứ tám là PARTIAL_LINK_TEXT. Nếu link text là 'Click here for details', bạn dùng By.partialLinkText('Click here'). Best practice là ID nếu có, vì ID cực nhanh. Nếu không có ID, dùng Name. Nếu không có Name, dùng CSS selector hay XPath. Tránh dùng By.tagName() vì nó quá generic - nếu có 100 buttons, nó sẽ find tất cả."</div>
+                </div>
+
+                <!-- SLIDE 4: ID & NAME LOCATORS -->
+                <div class="slide">
+                    <h2>🔍 Locators: ID & Name</h2>
+                    
+                    <h3>1. By ID - Nhanh & Reliable</h3>
+                    <p>Dùng attribute <code style="background: #f0f0f0; padding: 2px 6px;">id</code> của element</p>
+                    <div class="locator-example">
+&lt;input type="text" id="username" placeholder="Enter username"&gt;
+                    </div>
+                    <div class="code-example">
+<span class="comment">// Cú pháp</span>
+WebElement element = driver.findElement(By.id(<span class="string">"username"</span>));
+
+<span class="comment">// Điền username</span>
+element.sendKeys(<span class="string">"user123"</span>);
+
+<span class="comment">// Hoặc shorthand</span>
+driver.findElement(By.id(<span class="string">"username"</span>)).sendKeys(<span class="string">"user123"</span>);
+                    </div>
+
+                    <h3>2. By Name - Cũng Tốt</h3>
+                    <p>Dùng attribute <code style="background: #f0f0f0; padding: 2px 6px;">name</code> của element</p>
+                    <div class="locator-example">
+&lt;input type="password" name="pass" placeholder="Enter password"&gt;
+                    </div>
+                    <div class="code-example">
+<span class="comment">// Cú pháp</span>
+WebElement element = driver.findElement(By.name(<span class="string">"pass"</span>));
+
+<span class="comment">// Điền password</span>
+element.sendKeys(<span class="string">"password123"</span>);
+                    </div>
+
+                    <h3>Ưu & Nhược Điểm</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Locator</th>
+                            <th>Ưu Điểm</th>
+                            <th>Nhược Điểm</th>
+                        </tr>
+                        <tr>
+                            <td><strong>ID</strong></td>
+                            <td>✅ Nhanh, Unique, Reliable</td>
+                            <td>❌ Phải có ID attribute</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Name</strong></td>
+                            <td>✅ Đơn giản, Hay có</td>
+                            <td>❌ Không unique (nhiều element cùng name)</td>
+                        </tr>
+                    </table>
+
+                    <div class="narration-box">🔊 "Hãy xem code để find element. Import By từ org.openqa.selenium. Tạo WebDriver instance. Navigate đến URL. Bây giờ find element bằng ID: WebElement usernameField = driver.findElement(By.id('username')). Nếu element tồn tại, method return WebElement object. Nếu không tìm thấy, throw NoSuchElementException. Vì vậy thường viết trong try-catch block. Hoặc dùng WebDriverWait để wait cho element appear - chúng ta sẽ học sau. Find bằng name: WebElement passwordField = driver.findElement(By.name('password')). Find bằng CSS selector: WebElement loginButton = driver.findElement(By.cssSelector('button.login-btn')). Find bằng XPath: WebElement submitButton = driver.findElement(By.xpath('//button[@type="submit"]')). XPath là powerful vì có thể select element bằng text, attribute, position, v.v. Ví dụ xpath('//button[text()="Login"]') sẽ find button có text là 'Login'. XPath có 2 loại: relative XPath hay absolute XPath. Relative tốt hơn vì nó không phụ thuộc vào structure hoàn toàn. Ví dụ '//button' là relative, '/html/body/div/button' là absolute."</div>
+                </div>
+
+                <!-- SLIDE 5: CSS & XPATH LOCATORS -->
+                <div class="slide">
+                    <h2>🔍 Locators: CSS & XPath</h2>
+                    
+                    <h3>5. By CSS Selector - Flexible & Powerful</h3>
+                    <p>Dùng CSS selectors để tìm elements</p>
+                    
+                    <h4>CSS Selector Syntax:</h4>
+                    <div class="locator-example">
+/* Tìm theo class */
+By.cssSelector(".login-button")
+By.cssSelector("button.btn-primary")
+
+/* Tìm theo attribute */
+By.cssSelector("input[type='password']")
+By.cssSelector("input[name='email']")
+
+/* Tìm parent &gt; child */
+By.cssSelector("div.form &gt; input")
+
+/* Tìm theo text */
+By.cssSelector("button:contains('Login')")
+                    </div>
+
+                    <h3>6. By XPath - Mạnh Nhất</h3>
+                    <p>Dùng XPath (XML Path Language) - rất mạnh</p>
+
+                    <h4>XPath Syntax:</h4>
+                    <div class="locator-example">
+/* Tìm button có id='submit' */
+//button[@id='submit']
+
+/* Tìm input có type='password' */
+//input[@type='password']
+
+/* Tìm button có text chứa 'Login' */
+//button[contains(text(),'Login')]
+
+/* Tìm element thứ 2 */
+(//button)[2]
+
+/* Tìm button là child của form */
+//form//button
+                    </div>
+
+                    <h3>Ví Dụ So Sánh</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Locator</th>
+                            <th>CSS</th>
+                            <th>XPath</th>
+                        </tr>
+                        <tr>
+                            <td>Tìm button class="login"</td>
+                            <td>button.login</td>
+                            <td>//button[@class='login']</td>
+                        </tr>
+                        <tr>
+                            <td>Tìm input type="email"</td>
+                            <td>input[type='email']</td>
+                            <td>//input[@type='email']</td>
+                        </tr>
+                        <tr>
+                            <td>Tìm thẻ button chứa "Sign"</td>
+                            <td>❌ Khó</td>
+                            <td>✅ //button[contains(text(),'Sign')]</td>
+                        </tr>
+                    </table>
+
+                    <div class="warning">
+                        ⚠️ <strong>Cảnh báo:</strong> Tránh XPath quá phức tạp. Nếu HTML thay đổi, XPath sẽ break. Dùng XPath là last resort.
+                    </div>
+
+                    <div class="narration-box">🔊 "CSS selector hay XPath, cái nào tốt hơn? CSS selector thường nhanh hơn XPath vì browser native hỗ trợ CSS selector. XPath powerful hơn nhưng slow hơn. Ví dụ, find button với text 'Submit' bằng CSS selector khó, nhưng XPath là //button[text()='Submit']. Find button với class 'btn-primary' bằng CSS selector dễ, button.btn-primary. Best practice là dùng CSS selector khi có thể, dùng XPath khi cần. Không dùng absolute XPath vì nó brittle - nếu HTML structure change, nó break. Ví dụ, /html/body/div[1]/div[2]/button - nếu add một div, path này break rồi. Dùng relative XPath // để find element dù nó ở đâu. Hoặc dùng CSS selector div.container &gt; button.submit - cũng flexible. Pro tip: mở Chrome DevTools (F12), right-click element, chọn 'Inspect', rồi right-click element trong DevTools, chọn 'Copy full XPath' hoặc 'Copy selector' để generate XPath hay CSS selector automatically."</div>
+                </div>
+
+                <!-- SLIDE 6: FIND ELEMENTS PRACTICE -->
+                <div class="slide">
+                    <h2>🔍 Tìm Elements - Ví Dụ Thực Tế</h2>
+                    
+                    <h3>HTML Example:</h3>
+                    <div class="locator-example">
+&lt;form id="login-form"&gt;
+    &lt;input id="username" type="text" name="user"/&gt;
+    &lt;input id="password" type="password" name="pass"/&gt;
+    &lt;button id="submit-btn" class="btn-primary"&gt;Login&lt;/button&gt;
+&lt;/form&gt;
+                    </div>
+
+                    <h3>Cách Tìm Elements:</h3>
+                    <div class="code-example">
+<span class="comment">// 1. Tìm username input bằng ID (tốt nhất)</span>
+WebElement username = driver.findElement(By.id(<span class="string">"username"</span>));
+
+<span class="comment">// 2. Tìm password input bằng Name</span>
+WebElement password = driver.findElement(By.name(<span class="string">"pass"</span>));
+
+<span class="comment">// 3. Tìm login button bằng Class</span>
+WebElement loginBtn = driver.findElement(By.className(<span class="string">"btn-primary"</span>));
+
+<span class="comment">// 4. Tìm button bằng CSS Selector</span>
+WebElement submitBtn = driver.findElement(
+    By.cssSelector(<span class="string">"button#submit-btn"</span>)
+);
+
+<span class="comment">// 5. Tìm button bằng XPath</span>
+WebElement submitBtn2 = driver.findElement(
+    By.xpath(<span class="string">"//button[@id='submit-btn']"</span>)
+);
+
+<span class="comment">// 6. Tìm button bằng Link Text (nếu là link)</span>
+WebElement forgotLink = driver.findElement(By.linkText(<span class="string">"Forgot Password?"</span>));
+                    </div>
+
+                    <h3>Kiểm Tra Element Tìm Được?</h3>
+                    <div class="code-example">
+<span class="comment">// Check nếu element exist</span>
+<span class="keyword">try</span> {
+    WebElement elem = driver.findElement(By.id(<span class="string">"username"</span>));
+    System.out.println(<span class="string">"✅ Element found"</span>);
+} <span class="keyword">catch</span> (NoSuchElementException e) {
+    System.out.println(<span class="string">"❌ Element not found"</span>);
+}
+                    </div>
+
+                    <div class="narration-box">🔊 "Sau khi tìm element, bạn cần tương tác với nó. Tương tác thứ nhất là CLICK. usernameField.click() sẽ click vào element đó. Tương tác thứ hai là SENDKEYS. usernameField.sendKeys('john@example.com') sẽ gõ text vào input field. Bạn có thể gõ bình thường text hoặc dùng Keys enum để send special keys. Ví dụ sendKeys('text', Keys.TAB) sẽ gõ 'text' rồi nhấn Tab. sendKeys(Keys.ENTER) sẽ nhấn Enter. sendKeys(Keys.CONTROL, 'A') sẽ select all (Ctrl+A). Tương tác thứ ba là CLEAR. usernameField.clear() sẽ xóa hết text trong input field. Tương tác thứ tư là SUBMIT. loginForm.submit() sẽ submit form - đó là equivalent của click submit button. Tương tác thứ năm là GETTEXT. String text = element.getText() sẽ lấy text content của element. Ví dụ lấy text của success message sau login. Tương tác thứ sáu là GETATTRIBUTE. String value = element.getAttribute('href') sẽ lấy attribute của element. Ví dụ lấy href attribute của link. Tương tác thứ bảy là ISDISPLAYED. boolean displayed = element.isDisplayed() check element có visible không. Tương tác thứ tám là ISENABLED. boolean enabled = element.isEnabled() check element có enable không (button có thể disabled). Tương tác thứ chín là ISSELECTED. boolean selected = element.isSelected() check checkbox/radio có selected không."</div>
+                </div>
+
+                <!-- SLIDE 7: ELEMENT INTERACTIONS -->
+                <div class="slide">
+                    <h2>👆 Element Interactions</h2>
+                    
+                    <h3>WebElement Methods - Tương Tác Với Elements</h3>
+                    <p>Sau khi tìm element, bạn có thể tương tác:</p>
+
+                    <h3>1. sendKeys() - Gõ Text</h3>
+                    <div class="code-example">
+<span class="comment">// Gõ text vào textbox</span>
+WebElement username = driver.findElement(By.id(<span class="string">"username"</span>));
+username.sendKeys(<span class="string">"john_doe"</span>);
+
+<span class="comment">// Gõ multiple lines</span>
+username.sendKeys(<span class="string">"user"</span>, <span class="string">"name"</span>);
+
+<span class="comment">// Gõ dặc biệt keys (Enter, Tab, Delete)</span>
+username.sendKeys(Keys.ENTER); <span class="comment">// Nhấn Enter</span>
+username.sendKeys(Keys.TAB);   <span class="comment">// Nhấn Tab</span>
+                    </div>
+
+                    <h3>2. click() - Click Element</h3>
+                    <div class="code-example">
+<span class="comment">// Click button</span>
+WebElement loginBtn = driver.findElement(By.id(<span class="string">"login-btn"</span>));
+loginBtn.click();
+
+<span class="comment">// Double click (advanced)</span>
+Actions actions = <span class="keyword">new</span> Actions(driver);
+actions.doubleClick(loginBtn).perform();
+                    </div>
+
+                    <h3>3. clear() - Xóa Text</h3>
+                    <div class="code-example">
+<span class="comment">// Xóa text trong textbox</span>
+WebElement username = driver.findElement(By.id(<span class="string">"username"</span>));
+username.clear(); <span class="comment">// Xóa sạch</span>
+
+<span class="comment">// Vẫn cách: select all rồi delete</span>
+username.sendKeys(Keys.chord(Keys.CONTROL, <span class="string">"a"</span>));
+username.sendKeys(Keys.DELETE);
+                    </div>
+
+                    <h3>4. submit() - Submit Form</h3>
+                    <div class="code-example">
+<span class="comment">// Submit form</span>
+WebElement form = driver.findElement(By.id(<span class="string">"login-form"</span>));
+form.submit();
+
+<span class="comment">// Hoặc click submit button</span>
+driver.findElement(By.id(<span class="string">"submit-btn"</span>)).click();
+                    </div>
+
+                    <div class="narration-box">🔊 "Một vấn đề lớn khi automate browser là TIMING. Page load không instantaneous. Element có thể load chậm vì network slow. Nếu bạn cố click element trước nó load, bạn sẽ get NoSuchElementException. Selenium cung cấp 2 loại waits. Loại thứ nhất là IMPLICIT WAIT. Bạn set một global timeout, ví dụ driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)). Khi bạn findElement(), nếu element không exist, thay vì fail ngay, Selenium sẽ wait tối đa 10 giây, nếu element appear trong 10 giây, nó return element, nếu sau 10 giây element vẫn không appear, nó throw NoSuchElementException. Implicit wait áp dụng cho tất cả findElement() calls. Nhưng implicit wait có problem: nó wait cho tất cả elements, kể cả elements không quan trọng. Nếu element không exist, nó vẫn wait full 10 giây rồi throw exception, lãng phí time. Loại thứ hai là EXPLICIT WAIT - TỐT HƠN. WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)). Rồi bạn wait() cho condition cụ thể. Ví dụ, wait.until(ExpectedConditions.visibilityOfElementLocated(By.id('success-msg'))). Cái này sẽ wait tối đa 10 giây, nhưng chỉ chờ cho element cụ thể visible. Nếu element appear sau 2 giây, nó immediately return, không chờ full 10 giây. Explicit wait cũng chỉ apply cho element cụ thể, không tất cả. Pro tip: dùng explicit waits, không dùng implicit waits. Implicit waits slow vì wait tất cả. Ngoài visibilityOfElementLocated, có nhiều ExpectedConditions khác: elementToBeClickable (element visible và enable), presenceOfElementLocated (element ở DOM dù không visible), textToBePresentInElement (element có specific text), v.v."</div>
+                </div>
+
+                <!-- SLIDE 8: GET ELEMENT PROPERTIES -->
+                <div class="slide">
+                    <h2>📖 Lấy Thông Tin Element</h2>
+                    
+                    <h3>Các Methods Để Lấy Thông Tin</h3>
+                    
+                    <h3>1. getText() - Lấy Text Content</h3>
+                    <div class="code-example">
+<span class="comment">// Lấy text của element</span>
+WebElement heading = driver.findElement(By.id(<span class="string">"page-title"</span>));
+String text = heading.getText();
+System.out.println(<span class="string">"Title: "</span> + text);
+
+<span class="comment">// Verify text</span>
+<span class="keyword">assert</span> text.equals(<span class="string">"Login Page"</span>);
+                    </div>
+
+                    <h3>2. getAttribute() - Lấy Attribute</h3>
+                    <div class="code-example">
+<span class="comment">// Lấy attribute value</span>
+WebElement input = driver.findElement(By.id(<span class="string">"email"</span>));
+String placeholder = input.getAttribute(<span class="string">"placeholder"</span>);
+String type = input.getAttribute(<span class="string">"type"</span>);
+
+System.out.println(<span class="string">"Placeholder: "</span> + placeholder);
+System.out.println(<span class="string">"Type: "</span> + type);
+                    </div>
+
+                    <h3>3. isDisplayed() - Kiểm Tra Visible</h3>
+                    <div class="code-example">
+<span class="comment">// Kiểm tra element có hiển thị không</span>
+WebElement element = driver.findElement(By.id(<span class="string">"popup"</span>));
+<span class="keyword">if</span> (element.isDisplayed()) {
+    System.out.println(<span class="string">"✅ Element visible"</span>);
+} <span class="keyword">else</span> {
+    System.out.println(<span class="string">"❌ Element hidden"</span>);
+}
+                    </div>
+
+                    <h3>4. isEnabled() - Kiểm Tra Enable</h3>
+                    <div class="code-example">
+<span class="comment">// Kiểm tra button có enabled không</span>
+WebElement submitBtn = driver.findElement(By.id(<span class="string">"submit"</span>));
+<span class="keyword">if</span> (submitBtn.isEnabled()) {
+    submitBtn.click();
+} <span class="keyword">else</span> {
+    System.out.println(<span class="string">"Button disabled"</span>);
+}
+                    </div>
+
+                    <h3>5. isSelected() - Kiểm Tra Selected</h3>
+                    <div class="code-example">
+<span class="comment">// Kiểm tra checkbox/radio có selected không</span>
+WebElement checkbox = driver.findElement(By.id(<span class="string">"agree"</span>));
+<span class="keyword">if</span> (checkbox.isSelected()) {
+    System.out.println(<span class="string">"✅ Checkbox checked"</span>);
+} <span class="keyword">else</span> {
+    checkbox.click(); <span class="comment">// Check nó</span>
+}
+                    </div>
+
+                    <div class="narration-box">🔊 "Ngoài basic interactions, Selenium cung cấp Advanced Actions. Thứ nhất là HOVER (mouseover). Nếu bạn hover mouse vào element, element có thể show dropdown menu. Dùng Actions class: Actions actions = new Actions(driver); actions.moveToElement(element).perform(). Thứ hai là DRAG AND DROP. Nếu bạn kéo một element sang vị trí khác. actions.dragAndDrop(sourceElement, targetElement).perform(). Thứ ba là RIGHT CLICK. actions.contextClick(element).perform() sẽ right-click element. Thứ tư là KEY COMBINATIONS. actions.sendKeys(Keys.CONTROL, 'A') sẽ select all text. Thứ năm là SCROLL. Nếu element không visible vì nó ở dưới, bạn cần scroll. JavascriptExecutor js = (JavascriptExecutor) driver; js.executeScript('arguments[0].scrollIntoView(true);', element) sẽ scroll element vào view. Hoặc js.executeScript('window.scrollBy(0, 500)') scroll down 500 pixels. Thứ sáu là SWITCH WINDOW. Nếu click link open new window. driver.switchTo().window(windowHandle) switch sang window đó. Thứ bảy là SWITCH FRAME. Nếu element ở trong iframe. driver.switchTo().frame(frameElement) switch vào frame đó."</div>
+                </div>
+
+                <!-- SLIDE 9: WAITS - INTRO -->
+                <div class="slide">
+                    <h2>⏳ Waits - Chờ Elements Load</h2>
+                    
+                    <h3>Tại Sao Cần Waits?</h3>
+                    <p>Browser mất thời gian để load page, JS execute, elements render.</p>
+                    <p>Nếu Selenium tìm element trước khi element load xong → <span class="highlight">NoSuchElementException</span></p>
+
+                    <h3>Ví Dụ Problem:</h3>
+                    <div class="code-example">
+driver.get(<span class="string">"https://example.com"</span>);
+<span class="comment">// JavaScript tạo element sau 3 giây</span>
+WebElement elem = driver.findElement(By.id(<span class="string">"dynamic"</span>));
+<span class="comment">// ❌ Exception! Element chưa load</span>
+                    </div>
+
+                    <h3>3 Cách Waits</h3>
+                    <ul>
+                        <li>1️⃣ <strong>Implicit Waits:</strong> Chờ toàn bộ findElement calls</li>
+                        <li>2️⃣ <strong>Explicit Waits:</strong> Chờ specific condition (khuyến cáo)</li>
+                        <li>3️⃣ <strong>Fluent Waits:</strong> Advanced version của Explicit</li>
+                    </ul>
+
+                    <h3>Performance So Sánh</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Wait Type</th>
+                            <th>Tốc Độ</th>
+                            <th>Reliability</th>
+                            <th>Khi Dùng</th>
+                        </tr>
+                        <tr>
+                            <td>Implicit</td>
+                            <td>Chậm</td>
+                            <td>Thấp</td>
+                            <td>❌ Tránh</td>
+                        </tr>
+                        <tr>
+                            <td>Explicit</td>
+                            <td>Nhanh</td>
+                            <td>Cao</td>
+                            <td>✅ Dùng cái này</td>
+                        </tr>
+                        <tr>
+                            <td>Fluent</td>
+                            <td>Nhanh</td>
+                            <td>Cao</td>
+                            <td>✅ Advanced</td>
+                        </tr>
+                    </table>
+
+                    <div class="narration-box">🔊 "Best practice khi automate là combine waits với interactions. Không nên dùng Thread.sleep() - đó là hardcoded wait, luôn wait full time dù element appear sớm. Ví dụ, test case: click login button, chờ welcome message appear, lấy text message, verify it contains 'Welcome'. Code sẽ như thế này: driver.get('https://example.com/login'). driver.findElement(By.id('username')).sendKeys('john'). driver.findElement(By.id('password')).sendKeys('pass'). driver.findElement(By.id('login')).click(). Bây giờ bạn cần chờ welcome message appear. Dùng explicit wait: WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)). WebElement welcomeMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id('welcome'))). String text = welcomeMsg.getText(). Assert.assertTrue(text.contains('Welcome')). Nếu welcome element appear sau 3 giây, wait return immediately, không lãng phí time. Nếu sau 10 giây không appear, throw TimeoutException. Đó là proper way to handle waits."</div>
+                </div>
+
+                <!-- SLIDE 10: IMPLICIT WAITS -->
+                <div class="slide">
+                    <h2>⏳ Implicit Waits</h2>
+                    
+                    <h3>Implicit Wait Là Gì?</h3>
+                    <p>Báo Selenium: "Chờ tối đa 10 giây khi tìm element"</p>
+                    <p>Nếu element tìm được trước 10 giây → trả về ngay (không chờ hết)</p>
+                    <p>Nếu 10 giây hết mà chưa tìm → throw NoSuchElementException</p>
+
+                    <h3>Code Example:</h3>
+                    <div class="code-example">
+<span class="keyword">import</span> java.time.Duration;
+
+<span class="keyword">public class</span> ImplicitWaitTest {
+    <span class="keyword">public static void</span> main(String[] args) {
+        WebDriver driver = <span class="keyword">new</span> ChromeDriver();
+        
+        <span class="comment">// Set implicit wait = 10 seconds</span>
+        driver.manage().timeouts().implicitlyWait(
+            Duration.ofSeconds(10)
+        );
+        
+        driver.get(<span class="string">"https://example.com"</span>);
+        
+        <span class="comment">// Selenium sẽ chờ tối đa 10s</span>
+        WebElement elem = driver.findElement(By.id(<span class="string">"dynamic"</span>));
+        
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <h3>Nhược Điểm</h3>
+                    <ul>
+                        <li>❌ Chờ 10s cho mỗi findElement, dù element có trong 1s</li>
+                        <li>❌ Toàn cục (affect all findElements)</li>
+                        <li>❌ Không thể điều chỉnh per-element</li>
+                        <li>❌ Chậm (giảm execution time)</li>
+                    </ul>
+
+                    <div class="warning">
+                        ⚠️ <strong>Best Practice:</strong> Tránh implicit waits. Dùng explicit waits thay vào.
+                    </div>
+
+                    <div class="narration-box">🔊 "Hãy viết một complete login test flow sử dụng tất cả những gì chúng ta vừa học. Test case: Login with valid credentials. Bước 1: navigate to login page - driver.get('https://example.com/login'). Bước 2: find username field - WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id('username'))). Bước 3: type username - usernameField.sendKeys('john@example.com'). Bước 4: find password field - WebElement passwordField = driver.findElement(By.name('password')). Bước 5: type password - passwordField.sendKeys('password123'). Bước 6: find login button - WebElement loginButton = driver.findElement(By.cssSelector('button.login-btn')). Bước 7: click login - loginButton.click(). Bước 8: wait for welcome message - WebElement welcomeMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className('success-message'))). Bước 9: get text - String text = welcomeMsg.getText(). Bước 10: assert - Assert.assertTrue(text.contains('Chào mừng')). Nếu tất cả assert pass, test PASS. Nếu một assert fail, hoặc exception throw, test FAIL. Đó là một complete Selenium test case."</div>
+                </div>
+
+                <!-- SLIDE 11: EXPLICIT WAITS -->
+                <div class="slide">
+                    <h2>⏳ Explicit Waits (Best Practice)</h2>
+                    
+                    <h3>Explicit Wait Là Gì?</h3>
+                    <p>Báo Selenium: "Chờ cho condition cụ thể, tối đa 10 giây"</p>
+                    <p>Ví dụ conditions:</p>
+                    <ul>
+                        <li>✅ Element present/visible/clickable</li>
+                        <li>✅ Text appears in element</li>
+                        <li>✅ Element disabled</li>
+                        <li>✅ Alert appears</li>
+                    </ul>
+
+                    <h3>Code Example:</h3>
+                    <div class="code-example">
+<span class="keyword">import</span> org.openqa.selenium.support.ui.WebDriverWait;
+<span class="keyword">import</span> org.openqa.selenium.support.ui.ExpectedConditions;
+<span class="keyword">import</span> java.time.Duration;
+
+<span class="keyword">public class</span> ExplicitWaitTest {
+    <span class="keyword">public static void</span> main(String[] args) {
+        WebDriver driver = <span class="keyword">new</span> ChromeDriver();
+        driver.get(<span class="string">"https://example.com"</span>);
+        
+        <span class="comment">// Khởi tạo WebDriverWait (10 seconds)</span>
+        WebDriverWait wait = <span class="keyword">new</span> WebDriverWait(
+            driver,
+            Duration.ofSeconds(10)
+        );
+        
+        <span class="comment">// Chờ element present</span>
+        WebElement elem = wait.until(
+            ExpectedConditions.presenceOfElementLocated(
+                By.id(<span class="string">"dynamic"</span>)
+            )
+        );
+        
+        <span class="comment">// Chờ element visible</span>
+        WebElement button = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(
+                By.id(<span class="string">"submit"</span>)
+            )
+        );
+        button.click();
+        
+        <span class="comment">// Chờ element clickable</span>
+        WebElement link = wait.until(
+            ExpectedConditions.elementToBeClickable(By.id(<span class="string">"link"</span>))
+        );
+        link.click();
+        
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <h3>Common ExpectedConditions</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Condition</th>
+                            <th>Nghĩa</th>
+                        </tr>
+                        <tr>
+                            <td>presenceOfElementLocated</td>
+                            <td>Element có trong DOM (ngay cả khi hidden)</td>
+                        </tr>
+                        <tr>
+                            <td>visibilityOfElementLocated</td>
+                            <td>Element visible (displayed + enabled)</td>
+                        </tr>
+                        <tr>
+                            <td>elementToBeClickable</td>
+                            <td>Element visible + enabled + clickable</td>
+                        </tr>
+                        <tr>
+                            <td>textToBePresentInElement</td>
+                            <td>Element có text nào đó</td>
+                        </tr>
+                        <tr>
+                            <td>presenceOfAllElementsLocatedBy</td>
+                            <td>Tất cả elements trong list có</td>
+                        </tr>
+                    </table>
+
+                    <div class="success">
+                        ✅ <strong>Best Practice:</strong> Dùng explicit waits. Cụ thể, fail-fast, nhanh.
+                    </div>
+
+                    <div class="narration-box">🔊 "Khi automate, nhiều thứ có thể go wrong. Thứ nhất là NoSuchElementException - element không tìm thấy. Có thể element locator sai, hoặc element chưa load. Dùng explicit wait để avoid này. Thứ hai là TimeoutException - explicit wait timeout. Element không appear trong specified time. Có thể network slow, hoặc element load fail. Thứ ba là StaleElementReferenceException - element reference cũ. Sau khi page refresh, old element reference không valid. Thứ tư là AssertionError - assertion fail. Expected không match actual. Thứ năm là NullPointerException - element null. Tất cả exceptions này nên handle bằng try-catch hoặc test framework. Test framework như TestNG sẽ catch exceptions và mark test as FAILED. Không cần viết try-catch đơn giản để rethrow exception. Nhưng nếu bạn muốn custom error message, viết try-catch. Ví dụ: try { driver.findElement(By.id('login')).click(); } catch (NoSuchElementException e) { System.out.println('Login button not found'); throw new AssertionError('Login button not found', e); }."</div>
+                </div>
+
+                <!-- SLIDE 12: ADVANCED ACTIONS -->
+                <div class="slide">
+                    <h2>🎯 Advanced Actions</h2>
+                    
+                    <h3>Actions Class - Tương Tác Phức Tạp</h3>
+                    <p>Untuk interactions ngoài click/type: hover, drag & drop, keys combos</p>
+
+                    <h3>1. Hover Over Element</h3>
+                    <div class="code-example">
+<span class="keyword">import</span> org.openqa.selenium.interactions.Actions;
+
+<span class="comment">// Hover over element</span>
+WebElement menu = driver.findElement(By.id(<span class="string">"dropdown"</span>));
+Actions actions = <span class="keyword">new</span> Actions(driver);
+actions.moveToElement(menu).perform();
+
+<span class="comment">// Rồi click submenu</span>
+WebElement submenu = driver.findElement(By.id(<span class="string">"submenu"</span>));
+submenu.click();
+                    </div>
+
+                    <h3>2. Drag & Drop</h3>
+                    <div class="code-example">
+<span class="comment">// Drag element từ A tới B</span>
+WebElement source = driver.findElement(By.id(<span class="string">"box1"</span>));
+WebElement target = driver.findElement(By.id(<span class="string">"box2"</span>));
+
+Actions actions = <span class="keyword">new</span> Actions(driver);
+actions.dragAndDrop(source, target).perform();
+                    </div>
+
+                    <h3>3. Right Click (Context Menu)</h3>
+                    <div class="code-example">
+<span class="comment">// Right click</span>
+WebElement elem = driver.findElement(By.id(<span class="string">"element"</span>));
+Actions actions = <span class="keyword">new</span> Actions(driver);
+actions.contextClick(elem).perform();
+
+<span class="comment">// Rồi click menu option</span>
+driver.findElement(By.xpath(<span class="string">"//div[text()='Delete']"</span>)).click();
+                    </div>
+
+                    <h3>4. Key Combinations</h3>
+                    <div class="code-example">
+<span class="comment">// Ctrl + A (select all)</span>
+Actions actions = <span class="keyword">new</span> Actions(driver);
+actions.keyDown(Keys.CONTROL)
+       .sendKeys(<span class="string">"a"</span>)
+       .keyUp(Keys.CONTROL)
+       .perform();
+
+<span class="comment">// Ctrl + C (copy)</span>
+actions.keyDown(Keys.CONTROL)
+       .sendKeys(<span class="string">"c"</span>)
+       .keyUp(Keys.CONTROL)
+       .perform();
+                    </div>
+
+                    <h3>5. Scroll</h3>
+                    <div class="code-example">
+<span class="comment">// Scroll to element</span>
+WebElement elem = driver.findElement(By.id(<span class="string">"footer"</span>));
+((JavascriptExecutor) driver).executeScript(
+    <span class="string">"arguments[0].scrollIntoView(true);"</span>,
+    elem
+);
+
+<span class="comment">// Scroll page</span>
+((JavascriptExecutor) driver).executeScript(
+    <span class="string">"window.scrollBy(0, 500);"</span>
+);
+                    </div>
+
+                    <div class="narration-box">🔊 "Khi viết E2E tests, code có thể get messy nếu bạn mix page interaction logic với test logic. Best practice là PAGE OBJECT MODEL - tách page-specific code sang separate class. Ví dụ, tạo class LoginPage. Ngoài constructor, có private By locators: usernameLocator = By.id('username'), passwordLocator = By.name('password'), loginButtonLocator = By.cssSelector('button.login'). Có public methods: login(String username, String password) - fillUsername(username), fillPassword(password), clickLogin(). Mỗi method wrap page interaction. Test code sẽ clean: loginPage.login('john@example.com', 'password123'). String welcomeMsg = driver.findElement(...).getText(). Assert.assertTrue(...). Nếu locators change, bạn chỉ update LoginPage class, không cần update test code. Chúng ta sẽ deep dive vào POM ở PHASE 3."</div>
+                </div>
+
+                <!-- SLIDE 13: WINDOW & FRAME HANDLING -->
+                <div class="slide">
+                    <h2>🪟 Window & Frame Handling</h2>
+                    
+                    <h3>1. Switch Between Windows</h3>
+                    <p>Nếu website mở multiple windows, bạn phải switch</p>
+                    <div class="code-example">
+<span class="comment">// Lấy current window handle</span>
+String mainWindow = driver.getWindowHandle();
+
+<span class="comment">// Lấy tất cả window handles</span>
+Set&lt;String&gt; handles = driver.getWindowHandles();
+
+<span class="comment">// Switch to another window</span>
+<span class="keyword">for</span> (String handle : handles) {
+    <span class="keyword">if</span> (!handle.equals(mainWindow)) {
+        driver.switchTo().window(handle);
+        System.out.println(<span class="string">"Switched to: "</span> + driver.getTitle());
+    }
+}
+
+<span class="comment">// Switch back</span>
+driver.switchTo().window(mainWindow);
+                    </div>
+
+                    <h3>2. Switch to iFrame</h3>
+                    <p>iFrame = HTML element chứa document khác</p>
+                    <div class="code-example">
+<span class="comment">// HTML: &lt;iframe id="payment-frame"&gt;...&lt;/iframe&gt;</span>
+
+<span class="comment">// Switch to iframe</span>
+WebElement iframe = driver.findElement(By.id(<span class="string">"payment-frame"</span>));
+driver.switchTo().frame(iframe);
+
+<span class="comment">// Bây giờ có thể tìm elements trong iframe</span>
+WebElement cardNum = driver.findElement(By.id(<span class="string">"card-number"</span>));
+cardNum.sendKeys(<span class="string">"1234567890123456"</span>);
+
+<span class="comment">// Switch back to main content</span>
+driver.switchTo().defaultContent();
+                    </div>
+
+                    <h3>3. Switch to Alert</h3>
+                    <div class="code-example">
+<span class="comment">// Accept alert</span>
+Alert alert = driver.switchTo().alert();
+System.out.println(<span class="string">"Alert text: "</span> + alert.getText());
+alert.accept(); <span class="comment">// Click OK</span>
+
+<span class="comment">// Dismiss alert</span>
+alert.dismiss(); <span class="comment">// Click Cancel</span>
+
+<span class="comment">// Type in prompt</span>
+alert.sendKeys(<span class="string">"my answer"</span>);
+alert.accept();
+                    </div>
+
+                    <div class="tip">
+                        💡 <strong>Tip:</strong> Sau khi switch to iframe, phải switchTo().defaultContent() để quay lại main content.
+                    </div>
+
+                    <div class="narration-box">🔊 "PHASE 2 chúng ta đã learn Selenium WebDriver - công cụ chính để automate browser. Chúng ta learn 8 locators (ID, name, className, tagName, cssSelector, xpath, linkText, partialLinkText) với best practice là ID &gt; name &gt; cssSelector &gt; xpath. Chúng ta learn interactions: click(), sendKeys(), clear(), submit(), getText(), getAttribute(), isDisplayed(), isEnabled(), isSelected(). Chúng ta learn waits: implicit (slow, not recommended) vs explicit (fast, recommended với ExpectedConditions). Chúng ta learn advanced actions: hover, drag drop, right click, key combinations, scroll, switch window, switch frame. Chúng ta learn proper error handling: try-catch, explicit waits để avoid exceptions. Chúng ta learn best practice: Page Object Model để keep code clean. Selenium chỉ là tool - nó không manage test cases, assertions, reporting. Đó là lý do tại sao PHASE 3 chúng ta sẽ learn TestNG framework - để structure tests properly."</div>
+                </div>
+
+                <!-- SLIDE 14: REAL-WORLD EXAMPLE 1 -->
+                <div class="slide">
+                    <h2>💻 Real-World Example 1: Login Test</h2>
+                    
+                    <h3>Scenario: Test Login Functionality</h3>
+                    <p>Website: https://example.com/login</p>
+                    <p>Login flow: Username → Password → Click Login → Verify welcome message</p>
+
+                    <div class="code-example">
+<span class="keyword">import</span> org.openqa.selenium.*;
+<span class="keyword">import</span> org.openqa.selenium.chrome.ChromeDriver;
+<span class="keyword">import</span> org.openqa.selenium.support.ui.*;
+<span class="keyword">import</span> org.junit.Test;
+<span class="keyword">import</span> org.junit.After;
+<span class="keyword">import</span> java.time.Duration;
+
+<span class="keyword">public class</span> LoginTest {
+    WebDriver driver;
+    WebDriverWait wait;
+    
+    <span class="keyword">@Before</span>
+    <span class="keyword">public void</span> setUp() {
+        driver = <span class="keyword">new</span> ChromeDriver();
+        wait = <span class="keyword">new</span> WebDriverWait(driver, Duration.ofSeconds(10));
+    }
+    
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testValidLogin() {
+        <span class="comment">// Step 1: Navigate</span>
+        driver.get(<span class="string">"https://example.com/login"</span>);
+        
+        <span class="comment">// Step 2: Wait & find username input</span>
+        WebElement username = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"username"</span>))
+        );
+        username.sendKeys(<span class="string">"john@example.com"</span>);
+        
+        <span class="comment">// Step 3: Find & fill password</span>
+        WebElement password = driver.findElement(By.id(<span class="string">"password"</span>));
+        password.sendKeys(<span class="string">"password123"</span>);
+        
+        <span class="comment">// Step 4: Click login</span>
+        WebElement loginBtn = driver.findElement(By.id(<span class="string">"login-btn"</span>));
+        loginBtn.click();
+        
+        <span class="comment">// Step 5: Wait & verify welcome message</span>
+        WebElement welcome = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"welcome-msg"</span>))
+        );
+        
+        <span class="comment">// Step 6: Assert</span>
+        String welcomeText = welcome.getText();
+        assertTrue(<span class="string">"Welcome message should appear"</span>, 
+            welcomeText.contains(<span class="string">"Welcome"</span>));
+    }
+    
+    <span class="keyword">@After</span>
+    <span class="keyword">public void</span> tearDown() {
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+[ChromeDriver] Started
+🌐 Navigating to: https://example.com/login
+👆 Clicking username field
+✍️  Entering username: john@example.com
+✍️  Entering password: ****
+👆 Clicking login button
+⏳ Waiting for welcome message...
+💬 Welcome message found: "Welcome, John!"
+✅ TEST PASSED
+
+Time: 5.2 seconds
+                    </div>
+
+                    <div class="narration-box">🔊 "Khi bạn click link 'Open in new window', browser sẽ open new window. Selenium chạy trên window gốc, nếu bạn cố find element ở new window, nó fail vì Selenium focus vào window gốc. Bạn cần switch sang new window. Đầu tiên get all window handles: Set&lt;String&gt; allHandles = driver.getWindowHandles(). Nó return list of window handles - mỗi handle là unique ID của một window. Rồi loop through handles, switch sang window mới: for (String handle : allHandles) { driver.switchTo().window(handle); if (driver.getTitle().contains('New Page')) { break; } }. Bây giờ bạn đang ở new window, bạn có thể find elements ở page này. Sau khi done, switch back sang original window: driver.switchTo().window(originalHandle). Pro tip: nên store original window handle trước switch, rồi switch back sau."</div>
+                </div>
+
+                <!-- SLIDE 15: REAL-WORLD EXAMPLE 2 -->
+                <div class="slide">
+                    <h2>💻 Real-World Example 2: Shopping Test</h2>
+                    
+                    <h3>Scenario: Add Product to Cart</h3>
+                    <p>Flow: Search "Laptop" → Find product → View details → Add to cart → Verify cart count</p>
+
+                    <div class="code-example">
+<span class="keyword">@Test</span>
+<span class="keyword">public void</span> testAddToCart() {
+    driver.get(<span class="string">"https://ecommerce.com"</span>);
+    
+    <span class="comment">// Search for laptop</span>
+    WebElement searchBox = driver.findElement(By.id(<span class="string">"search"</span>));
+    searchBox.sendKeys(<span class="string">"Laptop"</span>);
+    driver.findElement(By.id(<span class="string">"search-btn"</span>)).click();
+    
+    <span class="comment">// Wait for search results</span>
+    WebElement product = wait.until(
+        ExpectedConditions.visibilityOfElementLocated(
+            By.xpath(<span class="string">"//div[@class='product'][1]"</span>)
+        )
+    );
+    product.click();
+    
+    <span class="comment">// Verify product page</span>
+    WebElement productName = driver.findElement(By.id(<span class="string">"product-name"</span>));
+    assertEquals(<span class="string">"Dell XPS 13"</span>, productName.getText());
+    
+    <span class="comment">// Set quantity</span>
+    WebElement quantity = driver.findElement(By.id(<span class="string">"qty"</span>));
+    quantity.clear();
+    quantity.sendKeys(<span class="string">"2"</span>);
+    
+    <span class="comment">// Add to cart</span>
+    WebElement addBtn = driver.findElement(By.id(<span class="string">"add-cart"</span>));
+    addBtn.click();
+    
+    <span class="comment">// Verify cart updated</span>
+    WebElement cartCount = wait.until(
+        ExpectedConditions.textToBePresentInElementLocated(
+            By.id(<span class="string">"cart-count"</span>),
+            <span class="string">"2"</span>
+        )
+    );
+    
+    assertEquals(<span class="string">"2"</span>, cartCount.getText());
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+🌐 Navigating to ecommerce.com
+🔍 Searching for: Laptop
+✅ Search results loaded
+👆 Clicking first product
+📦 Product: Dell XPS 13
+✍️  Setting quantity to 2
+👆 Clicking Add to Cart
+✅ Product added
+🛒 Cart count updated: 2
+✅ TEST PASSED
+
+Time: 8.3 seconds
+                    </div>
+
+                    <div class="narration-box">🔊 "Iframes là embedded pages trong main page. Nếu element ở trong iframe, Selenium không thể find nó từ main page. Bạn cần switch vào frame trước. driver.switchTo().frame(iframeElement) hoặc driver.switchTo().frame(frameIndex) hoặc driver.switchTo().frame(frameName). Ví dụ, website có iframe với id='payment-frame'. Bạn muốn find input field ở trong frame. Đầu tiên switch vào frame: driver.switchTo().frame(driver.findElement(By.id('payment-frame'))). Bây giờ bạn có thể find element ở trong frame: driver.findElement(By.id('card-number')). Sau khi done, switch out khỏi frame: driver.switchTo().defaultContent() back về main page, hoặc driver.switchTo().parentFrame() switch vào parent frame. Nếu có multiple nested iframes, bạn cần switch vào từng frame theo order."</div>
+                </div>
+
+                <!-- SLIDE 16: BEST PRACTICES -->
+                <div class="slide">
+                    <h2>🏆 Selenium Best Practices</h2>
+                    
+                    <h3>1. Use Explicit Waits (Not Implicit)</h3>
+                    <ul>
+                        <li>✅ Explicit: Fast, specific, reliable</li>
+                        <li>❌ Implicit: Slow, global, unreliable</li>
+                    </ul>
+
+                    <h3>2. Prefer ID Locators</h3>
+                    <ul>
+                        <li>🥇 ID: Fast, unique, reliable (best)</li>
+                        <li>🥈 CSS: Flexible, fast (good)</li>
+                        <li>❌ XPath: Powerful but fragile (last resort)</li>
+                    </ul>
+
+                    <h3>3. Page Object Model (POM)</h3>
+                    <p>Tách elements & actions thành page classes:</p>
+                    <div class="code-example">
+<span class="comment">// LoginPage.java</span>
+<span class="keyword">public class</span> LoginPage {
+    WebDriver driver;
+    
+    <span class="keyword">private</span> By usernameLocator = By.id(<span class="string">"username"</span>);
+    <span class="keyword">private</span> By passwordLocator = By.id(<span class="string">"password"</span>);
+    <span class="keyword">private</span> By loginLocator = By.id(<span class="string">"login"</span>);
+    
+    <span class="keyword">public</span> LoginPage(WebDriver driver) {
+        <span class="keyword">this</span>.driver = driver;
+    }
+    
+    <span class="keyword">public void</span> login(String user, String pass) {
+        driver.findElement(usernameLocator).sendKeys(user);
+        driver.findElement(passwordLocator).sendKeys(pass);
+        driver.findElement(loginLocator).click();
+    }
+}
+
+<span class="comment">// Test.java</span>
+LoginPage page = <span class="keyword">new</span> LoginPage(driver);
+page.login(<span class="string">"john@example.com"</span>, <span class="string">"password"</span>);
+                    </div>
+
+                    <h3>4. Handle Exceptions</h3>
+                    <div class="code-example">
+<span class="keyword">try</span> {
+    WebElement elem = driver.findElement(By.id(<span class="string">"element"</span>));
+} <span class="keyword">catch</span> (NoSuchElementException e) {
+    System.out.println(<span class="string">"Element not found"</span>);
+} <span class="keyword">catch</span> (StaleElementReferenceException e) {
+    System.out.println(<span class="string">"Element stale, retrying..."</span>);
+}
+                    </div>
+
+                    <h3>5. Add Logging & Screenshots</h3>
+                    <div class="code-example">
+<span class="comment">// Take screenshot on failure</span>
+File screenshot = ((TakesScreenshot)driver)
+    .getScreenshotAs(OutputType.FILE);
+FileUtils.copyFile(screenshot, 
+    <span class="keyword">new</span> File(<span class="string">"screenshot.png"</span>));
+
+System.out.println(<span class="string">"✅ Step completed successfully"</span>);
+                    </div>
+
+                    <div class="narration-box">🔊 "Alerts là popup windows - ví dụ confirmation dialog 'Are you sure?'. Nếu bạn cố find element ở alert, fail vì alert overlay page. Bạn cần switch sang alert object: Alert alert = driver.switchTo().alert(). Rồi bạn có 3 options. Thứ nhất: alert.accept() - click OK button. Thứ hai: alert.dismiss() - click Cancel button. Thứ ba: alert.sendKeys('text') - type text vào input field ở alert. Ví dụ, page show 'Enter your name' prompt. Code: Alert alert = driver.switchTo().alert(). alert.sendKeys('John'). alert.accept(). Sau khi accept/dismiss alert, control return về page. Bạn có thể continue làm action khác."</div>
+                </div>
+
+                <!-- SLIDE 17: COMMON PROBLEMS & SOLUTIONS -->
+                <div class="slide">
+                    <h2>⚠️ Common Problems & Solutions</h2>
+                    
+                    <h3>1. NoSuchElementException</h3>
+                    <p><strong>Problem:</strong> Element không tìm được</p>
+                    <p><strong>Solution:</strong> Dùng explicit waits</p>
+                    <div class="code-example">
+<span class="comment">// ❌ Bad</span>
+WebElement elem = driver.findElement(By.id(<span class="string">"dynamic"</span>));
+
+<span class="comment">// ✅ Good</span>
+WebElement elem = wait.until(
+    ExpectedConditions.presenceOfElementLocated(By.id(<span class="string">"dynamic"</span>))
+);
+                    </div>
+
+                    <h3>2. StaleElementReferenceException</h3>
+                    <p><strong>Problem:</strong> Element reference không còn valid (DOM refreshed)</p>
+                    <p><strong>Solution:</strong> Re-find element sau page refresh</p>
+                    <div class="code-example">
+<span class="comment">// ❌ Bad - element stale setelah refresh</span>
+WebElement elem = driver.findElement(By.id(<span class="string">"element"</span>));
+driver.refresh();
+elem.click(); <span class="comment">// ❌ StaleElementReferenceException</span>
+
+<span class="comment">// ✅ Good - re-find after refresh</span>
+driver.refresh();
+elem = driver.findElement(By.id(<span class="string">"element"</span>));
+elem.click();
+                    </div>
+
+                    <h3>3. Element Not Clickable</h3>
+                    <p><strong>Problem:</strong> Element ada tapi tidak clickable (covered by other element)</p>
+                    <p><strong>Solution:</strong> Scroll to element, dùng JavaScript click</p>
+                    <div class="code-example">
+<span class="comment">// Solution 1: Scroll to element</span>
+((JavascriptExecutor) driver).executeScript(
+    <span class="string">"arguments[0].scrollIntoView(true);"</span>, elem
+);
+elem.click();
+
+<span class="comment">// Solution 2: JavaScript click</span>
+((JavascriptExecutor) driver).executeScript(
+    <span class="string">"arguments[0].click();"</span>, elem
+);
+                    </div>
+
+                    <h3>4. Timeout Exceptions</h3>
+                    <p><strong>Problem:</strong> Explicit wait timeout (element tidak load 10 detik)</p>
+                    <p><strong>Solution:</strong> Debug - inspect page, extend timeout, check selectors</p>
+
+                    <div class="narration-box">🔊 "Ngoài cái mà Selenium support, bạn có thể execute JavaScript trực tiếp. Ví dụ, bạn muốn scroll tới element, hoặc bạn muốn hide element, hoặc bạn muốn inject data. JavascriptExecutor js = (JavascriptExecutor) driver. js.executeScript('script here', arg1, arg2, ...). Ví dụ, scroll element vào view: js.executeScript('arguments[0].scrollIntoView(true);', element). Highlight element (useful để debug): js.executeScript('arguments[0].style.border = "3px solid red";', element). Click element (alternative khi regular click fail): js.executeScript('arguments[0].click();', element). Get custom attribute: String value = (String) js.executeScript('return arguments[0].getAttribute("data-custom")', element). Nếu script return value, bạn cast vào appropriate type."</div>
+                </div>
+
+                <!-- SLIDE 18: RECAP & NEXT STEPS -->
+                <div class="slide">
+                    <h2>📚 Recap: PHASE 2</h2>
+                    
+                    <h3>Chúng Ta Đã Học:</h3>
+                    <ul>
+                        <li>✅ Selenium setup & WebDriver basics</li>
+                        <li>✅ 8 loại locators (ID, Name, CSS, XPath, etc.)</li>
+                        <li>✅ Element interactions (click, sendKeys, clear, submit)</li>
+                        <li>✅ Get element properties (getText, getAttribute, isDisplayed)</li>
+                        <li>✅ Waits (Implicit vs Explicit - use Explicit!)</li>
+                        <li>✅ Advanced actions (hover, drag, right-click, scroll)</li>
+                        <li>✅ Window & iframe handling</li>
+                        <li>✅ Real-world examples</li>
+                        <li>✅ Best practices (POM, exception handling)</li>
+                    </ul>
+
+                    <h3>Key Takeaways</h3>
+                    <div class="concept-box">
+                        <h4>🔑 Selenium Workflow</h4>
+                        <p>1. Initialize WebDriver<br>
+                        2. Navigate to URL<br>
+                        3. Wait for element<br>
+                        4. Find element (locate)<br>
+                        5. Interact (click, type)<br>
+                        6. Verify result<br>
+                        7. Close browser</p>
+                    </div>
+
+                    <h3>Next: PHASE 3</h3>
+                    <ul>
+                        <li>🎯 TestNG Framework (organize tests)</li>
+                        <li>📊 Data-Driven Testing (multiple test data)</li>
+                        <li>📋 Page Object Model (in-depth)</li>
+                        <li>🔗 CI/CD Integration (Jenkins, GitHub Actions)</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Khi test fail, screenshot sangat useful để debug. TakesScreenshot ts = (TakesScreenshot) driver. File screenshot = ts.getScreenshotAs(OutputType.FILE). String path = 'screenshots/' + System.currentTimeMillis() + '.png'. FileUtils.copyFile(screenshot, new File(path)). Nó sẽ save screenshot PNG file ke folder. Filename bisa contain timestamp để avoid overwrite. Banyak test frameworks auto capture screenshot on failure, tapi Selenium tidak. Jadi banyak tests manual call method ini di catch block. Atau dùng listener (PHASE 4) untuk auto screenshot."</div>
+                </div>
+
+            </div>
+
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Previous</button>
+                    <button class="btn-primary" id="nextBtn">Next ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 18</div>
+                </div>
+
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress" style="width: 5%;"></div>
+                </div>
+
+                                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. Intro PHASE 2</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. What is Selenium</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. Setup Selenium</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. Locators Intro</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. ID & Name Locators</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. CSS & XPath</a></li>
+                        <li><a href="#" onclick="return goToSlide(6)">6. Find Elements</a></li>
+                        <li><a href="#" onclick="return goToSlide(7)">7. Interactions</a></li>
+                        <li><a href="#" onclick="return goToSlide(8)">8. Get Properties</a></li>
+                        <li><a href="#" onclick="return goToSlide(9)">9. Waits Intro</a></li>
+                        <li><a href="#" onclick="return goToSlide(10)">10. Implicit Waits</a></li>
+                        <li><a href="#" onclick="return goToSlide(11)">11. Explicit Waits</a></li>
+                        <li><a href="#" onclick="return goToSlide(12)">12. Advanced Actions</a></li>
+                        <li><a href="#" onclick="return goToSlide(13)">13. Window & Frame</a></li>
+                        <li><a href="#" onclick="return goToSlide(14)">14. Example: Login</a></li>
+                        <li><a href="#" onclick="return goToSlide(15)">15. Example: Shopping</a></li>
+                        <li><a href="#" onclick="return goToSlide(16)">16. Best Practices</a></li>
+                        <li><a href="#" onclick="return goToSlide(17)">17. Common Problems</a></li>
+                        <li><a href="#" onclick="return goToSlide(18)">18. Recap & Next</a></li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~70 phút<br>
+                        📚 PHASE 2<br>
+                        🌐 Selenium WebDriver
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Automation Testing Tutorial | PHASE 2: Selenium WebDriver | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js"></script>
+    <script src="course-ui-demos.js"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateSlide();
+            }
+            return false;
+        }
+
+        const ttsPage = document.body.dataset.ttsPage;
+
+        function speak() {
+            const slide = slides[currentSlide];
+            if (!slide.querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+
+        function reset() {
+            currentSlide = 0;
+            updateSlide();
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        stopSpeakBtn.addEventListener('click', function () {
+            VietnameseTTS.stop();
+        });
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

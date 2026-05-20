@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASE 3: TestNG & Page Object Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            display: flex;
+            height: 800px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #667eea;
+            font-size: 2.3em;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #764ba2;
+            font-size: 1.5em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .slide h4 {
+            color: #555;
+            font-size: 1.2em;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.9;
+            color: #333;
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 18px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.7;
+            max-height: 350px;
+            border-left: 5px solid #667eea;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; font-weight: bold; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+
+        .explanation {
+            background: #e8f4f8;
+            border-left: 5px solid #0288d1;
+            padding: 18px;
+            margin: 18px 0;
+            border-radius: 8px;
+            color: #01579b;
+            font-size: 1em;
+            line-height: 1.8;
+        }
+
+        .explanation strong {
+            color: #0288d1;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 18px;
+            border-radius: 8px;
+            margin: 18px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.7;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .sidebar {
+            flex: 0 0 320px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 13px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #764ba2;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #663a8b;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.15em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 18px 0;
+            border-radius: 5px;
+            color: #333;
+            line-height: 1.7;
+            font-size: 1em;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffebee;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 18px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 1em;
+        }
+
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #51cf66;
+            padding: 15px;
+            margin: 18px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 1em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 15px;
+            margin: 18px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 1em;
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 18px;
+            border-radius: 8px;
+            margin: 18px 0;
+            font-size: 1em;
+            line-height: 1.8;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 25px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+<link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+    <link rel="stylesheet" href="course-ui-demos.css">
+</head>
+<body data-tts-page="phase3">
+    <div class="container">
+        <div class="header">
+            <h1>🎯 PHASE 3: TestNG & Page Object Model</h1>
+            <p style="font-size: 1.2em; opacity: 0.95;">Organizing & Scaling Automation Tests</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+                <!-- SLIDE 0: INTRO -->
+                <div class="slide active">
+                    <h2>👋 PHASE 3: TestNG & Page Object Model</h2>
+                    
+                    <p style="font-size: 1.2em; margin-bottom: 30px;">Organizing và Scaling Automation Tests</p>
+
+                    <h3>Ở PHASE 1 & 2 chúng ta đã học:</h3>
+                    <ul>
+                        <li>✅ Automation testing cơ bản (Unit, Integration, E2E, API)</li>
+                        <li>✅ Selenium WebDriver (locate, interact, wait)</li>
+                    </ul>
+
+                    <h3>PHASE 3 chúng ta sẽ học:</h3>
+                    <ul>
+                        <li><span class="emoji">🧪</span><strong>TestNG Framework</strong> - Tổ chức test cases</li>
+                        <li><span class="emoji">📄</span><strong>Page Object Model (POM)</strong> - Tách element locators & actions</li>
+                        <li><span class="emoji">📊</span><strong>Data-Driven Testing</strong> - Test với nhiều data sets</li>
+                        <li><span class="emoji">⚙️</span><strong>Test Fixtures</strong> - Setup & teardown</li>
+                        <li><span class="emoji">📈</span><strong>Test Reports</strong> - Generate test reports</li>
+                        <li><span class="emoji">🔧</span><strong>Advanced TestNG</strong> - Parallel execution, listeners</li>
+                    </ul>
+
+                    <div class="narration-box">
+                        🔊 "Ở PHASE 2 chúng ta học Selenium WebDriver - công cụ để control browser. Nhưng Selenium chỉ là low-level tool. Nó không manage test lifecycle, không run tests, không generate reports. Bạn phải viết main() method để trigger tests, phải manually assert, phải manually handle setup/teardown. Khi có 100 test cases, nó rất cumbersome. TestNG là một test framework - nó manage tất cả việc này. TestNG là viết tắt của Testing Next Generation. Nó dựa trên JUnit nhưng more powerful. TestNG cung cấp annotations để mark test methods, fixtures để setup/teardown, assertions để verify kết quả, parallel execution, data-driven tests, test grouping, detailed reports. Khi bạn dùng TestNG, bạn không viết main() method. Bạn chỉ viết test methods với @Test annotation. Bạn run tests qua TestNG framework - nó sẽ automatically discover @Test methods, run chúng, collect results, generate reports."
+                    </div>
+                </div>
+
+                <!-- SLIDE 1: WHY TESTNG -->
+                <div class="slide">
+                    <h2>🧪 TestNG Là Gì?</h2>
+                    
+                    <h3>Định Nghĩa</h3>
+                    <p><span class="highlight">TestNG</span> = Testing Framework cho Java, similar to JUnit nhưng powerful hơn.</p>
+
+                    <p>TestNG giúp bạn:</p>
+                    <ul>
+                        <li>✅ Organize test cases thành groups & classes</li>
+                        <li>✅ Run tests theo order, dependencies, priorities</li>
+                        <li>✅ Run tests in parallel (nhanh hơn)</li>
+                        <li>✅ Generate HTML reports</li>
+                        <li>✅ Parametrize tests (data-driven testing)</li>
+                        <li>✅ Setup/teardown fixtures (@BeforeClass, @AfterClass)</li>
+                    </ul>
+
+                    <h3>Ví Dụ: Với vs Không Có TestNG</h3>
+
+                    <h4>❌ Không có TestNG (JUnit):</h4>
+                    <div class="code-block">
+<span class="keyword">public class</span> TestLogin {
+    WebDriver driver;
+    
+    <span class="keyword">@Before</span>
+    <span class="keyword">public void</span> setUp() {
+        driver = <span class="keyword">new</span> ChromeDriver();
+    }
+    
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testValidLogin() {
+        <span class="comment">// Test code</span>
+    }
+    
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testInvalidLogin() {
+        <span class="comment">// Test code</span>
+    }
+    
+    <span class="keyword">@After</span>
+    <span class="keyword">public void</span> tearDown() {
+        driver.quit();
+    }
+}
+<span class="comment">// Khi run: không control thứ tự, không parallel, output basic</span>
+                    </div>
+
+                    <h4>✅ Với TestNG:</h4>
+                    <div class="code-block">
+<span class="keyword">@BeforeSuite</span> <span class="comment">// Run 1 lần trước tất cả tests</span>
+<span class="keyword">@BeforeTest</span>  <span class="comment">// Run trước mỗi test tag trong XML</span>
+<span class="keyword">@BeforeClass</span> <span class="comment">// Run 1 lần trước tất cả methods trong class</span>
+<span class="keyword">@BeforeMethod</span> <span class="comment">// Run trước mỗi @Test method</span>
+<span class="keyword">@Test</span>
+<span class="keyword">@AfterMethod</span>
+<span class="keyword">@AfterClass</span>
+<span class="keyword">@AfterTest</span>
+<span class="keyword">@AfterSuite</span>
+<span class="comment">// Khi run: control order, parallel, HTML reports</span>
+                    </div>
+
+                    <h3>Lợi Ích Của TestNG</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Feature</th>
+                            <th>JUnit</th>
+                            <th>TestNG</th>
+                        </tr>
+                        <tr>
+                            <td>Organize tests</td>
+                            <td>Basic</td>
+                            <td>✅ Powerful (groups, priorities)</td>
+                        </tr>
+                        <tr>
+                            <td>Parallel execution</td>
+                            <td>Khó</td>
+                            <td>✅ Easy (1 line XML)</td>
+                        </tr>
+                        <tr>
+                            <td>Parameterization</td>
+                            <td>@Parameterized</td>
+                            <td>✅ @DataProvider, @Parameters</td>
+                        </tr>
+                        <tr>
+                            <td>Fixtures</td>
+                            <td>@Before/@After</td>
+                            <td>✅ 4 levels (@BeforeSuite, @BeforeTest, @BeforeClass, @BeforeMethod)</td>
+                        </tr>
+                        <tr>
+                            <td>Reports</td>
+                            <td>Basic XML</td>
+                            <td>✅ HTML, detailed</td>
+                        </tr>
+                    </table>
+
+                    <div class="narration-box">🔊 "TestNG cung cấp annotations để hook vào test lifecycle. Annotations là metadata - Java cung cấp mechanism để mark method/class/field với extra info. TestNG sẽ scan class, tìm methods với annotations, rồi execute theo order. Annotations bắt đầu bằng @ symbol. @BeforeSuite - run once trước ALL tests. Useful để setup global resources như database, server. @AfterSuite - run once sau ALL tests. Useful để cleanup global resources. @BeforeTest - run trước mỗi test tag ở testng.xml (chúng ta sẽ học testng.xml sau). @AfterTest - run sau mỗi test tag. @BeforeClass - run once trước mỗi test class. Nếu class có 10 test methods, @BeforeClass run 1 lần, không 10 lần. @AfterClass - run once sau mỗi test class. @BeforeMethod - run trước MỖI test method. Nếu class có 10 test methods, @BeforeMethod run 10 lần. @AfterMethod - run sau MỖI test method. @Test - mark method là test method. TestNG sẽ execute methods có @Test annotation. Lifecycle hierarchy là: @BeforeSuite → @BeforeTest → @BeforeClass → @BeforeMethod → @Test → @AfterMethod → @AfterClass → @AfterTest → @AfterSuite. Nếu có 2 test methods, flow sẽ là: @BeforeSuite → @BeforeTest → @BeforeClass → @BeforeMethod → @Test 1 → @AfterMethod → @BeforeMethod → @Test 2 → @AfterMethod → @AfterClass → @AfterTest → @AfterSuite."</div>
+                </div>
+
+                <!-- SLIDE 2: TESTNG SETUP & ANNOTATIONS -->
+                <div class="slide">
+                    <h2>🧪 TestNG Setup & Annotations</h2>
+                    
+                    <h3>Step 1: Add Maven Dependency</h3>
+                    <div class="code-block">
+<span class="keyword">&lt;dependency&gt;</span>
+    <span class="keyword">&lt;groupId&gt;</span>org.testng<span class="keyword">&lt;/groupId&gt;</span>
+    <span class="keyword">&lt;artifactId&gt;</span>testng<span class="keyword">&lt;/artifactId&gt;</span>
+    <span class="keyword">&lt;version&gt;</span>7.8.1<span class="keyword">&lt;/version&gt;</span>
+    <span class="keyword">&lt;scope&gt;</span>test<span class="keyword">&lt;/scope&gt;</span>
+<span class="keyword">&lt;/dependency&gt;</span>
+                    </div>
+
+                    <div class="explanation">
+                        <strong>Giải thích:</strong> Maven dependency cho TestNG. Version 7.8.1 là latest. Scope=test nghĩa là chỉ dùng cho testing, không cần ở production.
+                    </div>
+
+                    <h3>Step 2: TestNG Annotations Hierarchy</h3>
+                    <div class="code-block">
+<span class="keyword">public class</span> TestNGExample {
+    
+    <span class="comment">// 1. Run 1 lần ở đầu, trước tất cả tests</span>
+    <span class="keyword">@BeforeSuite</span>
+    <span class="keyword">public void</span> beforeSuite() {
+        System.out.println(<span class="string">"1. Before Suite"</span>);
+    }
+    
+    <span class="comment">// 2. Run trước mỗi &lt;test&gt; tag trong testng.xml</span>
+    <span class="keyword">@BeforeTest</span>
+    <span class="keyword">public void</span> beforeTest() {
+        System.out.println(<span class="string">"2. Before Test"</span>);
+    }
+    
+    <span class="comment">// 3. Run 1 lần trước tất cả @Test methods trong class</span>
+    <span class="keyword">@BeforeClass</span>
+    <span class="keyword">public void</span> beforeClass() {
+        System.out.println(<span class="string">"3. Before Class"</span>);
+    }
+    
+    <span class="comment">// 4. Run trước MỖI @Test method</span>
+    <span class="keyword">@BeforeMethod</span>
+    <span class="keyword">public void</span> beforeMethod() {
+        System.out.println(<span class="string">"4. Before Method - setup"</span>);
+    }
+    
+    <span class="comment">// Actual test method 1</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testLogin() {
+        System.out.println(<span class="string">"[TEST 1] Login Test"</span>);
+    }
+    
+    <span class="comment">// Actual test method 2</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testLogout() {
+        System.out.println(<span class="string">"[TEST 2] Logout Test"</span>);
+    }
+    
+    <span class="comment">// 5. Run sau MỖI @Test method</span>
+    <span class="keyword">@AfterMethod</span>
+    <span class="keyword">public void</span> afterMethod() {
+        System.out.println(<span class="string">"5. After Method - teardown"</span>);
+    }
+    
+    <span class="comment">// 6. Run 1 lần sau tất cả @Test methods</span>
+    <span class="keyword">@AfterClass</span>
+    <span class="keyword">public void</span> afterClass() {
+        System.out.println(<span class="string">"6. After Class"</span>);
+    }
+    
+    <span class="comment">// 7. Run sau mỗi &lt;test&gt; tag</span>
+    <span class="keyword">@AfterTest</span>
+    <span class="keyword">public void</span> afterTest() {
+        System.out.println(<span class="string">"7. After Test"</span>);
+    }
+    
+    <span class="comment">// 8. Run 1 lần ở cuối, sau tất cả tests</span>
+    <span class="keyword">@AfterSuite</span>
+    <span class="keyword">public void</span> afterSuite() {
+        System.out.println(<span class="string">"8. After Suite"</span>);
+    }
+}
+                    </div>
+
+                    <h3>Output Khi Run:</h3>
+                    <div class="output-box">
+1. Before Suite
+2. Before Test
+3. Before Class
+4. Before Method - setup
+[TEST 1] Login Test
+5. After Method - teardown
+4. Before Method - setup
+[TEST 2] Logout Test
+5. After Method - teardown
+6. After Class
+7. After Test
+8. After Suite
+
+Giải thích:
+- BeforeSuite chạy 1 lần ở đầu
+- BeforeTest & AfterTest chạy cho &lt;test&gt; tag
+- BeforeClass & AfterClass chạy 1 lần cho class
+- BeforeMethod & AfterMethod chạy trước/sau MỖI test
+- Nếu có 2 @Test methods:
+  * BeforeMethod/AfterMethod sẽ chạy 2 lần (mỗi test 1 lần)
+  * BeforeClass/AfterClass chạy 1 lần
+                    </div>
+
+                    <div class="explanation">
+                        <strong>Giải thích Chi Tiết:</strong><br>
+                        • <strong>BeforeSuite/AfterSuite:</strong> Run 1 lần cho toàn bộ test suite (setup database, cleanup resources)<br>
+                        • <strong>BeforeTest/AfterTest:</strong> Run 1 lần per &lt;test&gt; tag trong XML (dùng khi có multiple &lt;test&gt; tags)<br>
+                        • <strong>BeforeClass/AfterClass:</strong> Run 1 lần per class (một class có 10 test methods, BeforeClass chạy 1 lần, setup shared resources)<br>
+                        • <strong>BeforeMethod/AfterMethod:</strong> Run trước/sau MỖI @Test (nếu 10 test methods, BeforeMethod chạy 10 lần, setup individual test)
+                    </div>
+
+                    <div class="tip">
+                        💡 <strong>Tip:</strong> Dùng BeforeSuite/BeforeTest để setup browser 1 lần. Dùng BeforeMethod để reset state trước mỗi test. Dùng AfterMethod để clear cookies/cache.
+                    </div>
+
+                    <div class="narration-box">🔊 "Hãy xem code ví dụ. Import TestNG annotations từ org.testng. Tạo public class LoginTests. Khai báo WebDriver driver (global variable để access trong các methods). Viết @BeforeSuite method - setup Selenium. Nó run once, trước tất cả tests. Viết @BeforeMethod method - reset browser state, navigate to login page. Nó run trước mỗi test method. Vì vậy nếu test 1 login fail, browser có lỗi state, @BeforeMethod sẽ reset nó cho test 2. Viết @Test method testValidLogin - test login với credentials hợp lệ. Viết @Test method testInvalidLogin - test login với invalid credentials. Viết @AfterMethod method - logout, clear cookies, reset state. Viết @AfterSuite method - close browser, cleanup resources. Khi bạn run class như JUnit, TestNG sẽ automatically execute methods theo lifecycle. Không cần main() method, không cần viết orchestration code. TestNG handle tất cả."</div>
+                </div>
+
+                <!-- SLIDE 3: TESTNG WITH SELENIUM -->
+                <div class="slide">
+                    <h2>🧪 TestNG + Selenium Integration</h2>
+                    
+                    <h3>Practical Example: Login Test with TestNG</h3>
+                    <div class="code-block">
+<span class="keyword">import</span> org.testng.annotations.*;
+<span class="keyword">import</span> org.openqa.selenium.*;
+<span class="keyword">import</span> org.openqa.selenium.chrome.ChromeDriver;
+
+<span class="keyword">public class</span> LoginTestWithTestNG {
+    
+    <span class="comment">// Declare WebDriver as class variable</span>
+    <span class="comment">// Why? So all @Test methods dapat access</span>
+    WebDriver driver;
+    WebDriverWait wait;
+    
+    <span class="comment">// ============ SETUP PHASE ============</span>
+    
+    <span class="comment">// Run 1 lần sebelum semua tests di class ini</span>
+    <span class="comment">// Dgunakan untuk: initialize WebDriver, load baseURL, login sekali</span>
+    <span class="keyword">@BeforeClass</span>
+    <span class="keyword">public void</span> beforeClass() {
+        System.out.println(<span class="string">"[Setup] Initializing WebDriver"</span>);
+        <span class="comment">// Create new Chrome browser instance</span>
+        driver = <span class="keyword">new</span> ChromeDriver();
+        
+        <span class="comment">// Initialize WebDriverWait (explicit waits)</span>
+        wait = <span class="keyword">new</span> WebDriverWait(driver, Duration.ofSeconds(<span class="number">10</span>));
+        
+        <span class="comment">// Open application base URL</span>
+        driver.get(<span class="string">"https://example.com"</span>);
+        
+        <span class="comment">// Maximize browser window untuk better visibility</span>
+        driver.manage().window().maximize();
+    }
+    
+    <span class="comment">// ============ PER-TEST SETUP ============</span>
+    
+    <span class="comment">// Run SEBELUM MASING-MASING @Test method</span>
+    <span class="comment">// Digunakan untuk: reset state, clear cookies, login if needed</span>
+    <span class="keyword">@BeforeMethod</span>
+    <span class="keyword">public void</span> beforeMethod(Method method) {
+        System.out.println(<span class="string">"[Before Test] "</span> + method.getName());
+        
+        <span class="comment">// Navigate to login page (reset state)</span>
+        driver.navigate().to(<span class="string">"https://example.com/login"</span>);
+        
+        <span class="comment">// Clear browser cookies (reset session)</span>
+        driver.manage().deleteAllCookies();
+    }
+    
+    <span class="comment">// ============ TEST METHODS ============</span>
+    
+    <span class="comment">// Test 1: Valid login dengan correct credentials</span>
+    <span class="comment">// priority=1: run ini duluan (default priority=0)</span>
+    <span class="keyword">@Test</span>(priority=<span class="number">1</span>)
+    <span class="keyword">public void</span> testValidLogin() {
+        System.out.println(<span class="string">"[TEST 1] Testing valid login"</span>);
+        
+        <span class="comment">// Find username input element</span>
+        WebElement username = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"username"</span>))
+        );
+        
+        <span class="comment">// Type username</span>
+        username.sendKeys(<span class="string">"john@example.com"</span>);
+        
+        <span class="comment">// Find password input</span>
+        WebElement password = driver.findElement(By.id(<span class="string">"password"</span>));
+        
+        <span class="comment">// Type password</span>
+        password.sendKeys(<span class="string">"password123"</span>);
+        
+        <span class="comment">// Click login button</span>
+        WebElement loginBtn = driver.findElement(By.id(<span class="string">"login-btn"</span>));
+        loginBtn.click();
+        
+        <span class="comment">// Wait for welcome message to appear (indicator ng successful login)</span>
+        WebElement welcome = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"welcome-msg"</span>))
+        );
+        
+        <span class="comment">// Assert (verify) welcome message contains "Welcome"</span>
+        Assert.assertTrue(
+            welcome.getText().contains(<span class="string">"Welcome"</span>),
+            <span class="string">"Welcome message should appear after successful login"</span>
+        );
+    }
+    
+    <span class="comment">// Test 2: Invalid login dengan wrong password</span>
+    <span class="comment">// priority=2: run ito second</span>
+    <span class="keyword">@Test</span>(priority=<span class="number">2</span>)
+    <span class="keyword">public void</span> testInvalidLogin() {
+        System.out.println(<span class="string">"[TEST 2] Testing invalid login"</span>);
+        
+        <span class="comment">// Fill username</span>
+        driver.findElement(By.id(<span class="string">"username"</span>)).sendKeys(<span class="string">"john@example.com"</span>);
+        
+        <span class="comment">// Fill wrong password</span>
+        driver.findElement(By.id(<span class="string">"password"</span>)).sendKeys(<span class="string">"wrongpassword"</span>);
+        
+        <span class="comment">// Click login</span>
+        driver.findElement(By.id(<span class="string">"login-btn"</span>)).click();
+        
+        <span class="comment">// Wait for error message</span>
+        WebElement errorMsg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"error-msg"</span>))
+        );
+        
+        <span class="comment">// Assert error message shows</span>
+        Assert.assertTrue(
+            errorMsg.getText().contains(<span class="string">"Invalid credentials"</span>),
+            <span class="string">"Error message should show for wrong password"</span>
+        );
+    }
+    
+    <span class="comment">// Test 3: Login dengan empty username</span>
+    <span class="keyword">@Test</span>(priority=<span class="number">3</span>)
+    <span class="keyword">public void</span> testLoginEmptyUsername() {
+        System.out.println(<span class="string">"[TEST 3] Testing login dengan empty username"</span>);
+        
+        <span class="comment">// Don't fill username (leave empty)</span>
+        <span class="comment">// Just fill password</span>
+        driver.findElement(By.id(<span class="string">"password"</span>)).sendKeys(<span class="string">"password123"</span>);
+        
+        <span class="comment">// Click login button</span>
+        driver.findElement(By.id(<span class="string">"login-btn"</span>)).click();
+        
+        <span class="comment">// Wait for error message</span>
+        WebElement errorMsg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"error-msg"</span>))
+        );
+        
+        <span class="comment">// Assert validation error shows</span>
+        Assert.assertTrue(
+            errorMsg.getText().contains(<span class="string">"Username required"</span>),
+            <span class="string">"Validation error should show"</span>
+        );
+    }
+    
+    <span class="comment">// ============ TEARDOWN PHASE ============</span>
+    
+    <span class="comment">// Run SESUDAH SETIAP @Test method</span>
+    <span class="comment">// Digunakan untuk: cleanup, logout, reset browser state</span>
+    <span class="keyword">@AfterMethod</span>
+    <span class="keyword">public void</span> afterMethod(Method method) {
+        System.out.println(<span class="string">"[After Test] "</span> + method.getName());
+        
+        <span class="comment">// Clear browser cookies untuk isolate tests</span>
+        <span class="comment">// (prevent test interference)</span>
+        driver.manage().deleteAllCookies();
+        
+        <span class="comment">// Clear browser cache by deleting IndexedDB</span>
+        ((JavascriptExecutor) driver).executeScript(<span class="string">"window.indexedDB.deleteDatabase('myDB')"</span>);
+    }
+    
+    <span class="comment">// Run 1 lần setelah semua @Test methods</span>
+    <span class="comment">// Digunakan untuk: close browser, cleanup resources</span>
+    <span class="keyword">@AfterClass</span>
+    <span class="keyword">public void</span> afterClass() {
+        System.out.println(<span class="string">"[Cleanup] Closing browser"</span>);
+        
+        <span class="comment">// Close all browser windows and end session</span>
+        <span class="comment">// quit() = close all windows + end WebDriver session</span>
+        <span class="comment">// close() = close current window only (not recommended)</span>
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <h3>Output Ketika Run:</h3>
+                    <div class="output-box">
+[Setup] Initializing WebDriver
+[Before Test] testValidLogin
+[TEST 1] Testing valid login
+✅ Assert passed: Welcome message appears
+[After Test] testValidLogin
+[Before Test] testInvalidLogin
+[TEST 2] Testing invalid login
+✅ Assert passed: Error message shows
+[After Test] testInvalidLogin
+[Before Test] testLoginEmptyUsername
+[TEST 3] Testing login dengan empty username
+✅ Assert passed: Validation error shows
+[After Test] testLoginEmptyUsername
+[Cleanup] Closing browser
+
+Total Tests Run: 3
+Passed: 3
+Failed: 0
+Skipped: 0
+                    </div>
+
+                    <div class="explanation">
+                        <strong>Mengapa Structure Ini Lebih Baik?</strong><br>
+                        1. <strong>BeforeClass:</strong> Initialize driver 1x (efficient, save time)<br>
+                        2. <strong>BeforeMethod:</strong> Reset state sebelum masing-masing test (isolate tests, prevent interference)<br>
+                        3. <strong>Priority:</strong> Control test execution order (test valid login dulu, baru test invalid)<br>
+                        4. <strong>AfterMethod:</strong> Cleanup cookies/cache (reset for next test)<br>
+                        5. <strong>AfterClass:</strong> Close browser (save resources)<br>
+                        6. <strong>Assert:</strong> Verify hasil (test pass/fail based on assertion)
+                    </div>
+
+                    <div class="narration-box">🔊 "Assertions là statements để verify expected vs actual. Nếu expected match actual, assertion pass, test continue. Nếu không match, assertion fail, throw AssertionError, test fail. Assertions là core của testing - nếu không assert, code chỉ run tapi tidak verify. TestNG cung cấp assertion methods. Assert.assertEquals(expected, actual) - check expected equal actual. Assert.assertNotEquals(expected, actual) - check not equal. Assert.assertTrue(condition) - check condition true. Assert.assertFalse(condition) - check condition false. Assert.assertNull(object) - check object null. Assert.assertNotNull(object) - check object not null. Assert.assertSame(obj1, obj2) - check obj1 dan obj2 adalah same object (reference). Assert.assertNotSame - check not same object. Assert.fail('message') - explicitly fail test dengan message. Assert.fail() throw AssertionError, test immediately fail. Ví dụ test case: login, get welcome message, assert message contains 'Welcome'. Jika message tidak contain, assertion fail, test fail. Developers akan lihat assertion error dan tahu apa yang wrong. Best practice: buat meaningful assertion messages. Assert.assertEquals('Welcome john', welcomeMsg, 'Welcome message should contain user name'). Message akan help debugging ketika assertion fail."</div>
+                </div>
+
+                <!-- SLIDE 4: PAGE OBJECT MODEL - INTRO -->
+                <div class="slide">
+                    <h2>📄 Page Object Model (POM) - Intro</h2>
+                    
+                    <h3>Problem Tanpa POM</h3>
+                    <p>Ketika script besar (100+ test cases), code menjadi:</p>
+                    <ul>
+                        <li>❌ Berulang-ulang (repeat locators di banyak places)</li>
+                        <li>❌ Sulit maintain (UI change → modify 100+ places)</li>
+                        <li>❌ Sulit baca (campur element locators + test logic)</li>
+                        <li>❌ Sulit scale (tidak organize)</li>
+                    </ul>
+
+                    <h3>Apa Itu Page Object Model?</h3>
+                    <p><span class="highlight">POM</span> = Design pattern untuk <span class="highlight">separate element locators & page actions dari test logic</span></p>
+
+                    <h3>Konsep Utama POM:</h3>
+                    <ul>
+                        <li>1️⃣ <strong>Buat 1 class per page</strong> (LoginPage, HomePage, DashboardPage)</li>
+                        <li>2️⃣ <strong>Simpan semua locators</strong> di class sebagai private variables</li>
+                        <li>3️⃣ <strong>Buat methods</strong> untuk setiap action (fillUsername(), fillPassword(), clickLogin())</li>
+                        <li>4️⃣ <strong>Test classes hanya</strong> call page methods (tidak access locators directly)</li>
+                    </ul>
+
+                    <h3>Struktur POM</h3>
+                    <div class="concept-box">
+<span class="string">src/test/java/
+├── pages/
+│   ├── LoginPage.java        (locators + actions for login page)
+│   ├── HomePage.java         (locators + actions for home page)
+│   └── DashboardPage.java    (locators + actions for dashboard)
+└── tests/
+    ├── LoginTest.java        (only test logic, call page methods)
+    ├── HomeTest.java
+    └── DashboardTest.java</span>
+                    </div>
+
+                    <h3>Apa Keuntungannya?</h3>
+                    <ul>
+                        <li>✅ <strong>Maintainability:</strong> Locator change → update 1 place (LoginPage class)</li>
+                        <li>✅ <strong>Readability:</strong> Test code clean, jelas intent</li>
+                        <li>✅ <strong>Reusability:</strong> Semua test classes bisa reuse same page methods</li>
+                        <li>✅ <strong>Scalability:</strong> Add 100 more tests hanya dengan kombinasi existing methods</li>
+                    </ul>
+
+                    <div class="tip">
+                        💡 <strong>Analogi:</strong> Tanpa POM kayak mencampur kitchen (where you cook) dengan dining room (where you eat). Dengan POM, pisah: kitchen punya recepes (LoginPage), dining room hanya order (LoginTest).
+                    </div>
+
+                    <div class="narration-box">🔊 "Ketika project besar, ada ratusan test classes. Baiknya tidak run semua setiap kali. TestNG menyediakan testng.xml file untuk organize dan configure tests. File ini adalah XML configuration file mana bisa specify: suite name, test names, classes to include/exclude, parallel execution, listeners, parameters. Struktur: &lt;suite&gt; tag adalah root, di dalamnya &lt;test&gt; tags, di dalamnya &lt;classes&gt; atau &lt;methods&gt; tags. Ví dụ, testng.xml: &lt;suite name='LoginSuite'&gt; specify suite name. &lt;test name='LoginTests'&gt; specify test group. &lt;classes&gt; &lt;class name='tests.LoginTest'/&gt; &lt;/classes&gt; specify class. Ketika run testng.xml, TestNG sẽ scan class, tìm @Test methods, run chúng. Bạn bisa specify specific methods bằng &lt;methods&gt;. Ví dụ &lt;methods&gt; &lt;include name='testValidLogin'/&gt; &lt;/methods&gt; sẽ run hanya testValidLogin, skip testInvalidLogin. Best practice: organize tests dalam testng.xml, run xml file, tidak run class individual. Nó memberikan flexibility untuk choose tests."</div>
+                </div>
+
+                <!-- SLIDE 5: POM DETAILED EXAMPLE -->
+                <div class="slide">
+                    <h2>📄 Page Object Model - Detailed Example</h2>
+                    
+                    <h3>Step 1: Create LoginPage Class (POM)</h3>
+                    <div class="code-block">
+<span class="keyword">import</span> org.openqa.selenium.*;
+<span class="keyword">import</span> org.openqa.selenium.support.ui.*;
+
+<span class="comment">/**
+ * LoginPage - Page Object Class
+ * Bertanggung jawab untuk:
+ * 1. Menyimpan semua locators untuk login page
+ * 2. Menyediakan methods untuk interact dengan page
+ * 3. Melakukan waits dan assertions untuk page
+ */</span>
+<span class="keyword">public class</span> LoginPage {
+    
+    <span class="comment">// ============ WEBDRIVER & WAIT ============</span>
+    
+    <span class="comment">// Store WebDriver reference</span>
+    <span class="comment">// Constructor akan initialize ini</span>
+    <span class="keyword">private</span> WebDriver driver;
+    
+    <span class="comment">// Store WebDriverWait reference</span>
+    <span class="comment">// Untuk explicit waits</span>
+    <span class="keyword">private</span> WebDriverWait wait;
+    
+    <span class="comment">// ============ LOCATORS ============</span>
+    
+    <span class="comment">// ALL locators simpan di sini sebagai private</span>
+    <span class="comment">// Why private? Tidak boleh diakses dari test class</span>
+    <span class="comment">// Test class hanya call methods, tidak akses locators</span>
+    
+    <span class="comment">// Username textbox locator</span>
+    <span class="keyword">private</span> By usernameLocator = By.id(<span class="string">"username"</span>);
+    
+    <span class="comment">// Password textbox locator</span>
+    <span class="keyword">private</span> By passwordLocator = By.id(<span class="string">"password"</span>);
+    
+    <span class="comment">// Login button locator</span>
+    <span class="keyword">private</span> By loginBtnLocator = By.id(<span class="string">"login-btn"</span>);
+    
+    <span class="comment">// "Forgot Password?" link locator</span>
+    <span class="keyword">private</span> By forgotPwdLocator = By.linkText(<span class="string">"Forgot Password?"</span>);
+    
+    <span class="comment">// Error message locator (shows when login fails)</span>
+    <span class="keyword">private</span> By errorMsgLocator = By.id(<span class="string">"error-msg"</span>);
+    
+    <span class="comment">// Welcome message locator (shows when login succeeds)</span>
+    <span class="keyword">private</span> By welcomeMsgLocator = By.id(<span class="string">"welcome-msg"</span>);
+    
+    <span class="comment">// ============ CONSTRUCTOR ============</span>
+    
+    <span class="comment">/**
+     * Constructor - initialize LoginPage dengan WebDriver
+     * Test class akan: new LoginPage(driver)
+     * Constructor akan initialize this.driver and this.wait
+     */</span>
+    <span class="keyword">public</span> LoginPage(WebDriver driver) {
+        <span class="comment">// Store driver reference</span>
+        <span class="keyword">this</span>.driver = driver;
+        
+        <span class="comment">// Initialize wait dengan 10 seconds timeout</span>
+        <span class="keyword">this</span>.wait = <span class="keyword">new</span> WebDriverWait(
+            driver,
+            Duration.ofSeconds(<span class="number">10</span>)
+        );
+    }
+    
+    <span class="comment">// ============ PAGE ACTIONS (METHODS) ============</span>
+    
+    <span class="comment">/**
+     * fillUsername - Fill username textbox
+     * @param username - username to enter
+     * 
+     * Logic:
+     * 1. Wait sampai username field visible
+     * 2. Type username
+     */</span>
+    <span class="keyword">public void</span> fillUsername(String username) {
+        <span class="comment">// Wait for username field sampai visible</span>
+        <span class="comment">// visibilityOfElementLocated = element ada + visible + enabled</span>
+        WebElement usernameField = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(usernameLocator)
+        );
+        
+        <span class="comment">// Clear field dulu (jika ada data sebelumnya)</span>
+        usernameField.clear();
+        
+        <span class="comment">// Type username</span>
+        usernameField.sendKeys(username);
+    }
+    
+    <span class="comment">/**
+     * fillPassword - Fill password textbox
+     * @param password - password to enter
+     */</span>
+    <span class="keyword">public void</span> fillPassword(String password) {
+        <span class="comment">// Find password field (tidak perlu wait, assume sebelumnya sudah visible)</span>
+        WebElement passwordField = driver.findElement(passwordLocator);
+        
+        <span class="comment">// Clear field</span>
+        passwordField.clear();
+        
+        <span class="comment">// Type password</span>
+        passwordField.sendKeys(password);
+    }
+    
+    <span class="comment">/**
+     * clickLoginButton - Click login button
+     * 
+     * Logic:
+     * 1. Wait until button clickable
+     * 2. Click button
+     */</span>
+    <span class="keyword">public void</span> clickLoginButton() {
+        <span class="comment">// Wait until button clickable</span>
+        <span class="comment">// elementToBeClickable = visible + enabled + clickable</span>
+        WebElement loginBtn = wait.until(
+            ExpectedConditions.elementToBeClickable(loginBtnLocator)
+        );
+        
+        <span class="comment">// Click button</span>
+        loginBtn.click();
+    }
+    
+    <span class="comment">/**
+     * login - Complete login flow
+     * @param username - username
+     * @param password - password
+     * 
+     * Logic:
+     * 1. Fill username
+     * 2. Fill password
+     * 3. Click login
+     * 
+     * Why create this method?
+     * Convenience method untuk test class
+     * Tidak perlu call 3 methods, hanya 1 call
+     */</span>
+    <span class="keyword">public void</span> login(String username, String password) {
+        fillUsername(username);
+        fillPassword(password);
+        clickLoginButton();
+    }
+    
+    <span class="comment">/**
+     * getErrorMessage - Get error message text
+     * @return error message string
+     * 
+     * Used when: login fails, want to verify error message
+     */</span>
+    <span class="keyword">public</span> String getErrorMessage() {
+        <span class="comment">// Wait until error message visible</span>
+        WebElement errorMsg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(errorMsgLocator)
+        );
+        
+        <span class="comment">// Return text</span>
+        <span class="keyword">return</span> errorMsg.getText();
+    }
+    
+    <span class="comment">/**
+     * getWelcomeMessage - Get welcome message text
+     * @return welcome message string
+     * 
+     * Used when: login succeeds, want to verify welcome message
+     */</span>
+    <span class="keyword">public</span> String getWelcomeMessage() {
+        <span class="comment">// Wait until welcome message visible (indicator ng successful login)</span>
+        WebElement welcomeMsg = wait.until(
+            ExpectedConditions.visibilityOfElementLocated(welcomeMsgLocator)
+        );
+        
+        <span class="keyword">return</span> welcomeMsg.getText();
+    }
+    
+    <span class="comment">/**
+     * isErrorMessageDisplayed - Check if error message shows
+     * @return true jika error message visible, false otherwise
+     */</span>
+    <span class="keyword">public boolean</span> isErrorMessageDisplayed() {
+        <span class="keyword">try</span> {
+            WebElement errorMsg = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(errorMsgLocator)
+            );
+            <span class="keyword">return</span> errorMsg.isDisplayed();
+        } <span class="keyword">catch</span> (TimeoutException e) {
+            <span class="comment">// Element tidak visible within 10 seconds</span>
+            <span class="keyword">return false</span>;
+        }
+    }
+    
+    <span class="comment">/**
+     * clickForgotPassword - Click "Forgot Password?" link
+     */</span>
+    <span class="keyword">public void</span> clickForgotPassword() {
+        WebElement forgotLink = driver.findElement(forgotPwdLocator);
+        forgotLink.click();
+    }
+}
+                    </div>
+
+                    <div class="explanation">
+                        <strong>Key Points:</strong><br>
+                        1. <strong>Private By locators:</strong> Hanya LoginPage yang tahu locators. Test class tidak tahu.<br>
+                        2. <strong>Constructor:</strong> Initialize driver & wait. Test akan: <code>new LoginPage(driver)</code><br>
+                        3. <strong>Methods untuk setiap action:</strong> fillUsername(), fillPassword(), clickLoginButton(), login() (combination)<br>
+                        4. <strong>Methods untuk verify:</strong> getErrorMessage(), getWelcomeMessage(), isErrorMessageDisplayed()<br>
+                        5. <strong>Waits & error handling:</strong> Semua handled di page class, tidak di test class<br>
+                        6. <strong>Comments:</strong> Setiap method punya javadoc explaining what it does
+                    </div>
+
+                    <div class="narration-box">🔊 "Default, testng run tests sequentially - test 1 finish, test 2 start, test 3 start. Nếu 100 tests, masing-masing 5 detik, total 500 detik. Tapi jika tests independent (tidak share state), bisa run parallel - test 1, 2, 3 run simultaneously. Total time = 5 detik (fastest test time). Testng support parallel execution. Di testng.xml: &lt;suite parallel='methods' thread-count='4'&gt;. Nó akan run tests parallel dengan 4 threads. Setiap thread run independent test method. Kalo parallel='classes', run classes parallel. Kalo parallel='tests', run test tags parallel. Thread-count specify berapa threads. Kalau 4 threads dan 100 tests, total time = 100/4 * 5 = 125 detik. Versus 500 detik sequential, hemat 75% time! Tapi penting: tests HARUS independent. Jika test A modify state yg test B depend on, parallel execution error. Ví dụ, test A create user 'john@example.com', test B expect user not exist - jika run parallel, bisa conflict. Solution: masing-masing test setup sendiri data, cleanup sendiri data, tidak share state. Atau gunakan fixture scope properly - @BeforeMethod create fresh data, @AfterMethod cleanup."</div>
+                </div>
+
+                <!-- SLIDE 6: TEST WITH POM -->
+                <div class="slide">
+                    <h2>🧪 Test Class Using POM</h2>
+                    
+                    <h3>Sebelum POM (❌ Buruk):</h3>
+                    <div class="code-block">
+<span class="keyword">public class</span> BadLoginTest {
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testLogin() {
+        <span class="comment">// Locators scattered di test class</span>
+        WebElement username = driver.findElement(By.id(<span class="string">"username"</span>));
+        username.sendKeys(<span class="string">"john@example.com"</span>);
+        
+        WebElement password = driver.findElement(By.id(<span class="string">"password"</span>));
+        password.sendKeys(<span class="string">"password123"</span>);
+        
+        driver.findElement(By.id(<span class="string">"login-btn"</span>)).click();
+        
+        WebElement welcome = driver.findElement(By.id(<span class="string">"welcome-msg"</span>));
+        Assert.assertTrue(welcome.getText().contains(<span class="string">"Welcome"</span>));
+    }
+}
+<span class="comment">// Problem: hardcoded locators, test logic mixed with UI details</span>
+<span class="comment">// UI change (id="username" → id="user")? Must change in 20+ tests!</span>
+                    </div>
+
+                    <h3>Sesudah POM (✅ Baik):</h3>
+                    <div class="code-block">
+<span class="keyword">public class</span> LoginTestWithPOM {
+    
+    <span class="comment">// Declare LoginPage page object</span>
+    LoginPage loginPage;
+    
+    <span class="comment">// Declare WebDriver</span>
+    WebDriver driver;
+    
+    <span class="keyword">@BeforeClass</span>
+    <span class="keyword">public void</span> beforeClass() {
+        <span class="comment">// Initialize browser</span>
+        driver = <span class="keyword">new</span> ChromeDriver();
+        driver.get(<span class="string">"https://example.com/login"</span>);
+        
+        <span class="comment">// Initialize LoginPage with driver</span>
+        <span class="comment">// LoginPage constructor will set this.driver and this.wait</span>
+        loginPage = <span class="keyword">new</span> LoginPage(driver);
+    }
+    
+    <span class="comment">// Test 1: Valid login</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testValidLogin() {
+        <span class="comment">// Test logic is CLEAN and SIMPLE</span>
+        <span class="comment">// Just call page methods, no worries about locators</span>
+        
+        <span class="comment">// Call loginPage.login() method</span>
+        loginPage.login(<span class="string">"john@example.com"</span>, <span class="string">"password123"</span>);
+        
+        <span class="comment">// Get welcome message from page</span>
+        String welcomeMsg = loginPage.getWelcomeMessage();
+        
+        <span class="comment">// Assert</span>
+        Assert.assertTrue(
+            welcomeMsg.contains(<span class="string">"Welcome"</span>),
+            <span class="string">"Welcome message should appear"</span>
+        );
+    }
+    
+    <span class="comment">// Test 2: Invalid login</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testInvalidLogin() {
+        <span class="comment">// Call login with wrong password</span>
+        loginPage.login(<span class="string">"john@example.com"</span>, <span class="string">"wrongpassword"</span>);
+        
+        <span class="comment">// Get error message</span>
+        String errorMsg = loginPage.getErrorMessage();
+        
+        <span class="comment">// Assert</span>
+        Assert.assertTrue(
+            errorMsg.contains(<span class="string">"Invalid credentials"</span>),
+            <span class="string">"Error message should show"</span>
+        );
+    }
+    
+    <span class="comment">// Test 3: Empty username</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testEmptyUsername() {
+        <span class="comment">// Don't fill username, just password</span>
+        loginPage.fillPassword(<span class="string">"password123"</span>);
+        loginPage.clickLoginButton();
+        
+        <span class="comment">// Check error message</span>
+        Assert.assertTrue(
+            loginPage.isErrorMessageDisplayed(),
+            <span class="string">"Error should show for empty username"</span>
+        );
+    }
+    
+    <span class="keyword">@AfterClass</span>
+    <span class="keyword">public void</span> afterClass() {
+        driver.quit();
+    }
+}
+<span class="comment">// Advantages:
+// 1. Test code clean, readable, intent jelas
+// 2. No locators di test class (all in LoginPage)
+// 3. UI change? Edit LoginPage, all tests work automatically
+// 4. Reusable: add 100 more tests, reuse same LoginPage methods
+// 5. Maintainable: 1 place to update for UI changes</span>
+                    </div>
+
+                    <h3>Comparison:</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Without POM</th>
+                            <th>With POM</th>
+                        </tr>
+                        <tr>
+                            <td>Test readability</td>
+                            <td>Messy (locators + logic)</td>
+                            <td>✅ Clean (just methods)</td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance</td>
+                            <td>Hard (change in 50+ tests)</td>
+                            <td>✅ Easy (change in 1 page class)</td>
+                        </tr>
+                        <tr>
+                            <td>Reusability</td>
+                            <td>Low (copy-paste)</td>
+                            <td>✅ High (share methods)</td>
+                        </tr>
+                        <tr>
+                            <td>Lines of code per test</td>
+                            <td>20+ lines</td>
+                            <td>✅ 3-5 lines</td>
+                        </tr>
+                        <tr>
+                            <td>Test data + test logic</td>
+                            <td>Mixed</td>
+                            <td>✅ Separated</td>
+                        </tr>
+                    </table>
+
+                    <div class="narration-box">🔊 "Kita sudah lihat Selenium code itu bisa messy jika mix page interaction dengan test logic. Test code punya locators hardcoded, methods scattered. Nanti jika UI change, perlu update banyak test code. PAGE OBJECT MODEL adalah design pattern untuk organize Selenium code. Ide: buat separate class untuk setiap page dalam aplikasi. Class ini capsulate semua page-specific stuff: locators, methods to interact dengan page. Test code hanya call methods dari page class, tidak tau tentang locators atau DOM structure. Benefits: DRY - Don't Repeat Yourself. Locators define once, reuse many tests. Maintainability - UI change, update page class, tests tidak perlu change. Readability - test code read like natural language: loginPage.login('john', 'pass'). Test code focus pada test logic, bukan implementation details. Ví dụ, LoginPage class. Private By locators - usernameLocator, passwordLocator, loginButtonLocator, errorMessageLocator. Public methods - login(username, password), getErrorMessage(), isErrorMessageDisplayed(). Constructor accept WebDriver untuk initialize locators. Test code: LoginPage page = new LoginPage(driver). page.login('john@example.com', 'password123'). Assert.assertTrue(driver.getCurrentUrl().contains('/dashboard'))."</div>
+                </div>
+
+                <!-- SLIDE 7: DATA-DRIVEN TESTING -->
+                <div class="slide">
+                    <h2>📊 Data-Driven Testing</h2>
+                    
+                    <h3>Masalah: Berulang-Ulang Untuk Multiple Data</h3>
+                    <p>Ingin test login dengan 5 usernames berbeda:</p>
+                    <div class="code-block">
+<span class="comment">// ❌ Buruk: Tulis 5 test methods hampir identik</span>
+<span class="keyword">@Test</span>
+<span class="keyword">public void</span> testLogin1() { loginPage.login(<span class="string">"user1@test.com"</span>, <span class="string">"pass1"</span>); }
+
+<span class="keyword">@Test</span>
+<span class="keyword">public void</span> testLogin2() { loginPage.login(<span class="string">"user2@test.com"</span>, <span class="string">"pass2"</span>); }
+
+<span class="keyword">@Test</span>
+<span class="keyword">public void</span> testLogin3() { loginPage.login(<span class="string">"user3@test.com"</span>, <span class="string">"pass3"</span>); }
+
+<span class="keyword">// ... 4 more methods ...</span>
+<span class="comment">// Total: 5 methods yang code-nya 99% sama!</span>
+                    </div>
+
+                    <h3>Solusi: Data-Driven Testing dengan @DataProvider</h3>
+                    <p>TestNG @DataProvider memungkinkan 1 method run dengan multiple data sets</p>
+
+                    <div class="code-block">
+<span class="keyword">public class</span> DataDrivenLoginTest {
+    
+    LoginPage loginPage;
+    WebDriver driver;
+    
+    <span class="keyword">@BeforeMethod</span>
+    <span class="keyword">public void</span> setUp() {
+        driver = <span class="keyword">new</span> ChromeDriver();
+        driver.get(<span class="string">"https://example.com/login"</span>);
+        loginPage = <span class="keyword">new</span> LoginPage(driver);
+    }
+    
+    <span class="comment">/**
+     * @DataProvider - Provide test data
+     * Return Object[][] dengan multiple test cases
+     * 
+     * Setiap row adalah 1 set data untuk 1 test execution
+     * Format: {username, password, expectedMessage}
+     */</span>
+    <span class="keyword">@DataProvider</span>(name = <span class="string">"loginTestData"</span>)
+    <span class="keyword">public</span> Object[][] getLoginTestData() {
+        <span class="keyword">return</span> <span class="keyword">new</span> Object[][] {
+            <span class="comment">// Test case 1: Valid login</span>
+            {<span class="string">"john@example.com"</span>, <span class="string">"password123"</span>, <span class="string">"Welcome"</span>},
+            
+            <span class="comment">// Test case 2: Different valid user</span>
+            {<span class="string">"jane@example.com"</span>, <span class="string">"securepass"</span>, <span class="string">"Welcome"</span>},
+            
+            <span class="comment">// Test case 3: Another user</span>
+            {<span class="string">"bob@example.com"</span>, <span class="string">"mypassword"</span>, <span class="string">"Welcome"</span>},
+            
+            <span class="comment">// Test case 4: Corporate account</span>
+            {<span class="string">"admin@company.com"</span>, <span class="string">"admin123"</span>, <span class="string">"Welcome"</span>},
+        };
+    }
+    
+    <span class="comment">/**
+     * testLoginWithMultipleUsers - Same test method run untuk setiap data set
+     * @param username - dari @DataProvider row
+     * @param password - dari @DataProvider row
+     * @param expectedMsg - dari @DataProvider row
+     * 
+     * How it works:
+     * 1. TestNG read getLoginTestData() -> returns 4 rows
+     * 2. testLoginWithMultipleUsers() run 4 times
+     * 3. Each run gunakan data dari 1 row
+     * 4. Output: 4 test executions dengan different data
+     */</span>
+    <span class="keyword">@Test</span>(dataProvider = <span class="string">"loginTestData"</span>)
+    <span class="keyword">public void</span> testLoginWithMultipleUsers(
+        String username,
+        String password,
+        String expectedMsg
+    ) {
+        <span class="comment">// Login dengan data dari @DataProvider</span>
+        loginPage.login(username, password);
+        
+        <span class="comment">// Get welcome message</span>
+        String welcomeMsg = loginPage.getWelcomeMessage();
+        
+        <span class="comment">// Assert dengan expected message dari data</span>
+        Assert.assertTrue(
+            welcomeMsg.contains(expectedMsg),
+            <span class="string">"Welcome message should contain: "</span> + expectedMsg
+        );
+        
+        <span class="comment">// Log successful test execution</span>
+        System.out.println(<span class="string">"✅ Login successful for: "</span> + username);
+    }
+    
+    <span class="keyword">@AfterMethod</span>
+    <span class="keyword">public void</span> tearDown() {
+        driver.quit();
+    }
+}
+<span class="comment">// Output when run:
+// Test 1: testLoginWithMultipleUsers[john@example.com, password123, Welcome] - PASSED
+// Test 2: testLoginWithMultipleUsers[jane@example.com, securepass, Welcome] - PASSED
+// Test 3: testLoginWithMultipleUsers[bob@example.com, mypassword, Welcome] - PASSED
+// Test 4: testLoginWithMultipleUsers[admin@company.com, admin123, Welcome] - PASSED
+// Total: 4 tests executed from 1 method!</span>
+                    </div>
+
+                    <h3>Keuntungan Data-Driven Testing:</h3>
+                    <ul>
+                        <li>✅ <strong>1 method, multiple executions:</strong> Reduce code duplication</li>
+                        <li>✅ <strong>Easy to add more data:</strong> Just add 1 row di DataProvider</li>
+                        <li>✅ <strong>Test report shows all executions:</strong> 4 data sets = 4 test results</li>
+                        <li>✅ <strong>Easier to maintain:</strong> 1 test logic, separate data</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Hãy viết LoginPage class theo POM. Package: pages, class name: LoginPage. Constructor: public LoginPage(WebDriver driver). Store driver: this.driver = driver. Initialize WebDriverWait: this.wait = new WebDriverWait(driver, Duration.ofSeconds(10)). Locators: private By usernameLocator = By.id('username'), private By passwordLocator = By.name('password'), private By loginButtonLocator = By.cssSelector('button.login'), private By welcomeMessageLocator = By.className('welcome'), private By errorMessageLocator = By.className('error'). Methods: public void fillUsername(String username) { wait.until(ExpectedConditions.visibilityOfElementLocated(usernameLocator)).sendKeys(username). } - wait untuk element visible, then fill username. public void fillPassword(String password) { driver.findElement(passwordLocator).sendKeys(password). } public void clickLoginButton() { driver.findElement(loginButtonLocator).click(). } public String login(String username, String password) { fillUsername(username). fillPassword(password). clickLoginButton(). } - compound method. public String getWelcomeMessage() { return wait.until(ExpectedConditions.visibilityOfElementLocated(welcomeMessageLocator)).getText(). } public String getErrorMessage() { return driver.findElement(errorMessageLocator).getText(). } public boolean isErrorMessageDisplayed() { try { return driver.findElement(errorMessageLocator).isDisplayed(). } catch (NoSuchElementException e) { return false. } }. Best practice: return types explicit, methods single responsibility, waits explicit, error handling proper."</div>
+                </div>
+
+                <!-- SLIDE 8: TESTNG XML & PARALLEL EXECUTION -->
+                <div class="slide">
+                    <h2>⚙️ TestNG XML & Parallel Execution</h2>
+                    
+                    <h3>TestNG XML Configuration</h3>
+                    <p>File <span class="highlight">testng.xml</span> untuk configure test execution</p>
+
+                    <h4>Contoh testng.xml:</h4>
+                    <div class="code-block">
+<span class="keyword">&lt;?xml version=</span><span class="string">"1.0"</span> <span class="keyword">encoding=</span><span class="string">"UTF-8"</span><span class="keyword">?&gt;</span>
+<span class="keyword">&lt;suite</span> <span class="string">name</span>=<span class="string">"LoginTestSuite"</span> <span class="string">parallel</span>=<span class="string">"methods"</span> <span class="string">thread-count</span>=<span class="string">"4"</span><span class="keyword">&gt;</span>
+    <span class="comment">&lt;!-- Suite: group of tests --&gt;</span>
+    <span class="comment">&lt;!-- parallel=</span><span class="string">"methods"</span>: run @Test methods in parallel --&gt;</span>
+    <span class="comment">&lt;!-- thread-count=</span><span class="string">"4"</span>: use 4 threads --&gt;</span>
+    
+    <span class="keyword">&lt;test</span> <span class="string">name</span>=<span class="string">"LoginTests"</span><span class="keyword">&gt;</span>
+        <span class="keyword">&lt;classes&gt;</span>
+            <span class="comment">&lt;!-- Run all tests in LoginTest class --&gt;</span>
+            <span class="keyword">&lt;class</span> <span class="string">name</span>=<span class="string">"tests.LoginTest"</span><span class="keyword">&gt;</span>
+                <span class="comment">&lt;!-- Optional: run specific methods only --&gt;</span>
+                <span class="keyword">&lt;methods&gt;</span>
+                    <span class="keyword">&lt;include</span> <span class="string">name</span>=<span class="string">"testValidLogin"</span><span class="keyword">/&gt;</span>
+                    <span class="keyword">&lt;include</span> <span class="string">name</span>=<span class="string">"testInvalidLogin"</span><span class="keyword">/&gt;</span>
+                <span class="keyword">&lt;/methods&gt;</span>
+            <span class="keyword">&lt;/class&gt;</span>
+        <span class="keyword">&lt;/classes&gt;</span>
+    <span class="keyword">&lt;/test&gt;</span>
+    
+    <span class="keyword">&lt;test</span> <span class="string">name</span>=<span class="string">"HomeTests"</span><span class="keyword">&gt;</span>
+        <span class="keyword">&lt;classes&gt;</span>
+            <span class="keyword">&lt;class</span> <span class="string">name</span>=<span class="string">"tests.HomeTest"</span><span class="keyword">/&gt;</span>
+        <span class="keyword">&lt;/classes&gt;</span>
+    <span class="keyword">&lt;/test&gt;</span>
+    
+<span class="keyword">&lt;/suite&gt;</span>
+                    </div>
+
+                    <h3>Parallel Execution Options:</h3>
+                    <div class="code-block">
+<span class="comment">// Option 1: Run methods in parallel</span>
+<span class="keyword">&lt;suite</span> <span class="string">parallel</span>=<span class="string">"methods"</span> <span class="string">thread-count</span>=<span class="string">"4"</span><span class="keyword">&gt;</span>
+<span class="comment">// Jalankan 4 @Test methods sekaligus di 4 threads
+// Useful untuk fast execution
+// Tapi perlu caution: avoid conflicts (e.g., shared resources)</span>
+
+<span class="comment">// Option 2: Run classes in parallel</span>
+<span class="keyword">&lt;suite</span> <span class="string">parallel</span>=<span class="string">"classes"</span> <span class="string">thread-count</span>=<span class="string">"3"</span><span class="keyword">&gt;</span>
+<span class="comment">// Run LoginTest, HomeTest, DashboardTest sekaligus di 3 threads</span>
+
+<span class="comment">// Option 3: Run tests sequentially (default)</span>
+<span class="keyword">&lt;suite</span> <span class="string">parallel</span>=<span class="string">"false"</span><span class="keyword">&gt;</span>
+<span class="comment">// Run tests one by one (slower tapi safe)</span>
+                    </div>
+
+                    <h3>Run testng.xml:</h3>
+                    <div class="code-block">
+<span class="comment">// Option 1: From IDE (right-click testng.xml → Run)</span>
+
+<span class="comment">// Option 2: From command line</span>
+$ mvn clean test
+
+<span class="comment">// Option 3: Run specific XML</span>
+$ mvn test -Dsuites=src/test/resources/testng.xml
+
+<span class="comment">// Output with parallel execution:</span>
+<span class="comment">// Thread-1: testValidLogin() running</span>
+<span class="comment">// Thread-2: testInvalidLogin() running</span>
+<span class="comment">// Thread-3: testEmptyUsername() running</span>
+<span class="comment">// Thread-4: testLoginEmptyPassword() running</span>
+<span class="comment">// (All 4 tests run simultaneously)</span>
+                    </div>
+
+                    <h3>Performance Impact:</h3>
+                    <ul>
+                        <li><strong>Sequential (1 thread):</strong> 4 tests × 5 seconds = 20 seconds</li>
+                        <li><strong>Parallel (4 threads):</strong> 4 tests ÷ 4 threads = 5 seconds ⚡</li>
+                        <li><strong>Speedup:</strong> 4x faster! (20s → 5s)</li>
+                    </ul>
+
+                    <div class="warning">
+                        ⚠️ <strong>Caution:</strong> Parallel execution can cause issues jika tests share resources (e.g., same database). Isolate tests untuk parallel execution.
+                    </div>
+
+                    <div class="narration-box">🔊 "Ngoài static test methods, TestNG support data-driven testing - run same test dengan different data. @DataProvider annotation provide data ke test method. Ví dụ, test login dengan multiple users: john/pass1, jane/pass2, bob/pass3. Thay vì viết 3 test methods, viết 1 test method, @DataProvider provide 3 sets data. @DataProvider(name='loginData') public Object[][] getLoginData() { return new Object[][] { {'john@example.com', 'password123'}, {'jane@example.com', 'securepass'}, {'bob@example.com', 'anotherpass'} }; }. @DataProvider return 2D array - masing-masing row adalah 1 set data. @Test(dataProvider='loginData') public void testLogin(String username, String password) { loginPage.login(username, password). String welcome = driver.findElement(...).getText(). Assert.assertTrue(welcome.contains('Welcome')). }. TestNG sẽ run testLogin 3 times, dengan data berbeda setiap kali. Output: testLogin[0] - dengan data row 0, testLogin[1] - dengan data row 1, testLogin[2] - dengan data row 2. Jika salah satu fail, report menunjukan testLogin[1] fail, bukan just 'testLogin fail'. Benefits: single test logic, multiple data sets, easy add more test cases (just add row to data provider)."</div>
+                </div>
+
+                <!-- SLIDE 9: RECAP & CONCLUSION -->
+                <div class="slide">
+                    <h2>📚 Recap: PHASE 3</h2>
+                    
+                    <h3>Chúng Ta Đã Học:</h3>
+                    <ul>
+                        <li>✅ <strong>TestNG Framework:</strong> Organize test cases, fixtures, annotations</li>
+                        <li>✅ <strong>Page Object Model (POM):</strong> Separate locators from test logic</li>
+                        <li>✅ <strong>Data-Driven Testing:</strong> @DataProvider untuk multiple data sets</li>
+                        <li>✅ <strong>TestNG XML:</strong> Configure test execution, parallel run</li>
+                        <li>✅ <strong>Best Practices:</strong> Clean code, maintainability, reusability</li>
+                    </ul>
+
+                    <h3>Before & After PHASE 3:</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Aspect</th>
+                            <th>Before</th>
+                            <th>After</th>
+                        </tr>
+                        <tr>
+                            <td>Test organization</td>
+                            <td>Messy (all in 1 class)</td>
+                            <td>✅ Organized (page + test classes)</td>
+                        </tr>
+                        <tr>
+                            <td>Locators location</td>
+                            <td>Scattered (in test methods)</td>
+                            <td>✅ Centralized (in page class)</td>
+                        </tr>
+                        <tr>
+                            <td>Test data</td>
+                            <td>Hardcoded (in test method)</td>
+                            <td>✅ Parameterized (@DataProvider)</td>
+                        </tr>
+                        <tr>
+                            <td>Execution speed</td>
+                            <td>Sequential (1 thread)</td>
+                            <td>✅ Parallel (4+ threads)</td>
+                        </tr>
+                        <tr>
+                            <td>Lines of code</td>
+                            <td>100+ (1 test)</td>
+                            <td>✅ 5-10 (1 test)</td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance</td>
+                            <td>Hard (UI change = modify 50+ tests)</td>
+                            <td>✅ Easy (UI change = modify 1 page class)</td>
+                        </tr>
+                    </table>
+
+                    <h3>Real-World Benefit:</h3>
+                    <div class="concept-box">
+                        <p><strong>Scenario:</strong> Website login page "username" ID changes from "username" to "user"</p>
+                        <p><strong>Without POM:</strong> Edit 50 test methods (each line: `By.id("username")`) = 2 hours work + high risk of mistakes</p>
+                        <p><strong>With POM:</strong> Edit 1 line in LoginPage class (change `By.id("username")` to `By.id("user")`) = 1 minute work, zero risk</p>
+                    </div>
+
+                    <h3>Next: PHASE 4</h3>
+                    <ul>
+                        <li>🔗 CI/CD Integration (Jenkins, GitHub Actions)</li>
+                        <li>📊 Test Reporting & Analytics</li>
+                        <li>🎯 Advanced Topics (Listeners, Retry Logic, Screenshots on Failure)</li>
+                        <li>🌐 Cross-Browser Testing</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "PHASE 3 hoàn thành. Bab 1: TestNG annotations - @BeforeSuite/@AfterSuite, @BeforeTest/@AfterTest, @BeforeClass/@AfterClass, @BeforeMethod/@AfterMethod, @Test. Lifecycle hierarchy: @BeforeSuite → @BeforeTest → @BeforeClass → @BeforeMethod → @Test → @AfterMethod → @AfterClass → @AfterTest → @AfterSuite. Bab 2: TestNG assertions - assertEquals, assertNotEquals, assertTrue, assertFalse, assertNull, assertNotNull, assertSame, fail. Bab 3: testng.xml - organize tests, include/exclude methods, run specific tests. Bab 4: Parallel execution - parallel='methods', thread-count='4', faster test runs, tapi tests harus independent. Bab 5: Page Object Model - capsulate page-specific code, separate page classes, DRY principle, maintainability, readability. Bab 6: Data-driven testing - @DataProvider, run same test dengan multiple data sets. Bab 7: POM structure - locators private, methods public, wait explicit, error handling proper. Dengan TestNG + Selenium + POM, bapak siap untuk production-grade automation testing. Setiap test clean, maintainable, scalable. Next PHASE 4 - advanced topics: screenshots, listeners, retry logic, cross-browser, CI/CD integration, reporting."</div>
+                </div>
+
+            </div>
+
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Previous</button>
+                    <button class="btn-primary" id="nextBtn">Next ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 9</div>
+                </div>
+
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress" style="width: 11%;"></div>
+                </div>
+
+                                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. PHASE 3 Intro</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. Why TestNG</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. TestNG Setup & Annotations</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. TestNG + Selenium</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. POM - Intro</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. POM - Detailed Example</a></li>
+                        <li><a href="#" onclick="return goToSlide(6)">6. Test with POM</a></li>
+                        <li><a href="#" onclick="return goToSlide(7)">7. Data-Driven Testing</a></li>
+                        <li><a href="#" onclick="return goToSlide(8)">8. TestNG XML & Parallel</a></li>
+                        <li><a href="#" onclick="return goToSlide(9)">9. Recap & Conclusion</a></li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~90 phút<br>
+                        📚 PHASE 3<br>
+                        🎯 TestNG & POM
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Automation Testing Tutorial | PHASE 3: TestNG & POM | Chi tiết giải thích từng dòng code</p>
+        </div>
+    </div>
+
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js"></script>
+    <script src="course-ui-demos.js"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateSlide();
+            }
+            return false;
+        }
+
+        function speak() {
+            const slide = slides[currentSlide];
+            if (!slide.querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+
+        function reset() {
+            currentSlide = 0;
+            updateSlide();
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        stopSpeakBtn.addEventListener('click', function () {
+            VietnameseTTS.stop();
+        });
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

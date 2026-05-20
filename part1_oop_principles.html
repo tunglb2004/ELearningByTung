@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java Core — Phần 1: OOP Principles</title>
+    <style>
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 750px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-top: 22px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 280px;
+            border-left: 4px solid #2a5298;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #2a5298;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #138496;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c4a6e;
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2a5298;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffe8e8;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 0.95em;
+        }
+
+        .locator-example {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #2a5298;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .concept-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+</head>
+<body data-tts-page="oop1">
+    <div class="container">
+        <div class="header">
+            <h1>☕ Java Core — Phần 1: OOP Principles</h1>
+            <p>Encapsulation · Inheritance · Polymorphism · Abstraction</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+<!-- SLIDE 1: INTRO -->
+                <div class="slide active">
+                    <h2>👋 Chào Mừng Bạn!</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 30px;">Đây là PHẦN 1: OOP Principles - Nền tảng của Lập Trình Java</p>
+                    
+                    <h3>Trong phần này chúng ta sẽ học:</h3>
+                    <ul>
+                        <li><span class="emoji">🔐</span><strong>Encapsulation (Đóng Gói)</strong> - Ẩn dữ liệu bên trong</li>
+                        <li><span class="emoji">🧬</span><strong>Inheritance (Kế Thừa)</strong> - Kế thừa từ class cha</li>
+                        <li><span class="emoji">🎭</span><strong>Polymorphism (Đa Hình)</strong> - Nhiều hình dạng, 1 interface</li>
+                        <li><span class="emoji">☁️</span><strong>Abstraction (Trừu Tượng)</strong> - Ẩn complexity, show interface</li>
+                    </ul>
+
+                    <h3>Tại Sao OOP Quan Trọng?</h3>
+                    <p>OOP là nền tảng của lập trình modern. Hiểu rõ OOP sẽ giúp bạn:</p>
+                    <ul>
+                        <li>✅ Viết code <span class="highlight">clean</span> và <span class="highlight">maintainable</span></li>
+                        <li>✅ <span class="highlight">Tái sử dụng code</span> (reusable)</li>
+                        <li>✅ Giải quyết bài toán <span class="highlight">phức tạp</span> một cách có tổ chức</li>
+                        <li>✅ Dễ <span class="highlight">collaborate</span> với team</li>
+                    </ul>
+
+                    <div class="narration-box">
+                        🔊 "Hôm nay chúng ta sẽ tìm hiểu về OOP - Object-Oriented Programming, một trong những paradigm quan trọng nhất trong lập trình. OOP không chỉ là một cơ chế lập trình, mà nó là một cách suy nghĩ. Khi bạn nhìn vào một bài toán, bạn không chỉ nhìn thấy dòng code, mà bạn nhìn thấy những đối tượng (objects) và mối quan hệ giữa chúng. Dưới đây là ví dụ thực tế. Khi bạn đi mua sắm, bạn không gọi 'cái quần', bạn gọi 'cái quần xanh'. Đó là abstraction. Bạn không quan tâm làm sao nó được may, bạn chỉ quan tâm nó có vừa không. Đó là encapsulation - ẩn chi tiết phức tạp. Bạn có một loại quần (class cha), từ đó có thể có quần jean, quần khaki, quần thun (inheritance). Khi bạn mặc quần, cách mặc là như nhau, nhưng kết quả lại khác (polymorphism). Chúng ta sẽ khám phá 4 trụ cột này một cách chi tiết, kèm theo code examples thực tế."
+                    </div>
+                </div>
+
+                <!-- SLIDE 2: ENCAPSULATION -->
+                <div class="slide">
+                    <h2>🔐 Encapsulation (Đóng Gói)</h2>
+                    
+                    <h3>Encapsulation Là Gì?</h3>
+                    <p>Encapsulation = <span class="highlight">"Đóng gói"</span>, ẩn chi tiết nội bộ của object. Người dùng chỉ nhìn thấy interface (public methods), không nhìn thấy implementation (private variables).</p>
+
+                    <div class="concept-box">
+                        <strong>Kiểu so sánh:</strong> Khi bạn bấm remote TV, bạn không cần biết bên trong nó hoạt động như nào. Bạn chỉ biết: nhấn nút lên → âm thanh tăng. Đó là encapsulation.
+                    </div>
+
+                    <h3>Lợi Ích của Encapsulation</h3>
+                    <ul>
+                        <li>✅ <strong>Bảo vệ dữ liệu:</strong> Không cho phép thay đổi dữ liệu trực tiếp</li>
+                        <li>✅ <strong>Dễ bảo trì:</strong> Thay đổi implementation mà không ảnh hưởng code khác</li>
+                        <li>✅ <strong>Enforce constraints:</strong> Đảm bảo dữ liệu luôn hợp lệ (ví dụ: balance không âm)</li>
+                    </ul>
+
+                    <h3>Code Example:</h3>
+                    <div class="code-example">
+<span class="keyword">public class</span> BankAccount {
+    <span class="comment">// Private - chỉ truy cập từ trong class</span>
+    <span class="keyword">private double</span> balance = 0;
+    <span class="keyword">private</span> String accountNumber;
+
+    <span class="comment">// Constructor</span>
+    <span class="keyword">public</span> BankAccount(String accountNumber, <span class="keyword">double</span> initialBalance) {
+        <span class="keyword">this</span>.accountNumber = accountNumber;
+        <span class="keyword">this</span>.balance = initialBalance;
+    }
+
+    <span class="comment">// Public method: deposit (gửi tiền)</span>
+    <span class="keyword">public boolean</span> deposit(<span class="keyword">double</span> amount) {
+        <span class="keyword">if</span> (amount &lt;= 0) {
+            System.out.println(<span class="string">"❌ Error: Amount must be positive"</span>);
+            <span class="keyword">return false</span>;
+        }
+        balance += amount;
+        System.out.println(<span class="string">"✅ Deposited: "</span> + amount);
+        <span class="keyword">return true</span>;
+    }
+
+    <span class="comment">// Public method: withdraw (rút tiền)</span>
+    <span class="keyword">public boolean</span> withdraw(<span class="keyword">double</span> amount) {
+        <span class="keyword">if</span> (amount &lt;= 0 || amount &gt; balance) {
+            System.out.println(<span class="string">"❌ Error: Invalid amount"</span>);
+            <span class="keyword">return false</span>;
+        }
+        balance -= amount;
+        <span class="keyword">return true</span>;
+    }
+
+    <span class="comment">// Public getter: xem số dư</span>
+    <span class="keyword">public double</span> getBalance() {
+        <span class="keyword">return</span> balance;
+    }
+}
+                    </div>
+
+                    <div class="success">
+                        ✅ <strong>Chú ý:</strong> balance là <span class="highlight">private</span> → User không thể làm account.balance = -1000 (vi phạm logic). Phải dùng methods deposit() và withdraw() để đảm bảo constraints.
+                    </div>
+
+                    <div class="narration-box">🔊 "Encapsulation là một trong những concepts quan trọng nhất. Hãy tưởng tượng bạn viết một class để quản lý tài khoản ngân hàng. Nếu bạn public balance variable, user có thể làm account.balance = -999999, điều đó vi phạm logic business. Vì vậy bạn đặt balance là private, và cung cấp public methods như deposit() và withdraw(). Bên trong những methods này, bạn có thể: 1. Validate dữ liệu (kiểm tra amount &gt; 0) 2. Log transactions (ghi lại giao dịch) 3. Update multiple related fields (cập nhật balance và lastTransaction date) 4. Trigger notifications (thông báo cho user) Điều này gọi là 'Separation of Concerns'. Business logic (validate, log) được tách riêng khỏi data access."</div>
+                </div>
+
+                <!-- SLIDE 3: INHERITANCE -->
+                <div class="slide">
+                    <h2>🧬 Inheritance (Kế Thừa)</h2>
+                    
+                    <h3>Inheritance Là Gì?</h3>
+                    <p>Inheritance = Class con kế thừa từ class cha, được tất cả properties và methods của class cha.</p>
+
+                    <div class="concept-box">
+                        <strong>Kiểu so sánh:</strong> Một con Dog kế thừa từ Animal. Dog có tất cả đặc tính của Animal (có bốn chân, ăn cơm), nhưng Dog có thêm đặc tính riêng (sủa, cắn).
+                    </div>
+
+                    <h3>Tại Sao Dùng Inheritance?</h3>
+                    <ul>
+                        <li>✅ <strong>Code Reuse:</strong> Không phải viết lại code</li>
+                        <li>✅ <strong>Establish Hierarchy:</strong> Tạo mối quan hệ giữa classes</li>
+                        <li>✅ <strong>Polymorphism:</strong> Cho phép override methods (chúng ta sẽ học sau)</li>
+                    </ul>
+
+                    <h3>Code Example:</h3>
+                    <div class="code-example">
+<span class="comment">// Class cha (parent/superclass)</span>
+<span class="keyword">public class</span> Animal {
+    <span class="keyword">private</span> String name;
+    <span class="keyword">private int</span> age;
+
+    <span class="keyword">public</span> Animal(String name, <span class="keyword">int</span> age) {
+        <span class="keyword">this</span>.name = name;
+        <span class="keyword">this</span>.age = age;
+    }
+
+    <span class="keyword">public void</span> eat() {
+        System.out.println(name + <span class="string">" is eating"</span>);
+    }
+
+    <span class="keyword">public void</span> sleep() {
+        System.out.println(name + <span class="string">" is sleeping"</span>);
+    }
+
+    <span class="keyword">public</span> String getName() { <span class="keyword">return</span> name; }
+}
+
+<span class="comment">// Class con (child/subclass)</span>
+<span class="keyword">public class</span> Dog <span class="keyword">extends</span> Animal {
+    <span class="keyword">private</span> String breed;
+
+    <span class="keyword">public</span> Dog(String name, <span class="keyword">int</span> age, String breed) {
+        <span class="keyword">super</span>(name, age); <span class="comment">// Gọi parent constructor</span>
+        <span class="keyword">this</span>.breed = breed;
+    }
+
+    <span class="comment">// Override method eat()</span>
+    @Override
+    <span class="keyword">public void</span> eat() {
+        System.out.println(getName() + <span class="string">" is eating meat"</span>);
+    }
+
+    <span class="comment">// Method riêng của Dog</span>
+    <span class="keyword">public void</span> bark() {
+        System.out.println(getName() + <span class="string">" says: Woof!"</span>);
+    }
+}
+                    </div>
+
+                    <div class="tip">
+                        💡 <strong>Tips:</strong> <code>extends</code> là keyword để kế thừa. <code>super()</code> để gọi parent constructor. @Override annotation để báo override method.
+                    </div>
+
+                    <div class="narration-box">🔊 "Inheritance giải quyết vấn đề code duplication. Nếu bạn không có inheritance, bạn phải viết eat(), sleep() ở cả Dog, Cat, Bird, ... Với inheritance, bạn viết một lần ở Animal, tất cả animal subclasses đều có. Nếu Animal có 100 methods, Dog sẽ kế thừa tất cả 100. Nhưng chú ý, inheritance không phải lúc nào cũng phù hợp. Kiểm tra quan hệ 'is-a'. Nếu Dog 'is-a' Animal, dùng inheritance. Nếu Dog 'has-a' Collar, dùng composition (chúng ta sẽ học sau)."</div>
+                </div>
+
+                <!-- SLIDE 4: POLYMORPHISM -->
+                <div class="slide">
+                    <h2>🎭 Polymorphism (Đa Hình)</h2>
+                    
+                    <h3>Polymorphism Là Gì?</h3>
+                    <p>Polymorphism = <span class="highlight">"Nhiều hình dạng"</span>. Cùng method name nhưng có implementations khác nhau tùy class.</p>
+
+                    <div class="concept-box">
+                        <strong>Kiểu so sánh:</strong> Nút 'On' ở remote TV, remote điều hòa, remote máy giặt... tên giống nhau nhưng chức năng khác. Đó là polymorphism.
+                    </div>
+
+                    <h3>2 Loại Polymorphism</h3>
+                    <ul>
+                        <li><strong>Compile-time:</strong> Method Overloading (cùng method name, parameters khác)</li>
+                        <li><strong>Runtime:</strong> Method Overriding (cùng method signature, implementation khác)</li>
+                    </ul>
+
+                    <h3>Runtime Polymorphism (Overriding):</h3>
+                    <div class="code-example">
+<span class="keyword">public class</span> Shape {
+    <span class="keyword">public void</span> draw() {
+        System.out.println(<span class="string">"Drawing a shape"</span>);
+    }
+}
+
+<span class="keyword">public class</span> Circle <span class="keyword">extends</span> Shape {
+    @Override
+    <span class="keyword">public void</span> draw() {
+        System.out.println(<span class="string">"🔵 Drawing a circle"</span>);
+    }
+}
+
+<span class="keyword">public class</span> Rectangle <span class="keyword">extends</span> Shape {
+    @Override
+    <span class="keyword">public void</span> draw() {
+        System.out.println(<span class="string">"▭ Drawing a rectangle"</span>);
+    }
+}
+
+<span class="comment">// Sử dụng Polymorphism</span>
+<span class="keyword">public static void</span> main(String[] args) {
+    Shape shape1 = <span class="keyword">new</span> Circle();
+    Shape shape2 = <span class="keyword">new</span> Rectangle();
+    
+    shape1.draw(); <span class="comment">// Output: 🔵 Drawing a circle</span>
+    shape2.draw(); <span class="comment">// Output: ▭ Drawing a rectangle</span>
+    
+    <span class="comment">// Cùng method name, khác output!</span>
+}
+                    </div>
+
+                    <div class="success">
+                        ✅ <strong>Magic:</strong> Dù shape1 và shape2 đều kiểu Shape, nhưng draw() sẽ gọi method của runtime type (Circle hoặc Rectangle), không phải compile-time type.
+                    </div>
+
+                    <div class="narration-box">🔊 "Polymorphism là feature mạnh nhất của OOP. Nó cho phép bạn viết code generic, xử lý nhiều types mà không cần biết chính xác type nào. Ví dụ, nếu bạn có một array chứa nhiều Shapes, bạn có thể loop qua tất cả và gọi draw() mà không cần biết draw() sẽ làm gì: Shape[] shapes = {new Circle(), new Rectangle(), new Triangle()}; for (Shape shape : shapes) { shape.draw(); // Tự động gọi đúng method cho từng type! } Điều này gọi là 'loose coupling'. Code của bạn không phụ thuộc vào implementation details của Shape subclasses."</div>
+                </div>
+
+                <!-- SLIDE 5: ABSTRACTION -->
+                <div class="slide">
+                    <h2>☁️ Abstraction (Trừu Tượng)</h2>
+                    
+                    <h3>Abstraction Là Gì?</h3>
+                    <p>Abstraction = Ẩn complexity, chỉ show những cần thiết. Dùng <span class="highlight">abstract class</span> hoặc <span class="highlight">interface</span>.</p>
+
+                    <div class="concept-box">
+                        <strong>Kiểu so sánh:</strong> Bạn dùng USB cable, bạn không cần biết bên trong nó hoạt động như nào (voltage, protocol...), bạn chỉ cắm vào. Đó là abstraction.
+                    </div>
+
+                    <h3>Abstract Class vs Interface</h3>
+                    <ul>
+                        <li><strong>Abstract Class:</strong> Có thể có concrete methods (có body) + abstract methods (không body)</li>
+                        <li><strong>Interface:</strong> Chỉ có abstract methods (Java 8+ có default methods)</li>
+                    </ul>
+
+                    <h3>Code Example: Abstract Class</h3>
+                    <div class="code-example">
+<span class="keyword">public abstract class</span> Database {
+    <span class="keyword">protected</span> String connectionString;
+
+    <span class="keyword">public</span> Database(String connectionString) {
+        <span class="keyword">this</span>.connectionString = connectionString;
+    }
+
+    <span class="comment">// Abstract methods - subclass PHẢI implement</span>
+    <span class="keyword">public abstract void</span> connect();
+    <span class="keyword">public abstract void</span> disconnect();
+
+    <span class="comment">// Concrete method - subclass có thể dùng hoặc override</span>
+    <span class="keyword">public void</span> startTransaction() {
+        System.out.println(<span class="string">"Starting transaction..."</span>);
+    }
+}
+
+<span class="keyword">public class</span> MySQLDatabase <span class="keyword">extends</span> Database {
+    @Override
+    <span class="keyword">public void</span> connect() {
+        System.out.println(<span class="string">"🔗 Connecting to MySQL"</span>);
+    }
+
+    @Override
+    <span class="keyword">public void</span> disconnect() {
+        System.out.println(<span class="string">"🔌 Disconnecting from MySQL"</span>);
+    }
+}
+
+<span class="keyword">public class</span> PostgreSQLDatabase <span class="keyword">extends</span> Database {
+    @Override
+    <span class="keyword">public void</span> connect() {
+        System.out.println(<span class="string">"🔗 Connecting to PostgreSQL"</span>);
+    }
+
+    @Override
+    <span class="keyword">public void</span> disconnect() {
+        System.out.println(<span class="string">"🔌 Disconnecting from PostgreSQL"</span>);
+    }
+}
+                    </div>
+
+                    <div class="tip">
+                        💡 <strong>Lợi Ích:</strong> Abstraction định nghĩa contract (interface), implementation có thể thay đổi. Code test có thể work với Database reference, dù underlying là MySQL hay PostgreSQL.
+                    </div>
+
+                    <div class="narration-box">🔊 "Abstraction là foundation của framework design. Khi bạn design một framework, bạn không muốn users biết details. Bạn define abstract class hoặc interface, users implement cái đó. Ví dụ, Spring Framework sử dụng Abstraction rất nhiều. Nó define Repository interface, bạn implement nó để connect DB khác nhau. Framework không quan tâm bạn dùng MySQL hay MongoDB. Lợi ích: 1. Flexibility - easily swap implementations 2. Testability - mock abstract interface 3. Maintainability - change implementation without affecting clients 4. Extensibility - add new implementations"</div>
+                </div>
+
+                <!-- SLIDE 6: RECAP -->
+                <div class="slide">
+                    <h2>📚 Recap: 4 OOP Principles</h2>
+                    
+                    <h3>1. Encapsulation (Đóng Gói)</h3>
+                    <ul>
+                        <li>✅ Ẩn private variables, expose public methods</li>
+                        <li>✅ Protect data integrity</li>
+                        <li>✅ "Data hiding"</li>
+                    </ul>
+
+                    <h3>2. Inheritance (Kế Thừa)</h3>
+                    <ul>
+                        <li>✅ Child class kế thừa từ parent class</li>
+                        <li>✅ Reuse code, establish hierarchy</li>
+                        <li>✅ "is-a" relationship</li>
+                    </ul>
+
+                    <h3>3. Polymorphism (Đa Hình)</h3>
+                    <ul>
+                        <li>✅ Same method name, different implementations</li>
+                        <li>✅ Runtime type determines which method to call</li>
+                        <li>✅ "one interface, many forms"</li>
+                    </ul>
+
+                    <h3>4. Abstraction (Trừu Tượng)</h3>
+                    <ul>
+                        <li>✅ Hide complexity, show interface</li>
+                        <li>✅ Abstract classes + interfaces</li>
+                        <li>✅ Define contract for implementations</li>
+                    </ul>
+
+                    <div class="success">
+                        ✅ <strong>Tổng Kết:</strong> 4 principles này phối hợp với nhau tạo nên powerful, flexible, maintainable code architecture.
+                    </div>
+
+                    <div class="narration-box">🔊 "Chúng ta vừa hoàn thành PHẦN 1: OOP Principles. Những concepts này không chỉ dùng cho Java, mà dùng cho hầu hết các ngôn ngữ OOP: C++, C#, Python, JavaScript... Khi bạn design một class, hãy suy nghĩ: 1. Encapsulation: Dữ liệu nào nên private? Dữ liệu nào nên public? 2. Inheritance: Có class cha chung không? Có thể extract common code? 3. Polymorphism: Có method nào nên override ở subclasses? 4. Abstraction: Có thể define abstract interface để multiple implementations? Hãy nhớ: 'Code is read more often than it is written'. Viết code theo OOP principles sẽ giúp người khác (hoặc chính bạn sau này) dễ hiểu và maintain code của bạn."</div>
+                </div>
+            </div>
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Trước</button>
+                    <button class="btn-primary" id="nextBtn">Tiếp ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Đặt lại</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 6</div>
+                </div>
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress"></div>
+                </div>
+                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. Giới thiệu OOP</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. Encapsulation</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. Inheritance</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. Polymorphism</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. Abstraction</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. Tóm tắt</a></li>
+                    </ul>
+                </div>
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~35 phút<br>
+                        📚 Java Core — Phần 1<br>
+                        ☕ OOP Principles
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2025 Automation Testing & Java Core | Java Core — Phần 1: OOP Principles | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js?v=5"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); }
+            return false;
+        }
+        function speak() {
+            if (!slides[currentSlide].querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+        function reset() { currentSlide = 0; updateSlide(); }
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        updateSlide();
+    </script>
+</body>
+</html>

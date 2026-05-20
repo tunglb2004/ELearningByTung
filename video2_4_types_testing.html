@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video 2: 4 Loại Test Automation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 700px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.5;
+            max-height: 300px;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #ff79c6; }
+        .string { color: #f1fa8c; }
+        .comment { color: #6272a4; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #1e1e1e;
+            color: #0dff00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 2px solid #0dff00;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 280px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #764ba2;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #663a8b;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+
+        .narration-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-style: italic;
+            color: #333;
+            line-height: 1.5;
+            font-size: 0.95em;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #fff5e6;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #e6f9f0;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .pyramid {
+            text-align: center;
+            font-family: monospace;
+            white-space: pre;
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 5px 0;
+        }
+
+        .nav-links a {
+            color: #667eea;
+            text-decoration: none;
+            display: block;
+            padding: 5px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+<link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+    <link rel="stylesheet" href="course-ui-demos.css">
+</head>
+<body data-tts-page="video2">
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Video 2: 4 Loại Test Automation</h1>
+            <p>PHASE 1: Nền Tảng - Unit | Integration | E2E | API Testing</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+                <!-- INTRO -->
+                <div class="slide active">
+                    <h2>👋 Xin Chào!</h2>
+                    <p style="font-size: 1.2em; margin-bottom: 30px;">Đây là Video 2 của PHASE 1</p>
+                    
+                    <h3>Ở video trước, chúng ta đã học:</h3>
+                    <ul>
+                        <li>Manual testing là gì</li>
+                        <li>Automation testing là gì</li>
+                        <li>Khác biệt và khi nào dùng cái nào</li>
+                    </ul>
+
+                    <h3>Hôm nay chúng ta sẽ học:</h3>
+                    <ul>
+                        <li><span class="emoji">🧩</span><strong>Unit Testing</strong> - Test từng method riêng lẻ</li>
+                        <li><span class="emoji">⚙️</span><strong>Integration Testing</strong> - Test modules hoạt động cùng nhau</li>
+                        <li><span class="emoji">🌐</span><strong>End-to-End (E2E) Testing</strong> - Test toàn bộ user workflow</li>
+                        <li><span class="emoji">📡</span><strong>API Testing</strong> - Test backend APIs</li>
+                    </ul>
+
+                    <h3>Mỗi loại sẽ có:</h3>
+                    <ul>
+                        <li>✅ Lý thuyết chi tiết</li>
+                        <li>✅ Code ví dụ</li>
+                        <li>✅ Giải thích từng dòng code</li>
+                        <li>✅ Output thực tế</li>
+                        <li>✅ Khi nào dùng</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Ở bài học trước, chúng ta đã học automation testing là viết code để tự động chạy tests. Nhưng câu hỏi là test cái gì? Có 4 loại automation testing khác nhau, mỗi loại test một phần khác nhau của ứng dụng. Loại đầu tiên là UNIT TESTING. Unit có nghĩa là đơn vị nhỏ nhất, và trong lập trình, đơn vị nhỏ nhất là một method hay một function. UNIT TESTING là việc test từng method riêng lẻ, độc lập, không phụ thuộc vào bất kỳ thứ gì khác. Hãy tưởng tượng bạn là một lập trình viên, bạn viết một class Calculator với 2 method. Method đầu tiên là add() nhận 2 số a và b, rồi return tổng a plus b. Method thứ hai là divide() nhận 2 số a và b, nếu b bằng 0 nó sẽ throw một exception với message 'Cannot divide by zero', nếu b không bằng 0 nó sẽ return a chia cho b. Vấn đề là các method này có hoạt động đúng không? Nếu bạn gọi add() với 5 và 3, nó có return 8 không? Nếu bạn gọi divide() với 10 và 2, nó có return 5 không? Và nếu bạn cố divide cho 0, nó có throw exception không? Đó chính là lúc bạn viết unit tests."</div>
+                </div>
+
+                <!-- UNIT TESTING 1 -->
+                <div class="slide">
+                    <h2>🧩 Unit Testing - Định Nghĩa</h2>
+                    
+                    <h3>Unit là gì?</h3>
+                    <p>"Unit" = <span class="highlight">đơn vị nhỏ nhất</span> trong code → thường là <span class="highlight">một method/function</span></p>
+
+                    <h3>Unit Testing là gì?</h3>
+                    <p>Unit Testing = <span class="highlight">Test từng method riêng lẻ, độc lập</span> với các thành phần khác</p>
+
+                    <h3>Đặc Điểm</h3>
+                    <ul>
+                        <li>✅ <strong>NHANH:</strong> Test chạy cực nhanh (milliseconds)</li>
+                        <li>✅ <strong>ĐỘC LẬP:</strong> Không cần database, browser, network</li>
+                        <li>✅ <strong>TẬP TRUNG:</strong> Chỉ test logic của 1 method</li>
+                        <li>✅ <strong>EASY DEBUG:</strong> Dễ tìm lỗi vì scope nhỏ</li>
+                        <li>🎯 <strong>NÊN VIẾT: 70% của tất cả tests</strong></li>
+                    </ul>
+
+                    <h3>Ví Dụ</h3>
+                    <p>Có method: <code style="background: #f0f0f0; padding: 2px 6px;">add(5, 3)</code></p>
+                    <p>Unit test: <code style="background: #f0f0f0; padding: 2px 6px;">assert add(5, 3) == 8</code> ✅</p>
+
+                    <div class="narration-box">🔊 "Hãy xem code để test add() method. Đầu tiên, trong phần ARRANGE, tôi tạo một instance mới của Calculator bằng cách gọi new Calculator(). Tại sao? Vì tôi cần một object để gọi method add() trên nó. Tiếp theo, trong phần ACT, tôi gọi calc.add() với 2 parameters là 5 và 3, và lưu kết quả vào biến result. Tại sao? Vì tôi muốn lấy kết quả của method để so sánh. Cuối cùng, trong phần ASSERT, tôi sử dụng assertEquals() để so sánh expected value là 8 với actual value là result. Nếu 8 bằng result, test sẽ PASS. Nếu không bằng, test sẽ FAIL. Đó gọi là AAA pattern - Arrange, Act, Assert, một pattern rất phổ biến để viết unit tests. Bây giờ hãy xem test cho divide() method. Khi b bằng 0, method này sẽ throw một IllegalArgumentException. Làm cách nào để kiểm tra nó throw exception? Tôi sử dụng @Test(expected = IllegalArgumentException.class). Nó có ý là 'tôi kỳ vọng method này sẽ throw IllegalArgumentException'. Nếu method thực sự throw exception đó, test sẽ PASS. Nếu nó không throw hay throw một exception khác, test sẽ FAIL."</div>
+                </div>
+
+                <!-- UNIT TESTING 2 -->
+                <div class="slide">
+                    <h2>🧩 Unit Testing - Code Example</h2>
+                    
+                    <h3>Calculator Class (Code cần test)</h3>
+                    <div class="code-example">
+<span class="keyword">public class</span> Calculator {
+    <span class="keyword">public int</span> add(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+        <span class="keyword">return</span> a + b;
+    }
+    
+    <span class="keyword">public int</span> divide(<span class="keyword">int</span> a, <span class="keyword">int</span> b) {
+        <span class="keyword">if</span> (b == 0) {
+            <span class="keyword">throw new</span> IllegalArgumentException(
+                <span class="string">"Cannot divide by zero"</span>
+            );
+        }
+        <span class="keyword">return</span> a / b;
+    }
+}
+                    </div>
+
+                    <h3>Unit Tests (Code để test)</h3>
+                    <div class="code-example">
+<span class="keyword">public class</span> CalculatorTest {
+    <span class="comment">// Test add() với 2 số dương</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testAddPositive() {
+        Calculator calc = <span class="keyword">new</span> Calculator();
+        <span class="keyword">int</span> result = calc.add(5, 3);
+        <span class="comment">// Kiểm tra: result == 8?</span>
+        assertEquals(8, result); <span class="comment">// ✅ PASS</span>
+    }
+    
+    <span class="comment">// Test divide() khi chia cho 0</span>
+    <span class="keyword">@Test</span>(expected = IllegalArgumentException.<span class="keyword">class</span>)
+    <span class="keyword">public void</span> testDivideByZero() {
+        Calculator calc = <span class="keyword">new</span> Calculator();
+        calc.divide(10, 0); <span class="comment">// Sẽ throw exception ✅</span>
+    }
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+Test 1: testAddPositive
+  Input: add(5, 3)
+  Expected: 8
+  Actual: 8
+  ✅ PASS
+
+Test 2: testDivideByZero
+  Input: divide(10, 0)
+  Expected: IllegalArgumentException
+  Actual: Exception thrown
+  ✅ PASS
+
+Total: 2 tests, 2 passed, 0 failed
+Time: 45ms ⚡
+                    </div>
+
+                    <div class="narration-box">🔊 "Tại sao unit testing lại quan trọng? Thứ nhất, nó NHANH. Không cần browser, không cần database, không cần network. Test 100 unit tests chỉ mất 1 giây, so với manual test là 5 phút nhân 100 bằng 500 phút. Thứ hai, DỄ DEBUG. Nếu testAddPositive fail, bạn biết ngay lỗi là ở method add(), không cần kiểm tra cả hệ thống. Thứ ba, theo best practice, 70% của tất cả tests nên là unit tests vì nó fast, nên bạn có thể chạy nó thường xuyên, mỗi khi developers commit code. Thay vì @Test(expected = IllegalArgumentException.class), bạn có thể dùng assertThrows() method từ Java 8 trở lên. Cách này modern hơn và dễ đọc hơn. Bạn cũng có thể dùng try-catch kiểu cũ, nhưng nó verbose hơn. Có nhiều loại assertion khác mà bạn có thể dùng như assertEquals() để kiểm tra bằng nhau, assertNotEquals() để kiểm tra không bằng, assertTrue() và assertFalse() để kiểm tra boolean, assertNull() và assertNotNull() để kiểm tra null, và assertArrayEquals() để kiểm tra arrays."</div>
+                </div>
+
+                <!-- INTEGRATION TESTING 1 -->
+                <div class="slide">
+                    <h2>⚙️ Integration Testing - Định Nghĩa</h2>
+                    
+                    <h3>"Integration" = Hợp Nhất</h3>
+                    <p>Integration Testing = Test khi <span class="highlight">2+ modules hoạt động cùng nhau</span></p>
+
+                    <h3>Khác Biệt vs Unit Test</h3>
+                    <ul>
+                        <li><strong>Unit:</strong> Test 1 method → add(5,3)=8</li>
+                        <li><strong>Integration:</strong> Test 2-3 services + database → user created → account created → verified ✅</li>
+                    </ul>
+
+                    <h3>Đặc Điểm</h3>
+                    <ul>
+                        <li>⏰ <strong>CHẬM HƠN:</strong> 500ms/test (phải I/O database)</li>
+                        <li>✅ <strong>CÓ DATABASE:</strong> Lưu/lấy từ database thực</li>
+                        <li>✅ <strong>CÓ API:</strong> Gọi external APIs</li>
+                        <li>🔍 <strong>PHÁT HIỆN:</strong> Bugs khi modules tương tác</li>
+                        <li>🎯 <strong>NÊN VIẾT: 20% của tất cả tests</strong></li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Loại thứ hai là INTEGRATION TESTING. Integration có nghĩa là hợp nhất. INTEGRATION TESTING là test khi 2 hay nhiều modules hoạt động cùng nhau. Lý do là gì? Ở unit testing, chúng ta test add() method riêng lẻ, test divide() riêng lẻ, nhưng chúng ta không biết liệu khi kết hợp chúng lại có work không. Hãy tưởng tượng một BankService mà sử dụng Calculator để tính toán số dư, sử dụng Database để lưu thông tin account, và sử dụng Logger để ghi lại giao dịch. Unit tests có thể pass cho mỗi method riêng lẻ, nhưng khi bạn gọi transferMoney() method, nó gọi calculate(), gọi database.save(), gọi logger.log(). Nếu bạn chỉ unit test, bạn không biết liệu database.save() có hoạt động không, liệu logger.log() có hoạt động không. Integration test sẽ giúp bạn kiểm tra tất cả những thứ này cùng nhau."</div>
+                </div>
+
+                <!-- INTEGRATION TESTING 2 -->
+                <div class="slide">
+                    <h2>⚙️ Integration Testing - Ví Dụ</h2>
+                    
+                    <h3>Scenario: Transfer Money (Transfer tiền)</h3>
+                    <p>Workflow: Get account A → Get account B → Transfer → Update DB</p>
+
+                    <div class="code-example">
+<span class="keyword">public class</span> BankIntegrationTest {
+    <span class="comment">// Test: Transfer tiền thành công</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testTransferMoney() {
+        <span class="comment">// Step 1: Chuẩn bị</span>
+        <span class="keyword">int</span> accountAId = 1;
+        <span class="keyword">int</span> accountBId = 2;
+        <span class="keyword">double</span> amount = 1000;
+        
+        <span class="comment">// Step 2: Get account A từ DB</span>
+        Account accountA = accountService.getAccountById(1);
+        <span class="comment">// accountA.balance = 5000</span>
+        
+        <span class="comment">// Step 3: Get account B từ DB</span>
+        Account accountB = accountService.getAccountById(2);
+        <span class="comment">// accountB.balance = 5000</span>
+        
+        <span class="comment">// Step 4: Transfer 1000 từ A → B</span>
+        <span class="keyword">boolean</span> success = transactionService
+            .transfer(accountAId, accountBId, amount);
+        
+        <span class="comment">// Step 5: Verify kết quả</span>
+        assertTrue(success); <span class="comment">// ✅ Transfer thành công?</span>
+        assertEquals(4000, accountA.getBalance()); <span class="comment">// ✅ A = 4000?</span>
+        assertEquals(6000, accountB.getBalance()); <span class="comment">// ✅ B = 6000?</span>
+    }
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+Test: testTransferMoney
+  Step 1: Getting account A from DB
+  Step 2: Getting account B from DB
+  Step 3: Transferring 1000 from A to B
+  Step 4: Updating DB for both accounts
+  ✅ Transfer successful
+  
+Assertions:
+  ✅ Transfer should succeed: PASS
+  ✅ Account A balance = 4000: PASS
+  ✅ Account B balance = 6000: PASS
+  
+Time: 523ms ⏱️
+                    </div>
+
+                    <div class="narration-box">🔊 "Hãy xem code integration test cho BankService. Trong ARRANGE, tôi tạo 2 accounts với balance khác nhau. Account từ có 5000, account đến có 3000. Tôi save chúng vào test database, không phải database thực để không ảnh hưởng dữ liệu sản xuất. Tại sao test database? Vì database thực có dữ liệu sản xuất quan trọng. Trong ACT, tôi gọi bankService.transferMoney(1, 2, 1000) để transfer 1000 từ account 1 sang account 2. Trong ASSERT, tôi verify rằng balance của account 1 bây giờ là 4000 (5000 - 1000), balance của account 2 là 4000 (3000 + 1000). Tôi cũng verify rằng transaction được logged vào database. Nếu tất cả assertions pass, test sẽ PASS, điều này chứng tỏ rằng transferMoney() hoạt động đúng khi kết hợp calculator, database, và logger. Test thứ hai là negative test - test khi có lỗi. Tôi cố transfer 1000 từ account chỉ có 500. Nó sẽ throw InsufficientFundsException. Sau khi throw exception, balance không thay đổi - vẫn 500 và 3000. Đây là behavior mà integration test cần kiểm tra."</div>
+                </div>
+
+                <!-- E2E TESTING 1 -->
+                <div class="slide">
+                    <h2>🌐 End-to-End (E2E) Testing - Định Nghĩa</h2>
+                    
+                    <h3>"End-to-End" = Từ Đầu Đến Cuối</h3>
+                    <p>E2E Testing = Test <span class="highlight">toàn bộ user workflow</span> từ lúc user bắt đầu đến khi hoàn thành task</p>
+
+                    <h3>Ví Dụ Workflow</h3>
+                    <ul>
+                        <li>👤 User login</li>
+                        <li>🔍 Browse products</li>
+                        <li>🔎 Search product "Laptop"</li>
+                        <li>📦 Add to cart</li>
+                        <li>🛒 View cart</li>
+                        <li>💳 Checkout</li>
+                        <li>📝 Enter shipping info</li>
+                        <li>💰 Pay</li>
+                        <li>✅ See order confirmation</li>
+                    </ul>
+
+                    <h3>Đặc Điểm</h3>
+                    <ul>
+                        <li>🐢 <strong>RẤT CHẬM:</strong> 20-30 seconds/test</li>
+                        <li>🌐 <strong>CẦN BROWSER:</strong> Chrome, Firefox, Safari (Selenium)</li>
+                        <li>👁️ <strong>USER PERSPECTIVE:</strong> Test từ browser, click, type</li>
+                        <li>🎯 <strong>NÊN VIẾT: 10% của tất cả tests</strong></li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Tại sao integration testing quan trọng? Thứ nhất, unit tests pass không có nghĩa là system works. Nếu chúng ta test unit riêng lẻ, mỗi cái pass, nhưng khi kết hợp lại có thể có problem với logic flow. Thứ hai, database integration. Unit tests không dùng database, nhưng integration tests dùng test database để verify read/write works. Thứ ba, error handling. Nếu database down, exception có được handle đúng không? Nếu logger fail, transfer có được cancel không? Tỷ lệ: 20% của tất cả tests nên là integration tests. Chúng chậm hơn unit tests vì cần I/O operations, nhưng quan trọng để verify components work together. Thay vì TestDatabase, bạn có thể dùng MOCKING - tạo fake objects. Với mocking library như Mockito, bạn dùng when() để mock behavior và verify() để kiểm tra method được gọi. Hoặc dùng EMBEDDED DATABASE như H2 hay SQLite - in-memory database chạy nhanh hơn external database."</div>
+                </div>
+
+                <!-- E2E TESTING 2 -->
+                <div class="slide">
+                    <h2>🌐 E2E Testing - Ví Dụ Code</h2>
+                    
+                    <h3>Shopping Workflow Test</h3>
+                    <div class="code-example">
+<span class="keyword">public class</span> ShoppingE2ETest {
+    WebDriver driver;
+    
+    <span class="keyword">@Before</span>
+    <span class="keyword">public void</span> setUp() {
+        driver = <span class="keyword">new</span> ChromeDriver();
+        driver.get(<span class="string">"https://ecommerce.com"</span>);
+    }
+    
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testShopping() {
+        <span class="comment">// Step 1: Login</span>
+        driver.findElement(By.id(<span class="string">"login"</span>)).click();
+        driver.findElement(By.id(<span class="string">"username"</span>))
+            .sendKeys(<span class="string">"user@test.com"</span>);
+        driver.findElement(By.id(<span class="string">"password"</span>))
+            .sendKeys(<span class="string">"pass123"</span>);
+        driver.findElement(By.name(<span class="string">"login"</span>)).click();
+        
+        <span class="comment">// Step 2: Search</span>
+        driver.findElement(By.id(<span class="string">"search"</span>))
+            .sendKeys(<span class="string">"Laptop"</span>);
+        driver.findElement(By.id(<span class="string">"search-btn"</span>))
+            .click();
+        
+        <span class="comment">// Step 3: Add to cart</span>
+        driver.findElement(By.xpath(<span class="string">"//*[contains(text(),'Laptop')]"</span>))
+            .click();
+        driver.findElement(By.id(<span class="string">"add-to-cart"</span>))
+            .click();
+        
+        <span class="comment">// Step 4: Checkout</span>
+        driver.findElement(By.id(<span class="string">"checkout"</span>))
+            .click();
+        
+        <span class="comment">// Step 5: Verify order</span>
+        WebElement confirmation = 
+            driver.findElement(By.id(<span class="string">"confirmation"</span>));
+        assertTrue(confirmation.getText()
+            .contains(<span class="string">"Order Confirmed"</span>));
+        
+        driver.quit();
+    }
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+🌐 Opening browser...
+👆 Clicking login button
+✍️  Entering username: user@test.com
+✍️  Entering password
+👆 Submitting login
+
+🔍 Searching for "Laptop"
+✅ Search results loaded
+
+📦 Found product: Dell XPS 13
+👆 Clicking add to cart
+✅ Added to cart
+
+💳 Clicking checkout
+📝 Entering shipping info
+💰 Processing payment
+
+✅ Order Confirmed! Order ID: ORD-2025-001
+
+Time: 23.4 seconds ⏱️
+                    </div>
+
+                    <div class="narration-box">🔊 "Loại thứ ba là E2E TESTING. E2E là viết tắt của End-to-End. E2E TESTING là test toàn bộ user journey từ lúc bắt đầu đến lúc hoàn thành task. Không test một method, không test một flow logic, mà test một workflow hoàn chỉnh của user. Ví dụ, bạn là một khách hàng trên Amazon, bạn muốn mua một laptop. Workflow của bạn sẽ là: mở website, login, search laptop, click vào product, xem chi tiết, configure options, add to cart, go to cart, verify product, checkout, enter address, enter payment, place order, xem confirmation. Đó là một E2E test - 19 bước! Unit test là test add() method, 1 dòng code, 1 giây. Integration test là test transferMoney(), 50 dòng code, 5 giây. E2E test là test toàn bộ shopping flow, 100+ dòng code, 20-30 giây vì phải mở browser, chờ pages load, chờ elements render."</div>
+                </div>
+
+                <!-- API TESTING 1 -->
+                <div class="slide">
+                    <h2>📡 API Testing - Định Nghĩa</h2>
+                    
+                    <h3>API = Application Programming Interface</h3>
+                    <p>API Testing = Test các <span class="highlight">API endpoints</span> (GET, POST, PUT, DELETE) mà không cần browser</p>
+
+                    <h3>REST API Methods</h3>
+                    <ul>
+                        <li><strong>GET</strong> /users/1 → Lấy user có ID=1</li>
+                        <li><strong>POST</strong> /users → Tạo user mới</li>
+                        <li><strong>PUT</strong> /users/1 → Update user ID=1</li>
+                        <li><strong>DELETE</strong> /users/1 → Xóa user ID=1</li>
+                    </ul>
+
+                    <h3>Đặc Điểm</h3>
+                    <ul>
+                        <li>⚡ <strong>NHANH:</strong> 2-3 seconds/10 tests</li>
+                        <li>✅ <strong>KHÔNG CẦN UI:</strong> Chỉ gửi request, check response</li>
+                        <li>✅ <strong>DỄ MAINTAIN:</strong> Không phụ thuộc UI changes</li>
+                        <li>👨‍💻 <strong>BACKEND TESTING:</strong> Test backend APIs riêng biệt</li>
+                        <li>🎯 <strong>NÊN VIẾT: 20% của tất cả tests</strong></li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Code E2E test sẽ dài hơn. Tôi dùng Selenium WebDriver để tự động hóa browser. Đầu tiên tôi khởi tạo ChromeDriver - nó sẽ tự động mở Chrome. Tiếp theo tôi dùng driver.get() để điều hướng đến URL. Rồi tôi dùng driver.findElement() để tìm element bằng ID hay XPath, dùng sendKeys() để gõ text, dùng click() để click button, dùng getText() để lấy text. Tôi dùng WebDriverWait để chờ element xuất hiện - đây rất quan trọng vì page load không phải instantaneous. Cuối cùng tôi dùng assertTrue() hoặc assertEquals() để verify kết quả. E2E test này mô phỏng user thực sự mua hàng - từ login đến place order."</div>
+                </div>
+
+                <!-- API TESTING 2 -->
+                <div class="slide">
+                    <h2>📡 API Testing - Ví Dụ Code</h2>
+                    
+                    <h3>User API Tests</h3>
+                    <div class="code-example">
+<span class="keyword">public class</span> UserAPITest {
+    <span class="comment">// Test 1: GET /users/1</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testGetUser() {
+        given()
+            .baseUri(<span class="string">"https://api.example.com"</span>)
+            .when()
+            .get(<span class="string">"/users/1"</span>)
+            .then()
+            .statusCode(200) <span class="comment">// Check status = 200</span>
+            .body(<span class="string">"name"</span>, equalTo(<span class="string">"John"</span>));
+    }
+    
+    <span class="comment">// Test 2: POST /users (Create new)</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testCreateUser() {
+        String body = <span class="string">"{\\"name\\":\\"Alice\\",\\"email\\":\\"alice@test\\"}"</span>;
+        given()
+            .baseUri(<span class="string">"https://api.example.com"</span>)
+            .contentType(<span class="string">"application/json"</span>)
+            .body(body)
+            .when()
+            .post(<span class="string">"/users"</span>)
+            .then()
+            .statusCode(201); <span class="comment">// Check status = 201 Created</span>
+    }
+    
+    <span class="comment">// Test 3: GET /users/999 (Not found)</span>
+    <span class="keyword">@Test</span>
+    <span class="keyword">public void</span> testGetNonExistent() {
+        given()
+            .baseUri(<span class="string">"https://api.example.com"</span>)
+            .when()
+            .get(<span class="string">"/users/999"</span>)
+            .then()
+            .statusCode(404); <span class="comment">// Check status = 404</span>
+    }
+}
+                    </div>
+
+                    <div class="output-box">
+OUTPUT:
+Test 1: testGetUser
+  Request: GET /users/1
+  Response Status: 200 OK ✅
+  Response Body:
+    - id: 1
+    - name: John
+    - email: john@example.com
+  ✅ PASS
+
+Test 2: testCreateUser
+  Request: POST /users
+  Body: {"name":"Alice","email":"alice@test"}
+  Response Status: 201 Created ✅
+  Response Body: {"id":11,"name":"Alice"}
+  ✅ PASS
+
+Test 3: testGetNonExistent
+  Request: GET /users/999
+  Response Status: 404 Not Found ✅
+  ✅ PASS
+
+Time: 2.3 seconds ⚡⚡
+                    </div>
+
+                    <div class="narration-box">🔊 "Tại sao E2E test chậm? Vì nó phải khởi động browser (2 giây), mở website (3 giây), mỗi click hay type là 0.5-1 giây, chờ page load là 1-5 giây. Total là 20-30 giây cho 1 test. Nếu có 100 E2E tests, đó là 3000 giây = 50 phút = 1 giờ chỉ để run tests. Nếu developer thay 1 dòng code, họ phải chạy lại 1 giờ - không productive! Vì vậy chúng ta không thể chỉ dùng E2E tests. Chúng ta cần test pyramid. Thay vì Selenium, bạn có thể dùng Cypress hay Playwright - những tools này thường nhanh hơn Selenium. Puppeteer là một thay thế khác nếu bạn muốn tự động hóa browser theo low-level."</div>
+                </div>
+
+                <!-- COMPARISON -->
+                <div class="slide">
+                    <h2>📊 So Sánh 4 Loại Testing</h2>
+                    
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Tiêu Chí</th>
+                            <th>Unit</th>
+                            <th>Integration</th>
+                            <th>E2E</th>
+                            <th>API</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Tốc Độ</strong></td>
+                            <td>⚡⚡⚡ ms</td>
+                            <td>⚡⚡ 500ms</td>
+                            <td>🐢 20-30s</td>
+                            <td>⚡⚡ ms</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Scope</strong></td>
+                            <td>1 method</td>
+                            <td>2+ modules</td>
+                            <td>Full workflow</td>
+                            <td>1 endpoint</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Browser</strong></td>
+                            <td>❌</td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>❌</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Database</strong></td>
+                            <td>❌</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                            <td>✅</td>
+                        </tr>
+                        <tr>
+                            <td><strong>% Tests</strong></td>
+                            <td>70%</td>
+                            <td>20%</td>
+                            <td>10%</td>
+                            <td>20%</td>
+                        </tr>
+                    </table>
+
+                    <div class="narration-box">🔊 "Loại thứ tư là API TESTING. API là viết tắt của Application Programming Interface. API Testing là test API endpoints (GET, POST, PUT, DELETE) mà không cần browser hoặc UI. Tại sao? Vì user không tương tác trực tiếp với API, nhưng backend tương tác. Khi bạn click 'Add to Cart' button, browser gửi HTTP request đến server, server xử lý, server trả response. API testing sẽ test phần server này trực tiếp, bypass browser hoàn toàn. Ví dụ, API endpoint GET /users/1 sẽ trả JSON response với user info. POST /users sẽ tạo user mới. PUT /users/1 sẽ update user. DELETE /users/1 sẽ xóa user. API test sẽ verify status code, verify response body, verify headers."</div>
+                </div>
+
+                <!-- TEST PYRAMID -->
+                <div class="slide">
+                    <h2>🔺 Test Pyramid</h2>
+                    
+                    <p>Bao nhiêu % của mỗi loại test nên viết?</p>
+
+                    <div class="pyramid">
+        /\
+       /  \
+      / 10%\       E2E Tests
+     / E2E  \      (20-30s each)
+    /--------\
+   /   20%   \     Integration Tests
+  / Integration\   (0.5s each)
+ /            \
+/    70%      \    Unit Tests
+/    Unit     \    (ms each)
+\             /
+ \-----------/
+                    </div>
+
+                    <h3>Lý Do:</h3>
+                    <ul>
+                        <li>✅ <strong>Unit tests:</strong> Nhanh (ms) → Viết nhiều (70%)</li>
+                        <li>✅ <strong>Integration tests:</strong> Chậm (0.5s) → Viết vừa phải (20%)</li>
+                        <li>✅ <strong>E2E tests:</strong> Chậm lắm (20-30s) → Viết ít (10%)</li>
+                        <li>✅ <strong>API tests:</strong> Nhanh (ms) → Hoặc 20% hoặc kết hợp unit</li>
+                    </ul>
+
+                    <p style="margin-top: 20px;"><strong>Kết Quả:</strong> Chạy tất cả tests mất ~5 phút (fast feedback)</p>
+
+                    <div class="narration-box">🔊 "Tôi dùng RestAssured library để test APIs. Syntax là given-when-then. Given() setup request - specify content type, body, headers. When() perform request - GET, POST, PUT, DELETE. Then() verify response - status code, body content. Ví dụ, GET /users/1 sẽ return status 200 với body chứa name 'John Doe', email chứa '@example.com', status 'active'. POST /users với body chứa new user info sẽ return status 201 Created với id không null. GET /users/9999 (non-existent user) sẽ return 404 Not Found. PUT /users/1 với updated info sẽ return 200 với updated data. DELETE /users/1 sẽ return 204 No Content. Mỗi test verify một aspect khác nhau của API."</div>
+                </div>
+
+                <!-- RECAP -->
+                <div class="slide">
+                    <h2>🎯 Recap: 4 Loại Testing</h2>
+                    
+                    <h3>1️⃣ Unit Testing</h3>
+                    <ul>
+                        <li>Test từng method riêng lẻ</li>
+                        <li>Nhanh (ms), không cần database</li>
+                        <li>70% của tất cả tests</li>
+                    </ul>
+
+                    <h3>2️⃣ Integration Testing</h3>
+                    <ul>
+                        <li>Test 2+ modules hoạt động cùng nhau</li>
+                        <li>Có database, có API</li>
+                        <li>20% của tất cả tests</li>
+                    </ul>
+
+                    <h3>3️⃣ E2E Testing</h3>
+                    <ul>
+                        <li>Test toàn bộ user workflow</li>
+                        <li>Cần browser, chậm (20-30s)</li>
+                        <li>10% của tất cả tests</li>
+                    </ul>
+
+                    <h3>4️⃣ API Testing</h3>
+                    <ul>
+                        <li>Test backend APIs</li>
+                        <li>Nhanh (ms), không cần browser</li>
+                        <li>20% của tất cả tests</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Bây giờ chúng ta đã học 4 loại tests: Unit, Integration, E2E, API. Câu hỏi là: chúng ta nên viết bao nhiêu tests cho mỗi loại? Nếu viết tất cả E2E, 180 tests nhân 30 giây = 1.5 giờ chỉ để run. Developers commit mỗi giờ - không productive! Giải pháp là TEST PYRAMID. Hình pyramid có 3 layer. Layer dưới cùng là UNIT TESTS 70% - test từng method, cực nhanh 1 giây per test. Layer giữa là INTEGRATION TESTS 20% - test modules cùng nhau, medium speed 5 giây per test. Layer trên cùng là E2E TESTS 10% - test user workflow, chậm 30 giây per test. Total time: 70% nhân 1 giây = 70 giây, 20% nhân 5 giây = 100 giây, 10% nhân 30 giây = 300 giây, total = 470 giây = 8 phút. Với 180 tests, mỗi commit triggers tests run 8 phút - acceptable! Developers có thể commit mỗi giờ mà vẫn productive. Vì vậy strategy là: viết nhiều unit tests (nhanh), viết vừa integration tests (medium), viết ít E2E tests (chậm). API tests không nằm trong pyramid nhưng cũng quan trọng - khoảng 20% giống integration tests."</div>
+                </div>
+
+                <!-- CONCLUSION -->
+                <div class="slide">
+                    <h2>🎬 Kết Luận</h2>
+                    
+                    <h3>Key Takeaways</h3>
+                    <ul>
+                        <li><span class="emoji">🧩</span>Unit tests test logic (1 method, nhanh)</li>
+                        <li><span class="emoji">⚙️</span>Integration tests test modules (2+ services, DB)</li>
+                        <li><span class="emoji">🌐</span>E2E tests test workflows (user perspective, chậm)</li>
+                        <li><span class="emoji">📡</span>API tests test backends (HTTP requests, nhanh)</li>
+                    </ul>
+
+                    <div class="success">
+                        ✅ Không phải chọn 1 loại<br>
+                        ✅ Dùng cả 4 loại để test hoàn chỉnh<br>
+                        ✅ 70% Unit + 20% Integration + 10% E2E = Hiệu quả nhất
+                    </div>
+
+                    <h3 style="margin-top: 25px;">Next Steps</h3>
+                    <ul>
+                        <li>📚 PHASE 2: Selenium WebDriver (E2E & Web Automation)</li>
+                        <li>📚 PHASE 3: TestNG Framework (Test Organization)</li>
+                        <li>📚 PHASE 4: Advanced Topics (POM, CI/CD, etc.)</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Kết luận là có 4 loại automation testing khác nhau, mỗi loại test một phần khác nhau. UNIT TESTS test từng method riêng lẻ - nhanh, cần nhiều. INTEGRATION TESTS test modules cùng nhau - medium speed, cần vừa. E2E TESTS test user workflows - chậm, cần ít. API TESTS test backend endpoints - nhanh, không cần browser. Strategy là follow test pyramid: 70% unit, 20% integration, 10% E2E, plus 20% API. Mỗi loại có ưu điểm: unit nhanh, integration test real integration, E2E test real user experience, API test backend. Chúng không thay thế nhau mà complement nhau. Một hệ thống kiểm thử tốt cần tất cả 4 loại. Trong video tiếp theo, chúng ta sẽ deep dive vào Selenium WebDriver - công cụ mà chúng ta dùng để tự động hóa browser cho E2E testing."</div>
+                </div>
+            </div>
+
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Previous</button>
+                    <button class="btn-primary" id="nextBtn">Next ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="slide-counter">
+                        <div id="slideCount">1 / 20</div>
+                    </div>
+                    <div class="progress-bar" style="margin: 20px 0;">
+                        <div class="progress-fill" id="sidebarProgress" style="width: 5%;"></div>
+                    </div>
+                </div>
+
+                                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. Intro</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(1)">1. Unit Định Nghĩa</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(2)">2. Unit Code</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(3)">3. Integration Định Nghĩa</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(4)">4. Integration Code</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(5)">5. E2E Định Nghĩa</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(6)">6. E2E Code</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(7)">7. API Định Nghĩa</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(8)">8. API Code</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(9)">9. So Sánh</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(10)">10. Test Pyramid</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(11)">11. Recap</a></li>
+                        <li style="padding-left: 10px;"><a href="#" onclick="return goToSlide(12)">12. Kết Luận</a></li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~50 phút<br>
+                        📚 PHASE 1 - Video 2<br>
+                        🎓 4 Loại Testing
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Automation Testing Tutorial | PHASE 1 Video 2 | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js"></script>
+    <script src="course-ui-demos.js"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlide();
+            return false;
+        }
+
+        const ttsPage = document.body.dataset.ttsPage;
+
+        function speak() {
+            const slide = slides[currentSlide];
+            if (!slide.querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+
+        function reset() {
+            currentSlide = 0;
+            updateSlide();
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        stopSpeakBtn.addEventListener('click', function () {
+            VietnameseTTS.stop();
+        });
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>API Users</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        body { background: #1e293b; }
+        .demo-card { background: #334155; border-color: #475569; color: #e2e8f0; }
+        .demo-card h1 { color: #e2e8f0; }
+        .demo-card .lead { color: #94a3b8; }
+        .api-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+        .api-btns button { padding: 8px; border: none; border-radius: 6px; font-size: 0.78rem; font-weight: 600; cursor: pointer; background: #6366f1; color: #fff; }
+        .api-btns button.del { background: #dc2626; }
+        .demo-field input { background: #1e293b; border-color: #475569; color: #fff; }
+        #response { margin-top: 0; max-height: 120px; overflow: auto; background: #0f172a; color: #a5b4fc; border-color: #475569; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card">
+            <h1>API Users</h1>
+            <p class="lead">Gọi thử GET / POST / PUT / DELETE — xem JSON trả về.</p>
+            <div class="api-btns">
+                <button type="button" data-op="get">GET /users/1</button>
+                <button type="button" data-op="post">POST /users</button>
+                <button type="button" data-op="put">PUT /users/1</button>
+                <button type="button" class="del" data-op="delete">DELETE</button>
+            </div>
+            <div class="demo-field">
+                <label for="name">Tên user (POST/PUT)</label>
+                <input type="text" id="name" value="Nguyen Van A">
+            </div>
+            <pre id="response" class="demo-result">Nhấn một thao tác API...</pre>
+        </div>
+    </div>
+    <script>
+        var users = [{ id: 1, name: 'Admin', email: 'a@test.com' }];
+        var pre = document.getElementById('response');
+        document.querySelectorAll('button[data-op]').forEach(function (btn) {
+            btn.onclick = function () {
+                var op = btn.dataset.op, res;
+                if (op === 'get') res = { status: 200, body: users[0] };
+                else if (op === 'post') {
+                    var u = { id: 2, name: document.getElementById('name').value, email: 'new@test.com' };
+                    users.push(u); res = { status: 201, body: u };
+                } else if (op === 'put') {
+                    users[0].name = document.getElementById('name').value;
+                    res = { status: 200, body: users[0] };
+                } else res = { status: 204, body: null };
+                pre.textContent = JSON.stringify(res, null, 2);
+            };
+        });
+    </script>
+</body>
+</html>

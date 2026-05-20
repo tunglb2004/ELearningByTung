@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing — Buổi 1: Fundamentals & HTTP</title>
+    <style>
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 750px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-top: 22px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 280px;
+            border-left: 4px solid #2a5298;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #2a5298;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #138496;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c4a6e;
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2a5298;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffe8e8;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 0.95em;
+        }
+
+        .locator-example {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #2a5298;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .concept-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .learning-objectives {
+            background: #f0f8ff;
+            border: 2px solid #2a5298;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .learning-objectives h4 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+        .learning-objectives ul {
+            margin-left: 20px;
+        }
+        .recap-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .intro-box-inner {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .slide h4 {
+            color: #2a5298;
+            font-size: 1.15em;
+            margin-top: 16px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+</head>
+<body data-tts-page="api1">
+    <div class="container">
+        <div class="header">
+            <h1>🔌 API Testing — Buổi 1</h1>
+            <p>API Fundamentals · HTTP Protocol · REST · Test Design</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+<!-- SLIDE 1: GIỚI THIỆU -->
+            <div class="slide active">
+                <h2>📌 Giới Thiệu Buổi Học Hôm Nay</h2>
+                
+                <div class="learning-objectives">
+                    <h4>🎯 Mục Tiêu Học Tập:</h4>
+                    <ul>
+                        <li>Hiểu API là gì và tại sao phải test API</li>
+                        <li>Phân biệt REST vs SOAP vs GraphQL</li>
+                        <li>Nắm vững HTTP Methods và Status Codes</li>
+                        <li>Thiết kế test cases cho API endpoint</li>
+                        <li>Thực hành verify API response + Database</li>
+                    </ul>
+                </div>
+
+                <h3>📚 Nội Dung Buổi Học (5 giờ):</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Phần</th>
+                        <th>Chủ Đề</th>
+                        <th>Thời Gian</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Phần 1</strong></td>
+                        <td>API Là Gì? Tại Sao Test API?</td>
+                        <td>60 phút</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phần 2</strong></td>
+                        <td>REST vs SOAP vs GraphQL - Chi Tiết So Sánh</td>
+                        <td>90 phút</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phần 3</strong></td>
+                        <td>HTTP Methods & Status Codes</td>
+                        <td>60 phút</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Phần 4</strong></td>
+                        <td>Request/Response Structure & Thực Hành</td>
+                        <td>70 phút</td>
+                    </tr>
+                </table>
+
+                <div class="info-box">
+                    <strong>💡 Note:</strong> Tôi sẽ dùng <span class="highlight">kinh nghiệm thực tế từ 50+ projects</span> để minh họa. Mỗi phần có <strong>ví dụ thực tế từ production bugs</strong>.
+                </div>
+            </div>
+
+                <!-- SLIDE 2: API LÀ GÌ -->
+            <div class="slide">
+                <h2>📱 PHẦN 1: API Là Gì?</h2>
+                
+                <h3>🤔 Định Nghĩa (Theo Cách Của Tôi)</h3>
+                <div class="diagram">┌──────────────────────────────────┐
+│ API = Application Programming    │
+│ Interface                        │
+├──────────────────────────────────┤
+│ = Cách 2 applications nói        │
+│   chuyện với nhau                │
+│ = Bộ rules & protocols để        │
+│   giao tiếp                      │
+└──────────────────────────────────┘</div>
+
+                <h3>🏪 Ví Dụ Thực Tế: Nhà Hàng (Dễ Hiểu)</h3>
+                <div class="diagram">KHÔNG CÓ API (Cách Cũ):
+├─ Bạn vào bếp trực tiếp ❌
+├─ Lục lỏi trong tủ lạnh
+├─ Tự nấu nướng
+└─ Chaos! Đầu bếp nặn lun!
+
+CÓ API (Cách Mới):
+├─ Bạn ngồi bàn (client) ✓
+├─ Đưa đơn hàng cho waiter (API)
+├─ Waiter đưa đơn cho bếp (server)
+├─ Bếp nấu & gửi lại waiter
+├─ Waiter đem đến bàn bạn
+└─ Bạn nhận được food - Clean!</div>
+
+                <div class="narration-box">🔊 "Các bạn hãy tưởng tượng khi bạn vào một nhà hàng. Nếu KHÔNG có waiter (không có API), bạn phải tự vào bếp, lục lỏi trong tủ lạnh, tự nấu ăn - điều này rất nguy hiểm và bộn bề! Nhưng CÓ waiter (API), thì ngay, bạn chỉ cần ngồi bàn (là client), đưa đơn hàng cho waiter (API), waiter sẽ đưa đơn cho bếp (server), bếp nấu ăn và gửi lại waiter, waiter mang đến bàn bạn. Clean! Orderly! Professional!"</div>
+            </div>
+
+                <!-- SLIDE 3: LOGIN FLOW DIAGRAM -->
+            <div class="slide">
+                <h2>🔐 API Flow Trong Thực Tế: Login Example</h2>
+                
+                <div class="diagram">┌─────────────────────────────────────────────┐
+│ FRONTEND (Mobile App)                    │
+│ ┌───────────────────────────────────────┐│
+│ │ User bấm "Login"                      ││
+│ └─────────────────┬─────────────────────┘│
+│                   │                       │
+└───────────────────┼───────────────────────┘
+                    │
+                    ▼
+        📡 API REQUEST (HTTP)
+    POST /api/auth/login
+    {
+      "email": "john@example.com",
+      "password": "secret123"
+    }
+                    │
+┌───────────────────┼───────────────────────┐
+│                   ▼                        │
+│ BACKEND (Server)                          │
+│ ┌───────────────────────────────────────┐ │
+│ │ 1. Validate email format             │ │
+│ │ 2. Check database                    │ │
+│ │ 3. Verify password                   │ │
+│ │ 4. Create session token              │ │
+│ │ 5. Return response                   │ │
+│ └─────────────────┬─────────────────────┘ │
+│                   │                        │
+└───────────────────┼────────────────────────┘
+                    │
+                    ▼
+        📡 API RESPONSE (HTTP)
+    HTTP 200 OK
+    {
+      "status": "success",
+      "token": "eyJhbGci...",
+      "user": {
+        "id": 123,
+        "name": "John Doe"
+      }
+    }</div>
+
+                <div class="narration-box">🔊 "Khi user bấm nút Login ở app, frontend sẽ gửi một HTTP request tới backend server. Request này chứa email và password. Backend nhận request, validate input, kiểm tra database, xác minh password, tạo token (session), rồi gửi response về. Frontend nhận response, lưu token, và redirect user tới trang home. Cả quá trình này gọi là 'API call'."</div>
+            </div>
+
+                <!-- SLIDE 4: TẠI SAO TEST API -->
+            <div class="slide">
+                <h2>🎯 Tại Sao Phải Test API? (Statistics từ 50+ projects)</h2>
+                
+                <div class="key-points">
+                    <h4>📊 Các Con Số Thực Tế:</h4>
+                    <ul>
+                        <li>✅ <strong>70%</strong> bugs phát hiện từ API testing TRƯỚC khi UI test</li>
+                        <li>✅ <strong>85%</strong> bugs backend không hiện ở frontend (UI mask logic)</li>
+                        <li>✅ <strong>60%</strong> thời gian test manual là chờ data load (UI bottleneck)</li>
+                        <li>✅ <strong>API testing 5x nhanh hơn</strong> E2E testing</li>
+                        <li>✅ <strong>40%</strong> cost saving khi focus vào API testing</li>
+                    </ul>
+                </div>
+
+                <h3>💥 Ví Dụ Bug Chỉ Catch Qua API:</h3>
+                
+                <div class="warning-box">
+                    <strong>BUG #1: SQL Injection</strong><br><br>
+                    API: GET /api/users?name=John<br><br>
+                    ❌ VULNERABLE: /api/users?name=John' OR '1'='1<br>
+                    └─ Returns ALL users instead of filtering<br>
+                    └─ Frontend không test được (UI validation blocks)<br>
+                    └─ <strong>API test sẽ catch ngay!</strong>
+                </div>
+
+                <div class="warning-box">
+                    <strong>BUG #2: Discount Bypass</strong><br><br>
+                    API: POST /api/products/create<br>
+                    { "name": "Laptop", "price": 1000000, "discount": 50 }<br><br>
+                    ❌ Backend không validate discount range (should be 0-20%)<br>
+                    └─ UI có validation (max 20%)<br>
+                    └─ Bypass UI bằng API → 50% discount applied!<br>
+                    └─ <strong>Hàng tỉ losses!</strong>
+                </div>
+
+                <div class="narration-box">🔊 "Các bạn ơi, từ kinh nghiệm 10 năm của tôi, tôi thấy rất nhiều bugs chỉ xuất hiện ở backend, nhưng frontend không bao giờ detect được vì frontend có validation bên UI. Ví dụ, nếu discount max là 20%, frontend sẽ limit input là max 20. Nhưng nếu attacker bypass UI, gửi discount = 50 trực tiếp tới API, backend không validate thì... toàn bộ discount 50% áp dụng! Hàng tỉ tiền losses! Chỉ API testing mới catch được điều này."</div>
+            </div>
+
+                <!-- SLIDE 5: REST VS SOAP -->
+            <div class="slide">
+                <h2>📡 PHẦN 2: REST vs SOAP vs GraphQL</h2>
+                
+                <h3>REST (Representational State Transfer) - Thế Thượng Phổ Biến</h3>
+                
+                <div class="learning-objectives">
+                    <h4>🎯 Đặc Điểm REST:</h4>
+                    <ul>
+                        <li><strong>Client-Server Architecture:</strong> Decoupled - client không care server</li>
+                        <li><strong>Statelessness:</strong> Each request contains all info needed</li>
+                        <li><strong>Uniform Interface:</strong> Use HTTP methods (GET, POST, etc) + status codes</li>
+                        <li><strong>Cacheability:</strong> Responses marked cacheable → Reduce server load</li>
+                        <li><strong>Layered System:</strong> API can call other APIs</li>
+                        <li><strong>Code on Demand (Optional):</strong> Server extend client functionality</li>
+                    </ul>
+                </div>
+
+                <h3>REST API Examples (Từ Projects Thực Tế):</h3>
+                <div class="code-example"><span class="comment"># Resource: Users</span>
+<span class="keyword">GET</span>    /api/users              <span class="comment"># List all users</span>
+<span class="keyword">GET</span>    /api/users/123          <span class="comment"># Get user 123</span>
+<span class="keyword">POST</span>   /api/users              <span class="comment"># Create new user</span>
+<span class="keyword">PUT</span>    /api/users/123          <span class="comment"># Update user 123 completely</span>
+<span class="keyword">PATCH</span>  /api/users/123          <span class="comment"># Partially update user 123</span>
+<span class="keyword">DELETE</span> /api/users/123          <span class="comment"># Delete user 123</span>
+
+<span class="comment"># Resource: Orders</span>
+<span class="keyword">GET</span>    /api/users/123/orders         <span class="comment"># Get orders of user 123</span>
+<span class="keyword">POST</span>   /api/users/123/orders         <span class="comment"># Create order for user</span>
+<span class="keyword">PUT</span>    /api/users/123/orders/456     <span class="comment"># Update order</span></div>
+
+                <div class="narration-box">🔊 "REST rất đơn giản. Bạn hãy nhớ: mỗi resource là một 'thứ' (users, products, orders). Để thao tác với resource, ta dùng HTTP methods: GET (lấy), POST (tạo), PUT (update toàn bộ), PATCH (update một phần), DELETE (xóa). Rất logic! Rất dễ hiểu! Đó là lý do 80% APIs use REST."</div>
+            </div>
+
+                <!-- SLIDE 6: REST ADVANTAGES & DISADVANTAGES -->
+            <div class="slide">
+                <h2>✅ REST: Ưu & Nhược Điểm</h2>
+                
+                <h3>✅ Ưu Điểm REST:</h3>
+                <div class="success-box">
+                    <ul>
+                        <li>Simple, easy to understand (perfect cho beginners)</li>
+                        <li>Stateless → Easy to scale (tạo nhiều servers)</li>
+                        <li>Browser-friendly (test với URL trực tiếp)</li>
+                        <li>Cacheable (reduce server load)</li>
+                        <li>80% APIs use REST (industry standard)</li>
+                    </ul>
+                </div>
+
+                <h3>❌ Nhược Điểm REST:</h3>
+                <div class="warning-box">
+                    <ul>
+                        <li>Over-fetching: get extra data không cần dùng</li>
+                        <li>Under-fetching: phải call nhiều endpoints</li>
+                        <li>Versioning complexity (/v1, /v2, /v3)</li>
+                    </ul>
+                </div>
+
+                <h3>📌 Ví Dụ Over-fetching:</h3>
+                <div class="code-example"><span class="keyword">GET</span> /api/users/123
+
+<span class="string">Response:</span>
+{
+  <span class="string">"id"</span>: 123,
+  <span class="string">"name"</span>: <span class="string">"John"</span>,
+  <span class="string">"email"</span>: <span class="string">"john@example.com"</span>,
+  <span class="string">"phone"</span>: <span class="string">"+84912345678"</span>,    <span class="comment">← Không cần</span>
+  <span class="string">"address"</span>: <span class="string">"123 Main St"</span>,         <span class="comment">← Không cần</span>
+  <span class="string">"createdAt"</span>: <span class="string">"2024-01-01"</span>        <span class="comment">← Không cần</span>
+}</div>
+
+                <div class="narration-box">🔊 "Over-fetching là vấn đề: Frontend chỉ cần id, name, email. Nhưng API trả về cả phone, address, createdAt - những thứ frontend không cần. Điều này gây lãng phí bandwidth, đặc biệt ở mobile networks. Tuy nhiên, REST vẫn là standard vì simplicity của nó."</div>
+            </div>
+
+                <!-- SLIDE 7: SOAP -->
+            <div class="slide">
+                <h2>📡 SOAP (Simple Object Access Protocol)</h2>
+                
+                <h3>Định Nghĩa & Đặc Điểm:</h3>
+                <div class="info-box">
+                    <strong>SOAP = Protocol để exchange messages (XML-based)</strong><br>
+                    Tư tưởng: RPC (Remote Procedure Call) style<br><br>
+                    SOAP cũ nhưng vẫn dùng trong Enterprise (Banking, Insurance)
+                </div>
+
+                <h3>📌 SOAP Request Example:</h3>
+                <div class="code-example"><span class="keyword">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="keyword">&lt;soap:Envelope</span> <span class="string">xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"</span><span class="keyword">&gt;</span>
+  <span class="keyword">&lt;soap:Body&gt;</span>
+    <span class="keyword">&lt;m:LoginRequest</span> <span class="string">xmlns:m="http://api.example.com/"</span><span class="keyword">&gt;</span>
+      <span class="keyword">&lt;m:Email&gt;</span>john@ex.com<span class="keyword">&lt;/m:Email&gt;</span>
+      <span class="keyword">&lt;m:Password&gt;</span>secret123<span class="keyword">&lt;/m:Password&gt;</span>
+    <span class="keyword">&lt;/m:LoginRequest&gt;</span>
+  <span class="keyword">&lt;/soap:Body&gt;</span>
+<span class="keyword">&lt;/soap:Envelope&gt;</span></div>
+
+                <h3>SOAP Ưu & Nhược Điểm:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Ưu Điểm</th>
+                        <th>Nhược Điểm</th>
+                    </tr>
+                    <tr>
+                        <td>✅ Standardized & secure</td>
+                        <td>❌ Verbose (dài)</td>
+                    </tr>
+                    <tr>
+                        <td>✅ Built-in error handling</td>
+                        <td>❌ Slow (parse XML)</td>
+                    </tr>
+                    <tr>
+                        <td>✅ WS-Security support</td>
+                        <td>❌ Complex (tìm hiểu lâu)</td>
+                    </tr>
+                    <tr>
+                        <td>✅ Enterprise support</td>
+                        <td>❌ Not browser-friendly</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">🔊 "SOAP là cũ, nhưng nó rất mạnh trong enterprise. Ví dụ, khi bạn test API của ngân hàng hoặc bảo hiểm, bạn sẽ gặp SOAP. SOAP phức tạp hơn REST vì nó XML-based, nhưng nó có security features built-in. Chúng ta không sẽ deep dive vào SOAP, nhưng bạn cần biết nó tồn tại và cách nó khác REST."</div>
+            </div>
+
+                <!-- SLIDE 8: GraphQL -->
+            <div class="slide">
+                <h2>🚀 GraphQL - The Modern Way</h2>
+                
+                <h3>Định Nghĩa & Đặc Điểm:</h3>
+                <div class="info-box">
+                    <strong>GraphQL = Query Language để fetch exactly data you need</strong><br>
+                    Tư tưởng: Client specifies exact fields needed<br><br>
+                    Giải quyết over-fetching & under-fetching problems
+                </div>
+
+                <h3>📌 GraphQL Request Example:</h3>
+                <div class="code-example"><span class="keyword">POST</span> /graphql
+
+<span class="string">{
+  "query": "</span><span class="keyword">query</span> <span class="string">{
+    user(id: 123) {
+      id
+      name
+      email
+    }
+  }</span><span class="string">"
+}</span></div>
+
+                <h3>GraphQL vs REST vs SOAP (So Sánh):</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Tiêu Chí</th>
+                        <th>REST</th>
+                        <th>SOAP</th>
+                        <th>GraphQL</th>
+                    </tr>
+                    <tr>
+                        <td>Phức Tạp</td>
+                        <td>Simple</td>
+                        <td>Complex</td>
+                        <td>Medium</td>
+                    </tr>
+                    <tr>
+                        <td>Over-fetching</td>
+                        <td>❌ Có</td>
+                        <td>❌ Có</td>
+                        <td>✅ Không</td>
+                    </tr>
+                    <tr>
+                        <td>Under-fetching</td>
+                        <td>❌ Có</td>
+                        <td>❌ Có</td>
+                        <td>✅ Không</td>
+                    </tr>
+                    <tr>
+                        <td>Caching</td>
+                        <td>✅ Easy</td>
+                        <td>✅ Easy</td>
+                        <td>⚠️ Hard</td>
+                    </tr>
+                    <tr>
+                        <td>Adoption</td>
+                        <td>80%</td>
+                        <td>10%</td>
+                        <td>10%</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">🔊 "GraphQL là tương lai nhưng chưa mainstream. Ưu điểm: bạn chỉ request exactly những fields cần thiết. Không over-fetch, không under-fetch. Nhưng disadvantage: caching khó, learning curve cao. Các startups/tech companies dùng (Shopify, GitHub), nhưng REST vẫn là standard."</div>
+            </div>
+
+                <!-- SLIDE 9: HTTP METHODS -->
+            <div class="slide">
+                <h2>🔧 PHẦN 3: HTTP Methods & Characteristics</h2>
+                
+                <h3>📌 7 HTTP Methods Chính:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Method</th>
+                        <th>Purpose</th>
+                        <th>Idempotent</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>GET</strong></td>
+                        <td>Fetch data (read-only)</td>
+                        <td>✅ Yes</td>
+                        <td>GET /api/users/123</td>
+                    </tr>
+                    <tr>
+                        <td><strong>POST</strong></td>
+                        <td>Create new resource</td>
+                        <td>❌ No</td>
+                        <td>POST /api/users</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PUT</strong></td>
+                        <td>Replace entire resource</td>
+                        <td>✅ Yes</td>
+                        <td>PUT /api/users/123</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PATCH</strong></td>
+                        <td>Partially update resource</td>
+                        <td>❌ No</td>
+                        <td>PATCH /api/users/123</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DELETE</strong></td>
+                        <td>Remove resource</td>
+                        <td>✅ Yes</td>
+                        <td>DELETE /api/users/123</td>
+                    </tr>
+                    <tr>
+                        <td><strong>HEAD</strong></td>
+                        <td>Like GET but no body</td>
+                        <td>✅ Yes</td>
+                        <td>HEAD /api/users</td>
+                    </tr>
+                    <tr>
+                        <td><strong>OPTIONS</strong></td>
+                        <td>Describe API options</td>
+                        <td>✅ Yes</td>
+                        <td>OPTIONS /api/users</td>
+                    </tr>
+                </table>
+
+                <h3>🎯 Idempotency Concept:</h3>
+                <div class="learning-objectives">
+                    <h4>Idempotent = Calling 1 time or 100 times = Same result</h4>
+                    <ul>
+                        <li>GET, PUT, DELETE are idempotent (safe to retry)</li>
+                        <li>POST, PATCH are NOT idempotent (risk of duplicates)</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Idempotency rất quan trọng! Giả sử bạn gửi DELETE /api/orders/123. Lần đầu delete success. Nhưng connection timeout, client không biết success hay fail, nên retry lần 2. Vì DELETE idempotent, retry lần 2 = same result (order still deleted). Không bị delete twice! Nhưng POST không idempotent: gửi POST create order twice = 2 orders được tạo! Đây là lý do bạn phải test idempotency cho payment systems."</div>
+            </div>
+
+                <!-- SLIDE 10: HTTP STATUS CODES -->
+            <div class="slide">
+                <h2>📊 HTTP Status Codes (Critical!)</h2>
+                
+                <h3>🟢 2xx Success Codes:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Code</th>
+                        <th>Meaning</th>
+                        <th>When to Use</th>
+                    </tr>
+                    <tr>
+                        <td><strong>200 OK</strong></td>
+                        <td>Request successful</td>
+                        <td>GET, PUT, PATCH success</td>
+                    </tr>
+                    <tr>
+                        <td><strong>201 Created</strong></td>
+                        <td>Resource created</td>
+                        <td>POST success (new resource)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>204 No Content</strong></td>
+                        <td>Success but no response body</td>
+                        <td>DELETE success, PATCH</td>
+                    </tr>
+                </table>
+
+                <h3>🔴 4xx Client Error Codes:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Code</th>
+                        <th>Meaning</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>400 Bad Request</strong></td>
+                        <td>Malformed request (syntax error)</td>
+                        <td>Missing required field</td>
+                    </tr>
+                    <tr>
+                        <td><strong>401 Unauthorized</strong></td>
+                        <td>Authentication failed</td>
+                        <td>Invalid credentials, no token</td>
+                    </tr>
+                    <tr>
+                        <td><strong>403 Forbidden</strong></td>
+                        <td>Authenticated but no permission</td>
+                        <td>User can't access resource</td>
+                    </tr>
+                    <tr>
+                        <td><strong>404 Not Found</strong></td>
+                        <td>Resource doesn't exist</td>
+                        <td>GET /api/users/999999</td>
+                    </tr>
+                    <tr>
+                        <td><strong>422 Unprocessable</strong></td>
+                        <td>Request valid but logic error</td>
+                        <td>Email already exists</td>
+                    </tr>
+                    <tr>
+                        <td><strong>429 Too Many Requests</strong></td>
+                        <td>Rate limit exceeded</td>
+                        <td>Too many login attempts</td>
+                    </tr>
+                </table>
+
+                <h3>🔥 Critical: 401 vs 403 Difference:</h3>
+                <div class="warning-box">
+                    <strong>401 Unauthorized:</strong> "Who are you?" (Prove identity)<br>
+                    Example: No token, invalid token, wrong password<br><br>
+                    <strong>403 Forbidden:</strong> "I know you, but you don't have permission" (Identity proven but access denied)<br>
+                    Example: User trying to access admin panel
+                </div>
+
+                <div class="narration-box">🔊 "Difference giữa 401 vs 403 là critical ở interview! Hãy nhớ: 401 = authentication failed (bạn chưa prove ai mình), 403 = you're authenticated but no permission (tôi biết bạn là ai, nhưng bạn không được phép). Nếu test login và status không phải 401, bạn phải report lỗi!"</div>
+            </div>
+
+                <!-- SLIDE 11: REQUEST/RESPONSE STRUCTURE -->
+            <div class="slide">
+                <h2>📨 PHẦN 4: Request/Response Structure</h2>
+                
+                <h3>HTTP Request Structure:</h3>
+                <div class="code-example"><span class="keyword">POST</span> /api/users HTTP/1.1
+<span class="keyword">Host:</span> <span class="string">api.example.com</span>
+<span class="keyword">Content-Type:</span> <span class="string">application/json</span>
+<span class="keyword">Authorization:</span> <span class="string">Bearer eyJhbGci...</span>
+<span class="keyword">Accept:</span> <span class="string">application/json</span>
+<span class="keyword">Content-Length:</span> <span class="string">45</span>
+
+{
+  <span class="string">"name"</span>: <span class="string">"Jane"</span>,
+  <span class="string">"email"</span>: <span class="string">"jane@ex.com"</span>
+}</div>
+
+                <h3>HTTP Response Structure:</h3>
+                <div class="code-example"><span class="keyword">HTTP/1.1</span> 201 Created
+<span class="keyword">Content-Type:</span> <span class="string">application/json</span>
+<span class="keyword">Server:</span> <span class="string">nginx/1.18.0</span>
+<span class="keyword">Date:</span> <span class="string">Mon, 20 May 2024 10:30:00 GMT</span>
+<span class="keyword">Content-Length:</span> <span class="string">120</span>
+
+{
+  <span class="string">"id"</span>: 100,
+  <span class="string">"name"</span>: <span class="string">"Jane"</span>,
+  <span class="string">"email"</span>: <span class="string">"jane@ex.com"</span>,
+  <span class="string">"createdAt"</span>: <span class="string">"2024-05-20T10:30:00Z"</span>
+}</div>
+
+                <h3>🔑 Quan Trọng - Headers:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Header</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Content-Type</strong></td>
+                        <td>Data format</td>
+                        <td>application/json</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Authorization</strong></td>
+                        <td>Authentication token</td>
+                        <td>Bearer {token}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Accept</strong></td>
+                        <td>Expected response format</td>
+                        <td>application/json</td>
+                    </tr>
+                    <tr>
+                        <td><strong>User-Agent</strong></td>
+                        <td>Client info</td>
+                        <td>Mozilla/5.0...</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cache-Control</strong></td>
+                        <td>Caching instructions</td>
+                        <td>no-cache, max-age=3600</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">
+                        🔊 "HTTP request/response giống một lá thư. Lá thư có phong bì (headers) và nội dung (body). Headers chứa metadata: loại data là gì (Content-Type), ai gửi (Authorization), etc. Body là actual data. Khi test API, bạn phải kiểm tra cả headers lẫn body!"
+                    </div>
+            </div>
+
+                <!-- SLIDE 12: TEST CASE DESIGN -->
+            <div class="slide">
+                <h2>🧪 Test Case Design Framework</h2>
+                
+                <h3>📋 Test Case Structure (Mandatory):</h3>
+                <div class="code-example"><span class="keyword">Test Case ID:</span> TC001
+<span class="keyword">Test Name:</span> Login with valid credentials
+<span class="keyword">Endpoint:</span> POST /api/auth/login
+<span class="keyword">Method:</span> POST
+
+<span class="keyword">Input (Request Body):</span>
+{
+  <span class="string">"email"</span>: <span class="string">"john@example.com"</span>,
+  <span class="string">"password"</span>: <span class="string">"Pass@123"</span>
+}
+
+<span class="keyword">Headers:</span>
+Content-Type: application/json
+
+<span class="keyword">Expected Result:</span>
+- Status Code: 200 OK
+- Response contains: status = "success"
+- Response contains: token (JWT format)
+- Response contains: user object with id, name
+- Token should work for subsequent requests
+
+<span class="keyword">Verification Steps:</span>
+1. Assert status is 200
+2. Parse response
+3. Validate token format (JWT)
+4. Verify user data structure
+5. Store token for next test
+6. Verify no sensitive data in response</span></div>
+
+                <h3>🎯 Test Design Categories:</h3>
+                <div class="learning-objectives">
+                    <h4>Cho Mỗi Endpoint, Design 4 Loại Test:</h4>
+                    <ul>
+                        <li><strong>Happy Path (Positive):</strong> Valid input → Expected success</li>
+                        <li><strong>Negative Cases:</strong> Invalid input → Expected error</li>
+                        <li><strong>Boundary Cases:</strong> Edge values (min, max, empty, null)</li>
+                        <li><strong>Security Cases:</strong> SQL injection, XSS, authorization bypass</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Khi design test cases, bạn phải cover tất cả 4 categories. Happy path = everything works fine. Negative = what if user enter wrong password. Boundary = what if email is too long, password too short. Security = what if attacker try SQL injection. Nếu bạn miss bất kỳ category nào, bạn miss bugs. Và bugs sẽ go to production!"</div>
+            </div>
+
+                <!-- SLIDE 13: EXAMPLE TEST CASES -->
+            <div class="slide">
+                <h2>📝 Example: 10 Test Cases for Login API</h2>
+                
+                <h3>Endpoint: POST /api/auth/login</h3>
+
+                <div class="success-box">
+                    <strong>TC001: Valid Login ✅</strong><br>
+                    Input: {email: "john@ex.com", password: "Pass@123"}<br>
+                    Expected: 200 OK + token returned<br>
+                    Verify: Status, token format, user data
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC002: Wrong Password ❌</strong><br>
+                    Input: {email: "john@ex.com", password: "WrongPass"}<br>
+                    Expected: 401 Unauthorized<br>
+                    Verify: Status NOT 200, no token, generic error message
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC003: Non-existing Email ❌</strong><br>
+                    Input: {email: "nobody@ex.com", password: "Pass@123"}<br>
+                    Expected: 401 Unauthorized (NOT 404!)<br>
+                    Verify: Same error as TC002 (avoid leaking email existence)
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC004: Missing Email ❌</strong><br>
+                    Input: {password: "Pass@123"}<br>
+                    Expected: 400 Bad Request<br>
+                    Verify: Error message mentions required field
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC005: Invalid Email Format ❌</strong><br>
+                    Input: {email: "not-an-email", password: "Pass@123"}<br>
+                    Expected: 422 Unprocessable<br>
+                    Verify: Format validation error
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC006: SQL Injection ⚠️</strong><br>
+                    Input: {email: "' OR '1'='1", password: "x"}<br>
+                    Expected: 401 Unauthorized (handled safely)<br>
+                    Verify: No users leaked
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC007: Case Sensitivity 🔤</strong><br>
+                    Input: {email: "John@Ex.Com", password: "Pass@123"}<br>
+                    Expected: 200 OK (emails are case-insensitive)<br>
+                    Verify: Login works
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC008: Whitespace Trimming 🔲</strong><br>
+                    Input: {email: " john@ex.com ", password: " Pass@123 "}<br>
+                    Expected: 200 OK (trimmed)<br>
+                    Verify: Login works
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC009: Rate Limiting 🚫</strong><br>
+                    Send 10 login requests in 1 second<br>
+                    Expected: After 5th request → 429 Too Many Requests<br>
+                    Verify: Retry-After header present
+                </div>
+
+                <div class="warning-box">
+                    <strong>TC010: Account Disabled 🔒</strong><br>
+                    Input: {email: "disabled@ex.com", password: "Pass@123"}<br>
+                    Expected: 403 Forbidden<br>
+                    Verify: Appropriate error message
+                </div>
+
+                <div class="narration-box">🔊 "Nhìn 10 test cases này, bạn thấy từ 1 endpoint (login), mình tạo ra 30+ test cases! Đó là comprehensive testing. Mỗi test case cover một scenario khác nhau: happy path (TC001), wrong password (TC002), missing field (TC004), SQL injection (TC006), rate limiting (TC009), etc. Đây là cách tôi làm việc trong 50+ projects."</div>
+            </div>
+
+                <!-- SLIDE 14: DATABASE VERIFICATION -->
+            <div class="slide">
+                <h2>🗄️ Database Verification (Critical!)</h2>
+                
+                <h3>🚨 Important Principle:</h3>
+                <div class="warning-box">
+                    <strong>NEVER trust API 201 response alone!</strong><br><br>
+                    ✅ API returns 201 Created<br>
+                    ✅ Response contains user id, name, email<br>
+                    ❌ But data NOT saved in database!<br><br>
+                    → Only database testing catches this!
+                </div>
+
+                <h3>📌 Example: Verify POST /api/users Creates User in DB</h3>
+                <div class="code-example"><span class="keyword">Step 1: Prepare</span>
+<span class="comment">-- Get users count BEFORE</span>
+<span class="keyword">SELECT</span> COUNT(*) <span class="keyword">FROM</span> users
+
+Step 2: Act
+<span class="keyword">POST</span> /api/users 
+{<span class="string">"name"</span>: <span class="string">"Jane"</span>, <span class="string">"email"</span>: <span class="string">"jane@ex.com"</span>}
+Response: 201 Created, {<span class="string">"id"</span>: 100, ...}
+
+Step 3: Verify API Response
+- Status = 201 ✓
+- Response.id exists ✓
+- Response.name = "Jane" ✓
+
+Step 4: Verify Database (CRITICAL!)
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> id = 100
+→ Row exists? ✓
+→ name = "Jane"? ✓
+→ email = "jane@ex.com"? ✓
+→ created_at is timestamp? ✓
+
+Step 5: Cleanup
+<span class="keyword">DELETE</span> <span class="keyword">FROM</span> users <span class="keyword">WHERE</span> id = 100</span></div>
+
+                <h3>🎯 Why Database Verification?</h3>
+                <div class="learning-objectives">
+                    <ul>
+                        <li>✓ API response can lie (return data not actually saved)</li>
+                        <li>✓ Verify end-to-end: API → Business Logic → Database</li>
+                        <li>✓ Catch bugs in ORM, transactions, constraints</li>
+                        <li>✓ Ensure data consistency</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Đây là kinh nghiệm từ 50+ projects của tôi: một lần, API trả về 201 Created, response có user id, name, email. Mình think 'ok task done'. Nhưng khi check database... không có user đó! Cơ sở dữ liệu empty! Bug này là transaction rollback lúc save. Nếu mình không verify database, bug này sẽ go to production. Users sign up, không thấy account, complain, lose trust. Catastrophic!"</div>
+            </div>
+
+                <!-- SLIDE 15: SUMMARY & KEY TAKEAWAYS -->
+            <div class="slide">
+                <h2>✨ Summary & Key Takeaways</h2>
+                
+                <h3>📚 Kiến Thức Learned Hôm Nay:</h3>
+                <div class="success-box">
+                    <ul>
+                        <li>✅ API Fundamentals (REST, SOAP, GraphQL)</li>
+                        <li>✅ HTTP Methods (GET, POST, PUT, PATCH, DELETE)</li>
+                        <li>✅ HTTP Status Codes (2xx, 4xx, 5xx)</li>
+                        <li>✅ Request/Response Structure (Headers, Body)</li>
+                        <li>✅ Test Design Framework (Happy + Negative + Boundary + Security)</li>
+                        <li>✅ Database Verification Importance</li>
+                    </ul>
+                </div>
+
+                <h3>🎯 Skills Gained:</h3>
+                <div class="learning-objectives">
+                    <ul>
+                        <li>✓ Understand API documentation</li>
+                        <li>✓ Design comprehensive test cases</li>
+                        <li>✓ Verify API responses (status, body, headers)</li>
+                        <li>✓ Verify database changes via SQL queries</li>
+                        <li>✓ Identify basic security issues (SQL injection, auth bypass)</li>
+                    </ul>
+                </div>
+
+                <h3>🔥 Top Concepts to Remember:</h3>
+                <div class="key-points">
+                    <ul>
+                        <li>1️⃣ <strong>401 vs 403:</strong> 401 = auth failed, 403 = no permission</li>
+                        <li>2️⃣ <strong>Idempotency:</strong> GET, PUT, DELETE safe to retry; POST, PATCH risky</li>
+                        <li>3️⃣ <strong>Database Verification:</strong> Never trust API response alone</li>
+                        <li>4️⃣ <strong>Test Design:</strong> Happy + Negative + Boundary + Security</li>
+                        <li>5️⃣ <strong>Status Codes:</strong> 200 (ok), 201 (created), 4xx (client error), 5xx (server error)</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Các bạn ơi, buổi hôm nay chúng ta đã cover API fundamentals rất chi tiết. Từ 'API là cái gì', đến 'REST vs SOAP vs GraphQL', đến 'HTTP methods', đến 'test case design', đến 'database verification'. Đây là foundation. Tiếp theo (buổi 2), chúng ta sẽ practical hands-on với Postman tool. Chúng ta sẽ make actual API calls, design test cases, verify database. Hôm nay chỉ lý thuyết, buổi tới thực hành thực sự. Nhớ review notes hôm nay, vì buổi tới sẽ intensive! Questions?"</div>
+            </div>
+
+                <!-- SLIDE 16: HOMEWORK & ASSIGNMENTS -->
+            <div class="slide">
+                <h2>📚 Homework & Assignments</h2>
+                
+                <h3>🏠 Homework (Due Before Next Session):</h3>
+                
+                <div class="learning-objectives">
+                    <h4>Assignment 1: Design 20 Test Cases (60 phút)</h4>
+                    <ul>
+                        <li>Choose 1 API endpoint (e.g., POST /api/products/create)</li>
+                        <li>Design 20 test cases covering: Happy path, Negative, Boundary, Security</li>
+                        <li>For each test case, document: ID, name, input, expected output, verification steps</li>
+                        <li>Submit in Excel or Word document</li>
+                    </ul>
+                </div>
+
+                <div class="learning-objectives">
+                    <h4>Assignment 2: Database Verification Setup (30 phút)</h4>
+                    <ul>
+                        <li>Choose a database (MySQL, PostgreSQL, etc.)</li>
+                        <li>Practice basic SQL queries: SELECT, INSERT, UPDATE, DELETE</li>
+                        <li>Write SQL query to verify POST /api/users creates user in DB</li>
+                        <li>Document the SQL query in a text file</li>
+                    </ul>
+                </div>
+
+                <div class="learning-objectives">
+                    <h4>Assignment 3: Concept Quiz (20 phút)</h4>
+                    <ul>
+                        <li>Q1: Explain the difference between 401 and 403 with an example</li>
+                        <li>Q2: What are the advantages and disadvantages of REST?</li>
+                        <li>Q3: Why is database verification important?</li>
+                        <li>Q4: What is idempotency? Why does it matter for testing?</li>
+                        <li>Q5: Design 5 test cases for a login API</li>
+                    </ul>
+                </div>
+
+                <h3>📖 Recommended Reading Before Next Session:</h3>
+                <div class="info-box">
+                    <ul>
+                        <li>📄 HTTP/1.1 Status Code Reference (MDN Web Docs)</li>
+                        <li>📄 RESTful API Design Best Practices</li>
+                        <li>📄 Postman Documentation (Getting Started)</li>
+                        <li>📄 SQL Basics for Testers</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Assignments này không optional! Nó là part của learning journey. Assignment 1 giúp bạn practice test case design. Assignment 2 giúp bạn quen SQL queries. Assignment 3 giúp bạn consolidate knowledge. Khi buổi 2, tôi sẽ review assignments của mỗi bạn, give feedback. Những bạn không submit, chúng ta sẽ discuss tại sao... và bạn sẽ work harder! OK?"</div>
+            </div>
+
+                <!-- SLIDE 17: Q&A & INTERVIEW PREPARATION -->
+            <div class="slide">
+                <h2>🎓 Interview Preparation</h2>
+                
+                <h3>🔥 Top 10 Interview Questions (Likely to Ask):</h3>
+                
+                <div class="warning-box">
+                    <strong>Q1: What's the difference between 401 and 403?</strong><br><br>
+                    ✅ Correct Answer:<br>
+                    "401 Unauthorized = authentication failed (prove who you are)<br>
+                    403 Forbidden = authenticated but no permission (I know you, but you can't access)"<br><br>
+                    ❌ Wrong Answer: "Same thing"
+                </div>
+
+                <div class="warning-box">
+                    <strong>Q2: How do you test an API endpoint that creates a resource?</strong><br><br>
+                    ✅ Correct Answer:<br>
+                    "1) Happy path (create → 201)<br>
+                    2) Negative (invalid input → 400)<br>
+                    3) Database verify (check DB, row exists)<br>
+                    4) Idempotency test (retry same call)<br>
+                    5) Security test (SQL injection, bypass)"<br><br>
+                    ❌ Wrong Answer: "Just check if response is 201"
+                </div>
+
+                <div class="warning-box">
+                    <strong>Q3: What is idempotency and why does it matter?</strong><br><br>
+                    ✅ Correct Answer:<br>
+                    "Idempotent = calling 1x or 100x = same result<br>
+                    GET, PUT, DELETE idempotent (safe retry)<br>
+                    POST, PATCH not (risk duplicates)<br>
+                    For payment/order: MUST test idempotency"
+                </div>
+
+                <div class="warning-box">
+                    <strong>Q4: Why is database verification important?</strong><br><br>
+                    ✅ Correct Answer:<br>
+                    "API response can lie. Example: API returns 201, data structure looks correct, but NOT saved in DB. Only DB query catches this. Never trust API response alone."
+                </div>
+
+                <div class="warning-box">
+                    <strong>Q5: REST vs SOAP, which is better?</strong><br><br>
+                    ✅ Correct Answer:<br>
+                    "REST simple, stateless, cacheable, 80% use (better)<br>
+                    SOAP complex, secure, enterprise (specific use)<br>
+                    Context matters: startup use REST, bank use SOAP"
+                </div>
+
+                <h3>💡 Pro Tips for Interview:</h3>
+                <div class="success-box">
+                    <ul>
+                        <li>✨ Use real examples from projects you worked on</li>
+                        <li>✨ Emphasize: "I always test at 3 levels: API response, DB state, side effects"</li>
+                        <li>✨ Mention security testing as part of test design</li>
+                        <li>✨ Talk about database verification (impress them!)</li>
+                        <li>✨ Understand idempotency concept deeply</li>
+                        <li>✨ Know the difference between 401/403/404 perfectly</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Nếu bạn được hỏi những câu hỏi này ở interview, hãy trả lời tự tin. Nếu bạn nói 'I always verify database after POST create' - recruiter sẽ impress! Vì 90% testers chỉ check API response, không check DB. But you do - và đó là reason bạn catch more bugs!"</div>
+            </div>
+
+                <!-- SLIDE 18: RESOURCES & NEXT STEPS -->
+            <div class="slide">
+                <h2>📚 Resources & Next Steps</h2>
+                
+                <h3>🔗 Recommended Tools (Buổi 2 sẽ dùng):</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Tool</th>
+                        <th>Purpose</th>
+                        <th>Note</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Postman</strong></td>
+                        <td>API testing (make requests, save test cases)</td>
+                        <td>Most popular, free version ok</td>
+                    </tr>
+                    <tr>
+                        <td><strong>MySQL/PostgreSQL</strong></td>
+                        <td>Database for verification</td>
+                        <td>Free, open-source</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VS Code + REST Client</strong></td>
+                        <td>Alternative to Postman (lightweight)</td>
+                        <td>Free plugin</td>
+                    </tr>
+                    <tr>
+                        <td><strong>cURL / curl command</strong></td>
+                        <td>Command-line API testing</td>
+                        <td>Built-in on most systems</td>
+                    </tr>
+                </table>
+
+                <h3>📖 Reference Documentation:</h3>
+                <div class="info-box">
+                    <ul>
+                        <li>📌 RFC 7231 - HTTP/1.1 Semantics: <span class="highlight">https://tools.ietf.org/html/rfc7231</span></li>
+                        <li>📌 REST API Design Best Practices: <span class="highlight">https://restfulapi.net</span></li>
+                        <li>📌 HTTP Status Codes (MDN): <span class="highlight">https://developer.mozilla.org/en-US/docs/Web/HTTP/Status</span></li>
+                        <li>📌 Postman Learning Center: <span class="highlight">https://learning.postman.com</span></li>
+                        <li>📌 SQL Tutorial for Testers: <span class="highlight">https://www.w3schools.com/sql/</span></li>
+                    </ul>
+                </div>
+
+                <h3>🎯 Buổi 2 Agenda (Next Week):</h3>
+                <div class="learning-objectives">
+                    <h4>Live Hands-On Practical Session (5 giờ):</h4>
+                    <ul>
+                        <li>Postman Installation + Setup</li>
+                        <li>Make actual API calls (public APIs)</li>
+                        <li>Design test cases in Postman</li>
+                        <li>Verify API responses</li>
+                        <li>Connect database + verify data</li>
+                        <li>Real project scenarios & bug hunting</li>
+                    </ul>
+                </div>
+
+                <div class="narration-box">🔊 "Buổi hôm nay là foundation theory. Buổi tới là hands-on practical. Hãy chuẩn bị: cài Postman, MySQL, VS Code. Hãy làm assignments. Hãy review notes. Buổi tới chúng ta sẽ code, make API calls, find bugs for real. Nếu bạn đã sẵn sàng, tôi ready. Buổi tới sẽ excited! See you all next week!"</div>
+            </div>
+
+            </div>
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Trước</button>
+                    <button class="btn-primary" id="nextBtn">Tiếp ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Đặt lại</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 18</div>
+                </div>
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress"></div>
+                </div>
+                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. GIỚI THIỆU</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. API LÀ GÌ</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. LOGIN FLOW DIAGRAM</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. TẠI SAO TEST API</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. REST VS SOAP</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. REST ADVANTAGES & DISADVANTAGES</a></li>
+                        <li><a href="#" onclick="return goToSlide(6)">6. SOAP</a></li>
+                        <li><a href="#" onclick="return goToSlide(7)">7. GraphQL</a></li>
+                        <li><a href="#" onclick="return goToSlide(8)">8. HTTP METHODS</a></li>
+                        <li><a href="#" onclick="return goToSlide(9)">9. HTTP STATUS CODES</a></li>
+                        <li><a href="#" onclick="return goToSlide(10)">10. REQUEST/RESPONSE STRUCTURE</a></li>
+                        <li><a href="#" onclick="return goToSlide(11)">11. TEST CASE DESIGN</a></li>
+                        <li><a href="#" onclick="return goToSlide(12)">12. EXAMPLE TEST CASES</a></li>
+                        <li><a href="#" onclick="return goToSlide(13)">13. DATABASE VERIFICATION</a></li>
+                        <li><a href="#" onclick="return goToSlide(14)">14. SUMMARY & KEY TAKEAWAYS</a></li>
+                        <li><a href="#" onclick="return goToSlide(15)">15. HOMEWORK & ASSIGNMENTS</a></li>
+                        <li><a href="#" onclick="return goToSlide(16)">16. Q&A & INTERVIEW PREPARATION</a></li>
+                        <li><a href="#" onclick="return goToSlide(17)">17. RESOURCES & NEXT STEPS</a></li>
+                    </ul>
+                </div>
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~5 giờ<br>
+                        📚 API Testing · Buổi 1<br>
+                        🌐 HTTP & REST
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2025 Automation Testing & Java Core | API Testing — Buổi 1: Fundamentals | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js?v=4"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); }
+            return false;
+        }
+        function speak() {
+            if (!slides[currentSlide].querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+        function reset() { currentSlide = 0; updateSlide(); }
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        updateSlide();
+    </script>
+</body>
+</html>

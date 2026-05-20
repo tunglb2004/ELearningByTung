@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chuyển tiền</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .bal { display: flex; justify-content: space-between; padding: 10px 12px; background: #f0fdf4; border-radius: 8px; margin-bottom: 8px; font-size: 0.9rem; }
+        .bal strong { color: #166534; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card">
+            <h1>Chuyển tiền</h1>
+            <p class="lead">Integration test: chuyển từ tài khoản A sang B.</p>
+            <div class="bal"><span>Tài khoản A</span><strong id="bal-a">1.000.000 ₫</strong></div>
+            <div class="bal"><span>Tài khoản B</span><strong id="bal-b">500.000 ₫</strong></div>
+            <div class="demo-field">
+                <label for="amount">Số tiền</label>
+                <input type="number" id="amount" value="100000" min="1">
+            </div>
+            <button type="button" class="demo-btn" id="transfer">Chuyển A → B</button>
+            <div id="log" class="demo-result" style="margin-top:12px;min-height:40px">Sẵn sàng chuyển</div>
+        </div>
+    </div>
+    <script>
+        var a = 1000000, b = 500000;
+        function fmt(n) { return n.toLocaleString('vi-VN') + ' ₫'; }
+        function render() {
+            document.getElementById('bal-a').textContent = fmt(a);
+            document.getElementById('bal-b').textContent = fmt(b);
+        }
+        document.getElementById('transfer').onclick = function () {
+            var amt = +document.getElementById('amount').value;
+            var log = document.getElementById('log');
+            if (amt <= 0 || amt > a) {
+                log.textContent = 'Lỗi: số dư không đủ';
+                return;
+            }
+            a -= amt; b += amt;
+            render();
+            log.textContent = 'Thành công: A -' + fmt(amt) + ', B +' + fmt(amt);
+        };
+        render();
+    </script>
+</body>
+</html>

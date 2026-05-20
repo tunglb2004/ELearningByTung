@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chờ phần tử</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .wait-zone { text-align: center; }
+        #dynamic, #submit, #link { display: none; margin: 10px auto 0; max-width: 100%; }
+        #dynamic { padding: 12px; background: #dcfce7; color: #166534; border-radius: 8px; font-size: 0.88rem; }
+        #submit { padding: 10px 20px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        #link { display: inline-block; padding: 10px 16px; background: #e0e7ff; color: #3730a3; border-radius: 8px; text-decoration: none; font-size: 0.88rem; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card wait-zone">
+            <h1>Chờ phần tử load</h1>
+            <p class="lead">Bấm tải — nội dung xuất hiện lần lượt (mô phỏng explicit wait).</p>
+            <button type="button" class="demo-btn" id="load-btn">Tải nội dung</button>
+            <div id="dynamic">Nội dung đã sẵn sàng</div>
+            <button type="button" id="submit">Tiếp tục</button>
+            <a href="#" id="link" onclick="return false">Xem chi tiết</a>
+        </div>
+    </div>
+    <script>
+        document.getElementById('load-btn').onclick = function () {
+            var d = document.getElementById('dynamic');
+            var s = document.getElementById('submit');
+            var l = document.getElementById('link');
+            d.style.display = s.style.display = 'none';
+            l.style.display = 'none';
+            setTimeout(function () { d.style.display = 'block'; }, 1200);
+            setTimeout(function () { s.style.display = 'inline-block'; }, 2200);
+            setTimeout(function () { l.style.display = 'inline-block'; }, 2800);
+        };
+    </script>
+</body>
+</html>

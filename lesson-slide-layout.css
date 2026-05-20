@@ -1,0 +1,361 @@
+/* Layout slide bài học — đồng bộ Automation PHASE 1–4 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body.lesson-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.lesson-page .container {
+    max-width: 1500px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.lesson-page .header {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 35px;
+    text-align: center;
+}
+
+.lesson-page .header h1 {
+    font-size: 2.8em;
+    margin-bottom: 10px;
+}
+
+.lesson-page .header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+.lesson-page .top-progress {
+    display: flex;
+    margin-bottom: 20px;
+    padding: 0 30px;
+    padding-top: 20px;
+}
+
+.lesson-page .content {
+    display: flex;
+    height: 750px;
+}
+
+.lesson-page .slides {
+    flex: 1;
+    padding: 40px;
+    overflow-y: auto;
+    background: #f8f9fa;
+    border-right: 1px solid #ddd;
+}
+
+.lesson-page .slide {
+    display: none;
+    animation: fadeIn 0.5s;
+}
+
+.lesson-page .slide.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.lesson-page .slide h2 {
+    color: #1e3c72;
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #2a5298;
+    padding-bottom: 15px;
+}
+
+.lesson-page .slide h3 {
+    color: #2a5298;
+    font-size: 1.4em;
+    margin-top: 22px;
+    margin-bottom: 15px;
+}
+
+.lesson-page .slide p,
+.lesson-page .slide li {
+    line-height: 1.8;
+    color: #333;
+    font-size: 1em;
+    margin-bottom: 12px;
+}
+
+.lesson-page .slide ul {
+    margin-left: 30px;
+}
+
+.lesson-page .code-example,
+.lesson-page .code-block {
+    background: #1e1e1e;
+    color: #d4d4d4;
+    padding: 18px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 15px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85em;
+    line-height: 1.6;
+    max-height: 320px;
+    border-left: 4px solid #2a5298;
+    white-space: pre-wrap;
+}
+
+.lesson-page .keyword { color: #569cd6; }
+.lesson-page .string { color: #ce9178; }
+.lesson-page .comment { color: #6a9955; }
+.lesson-page .method { color: #dcdcaa; }
+
+.lesson-page .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+    font-size: 0.95em;
+}
+
+.lesson-page .comparison-table th,
+.lesson-page .comparison-table td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.lesson-page .comparison-table th {
+    background: #2a5298;
+    color: white;
+}
+
+.lesson-page .comparison-table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.lesson-page .emoji {
+    font-size: 1.3em;
+    margin-right: 8px;
+}
+
+.lesson-page .sidebar.lesson-sidebar {
+    flex: 0 0 380px;
+    padding: 30px;
+    background: white;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.lesson-page .controls {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.lesson-page button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.lesson-page .btn-primary {
+    background: #2a5298;
+    color: white;
+}
+
+.lesson-page .btn-primary:hover {
+    background: #1e3c72;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+}
+
+.lesson-page .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.lesson-page .btn-secondary {
+    background: #17a2b8;
+    color: white;
+}
+
+.lesson-page .btn-secondary:hover {
+    background: #138496;
+}
+
+.lesson-page .slide-counter {
+    text-align: center;
+    font-weight: bold;
+    color: #2a5298;
+    font-size: 1.1em;
+    margin: 20px 0;
+}
+
+.lesson-page .narration-box {
+    background: #e7f5ff;
+    border-left: 4px solid #1e88e5;
+    padding: 12px;
+    margin: 15px 0;
+    border-radius: 5px;
+    color: #0c4a6e;
+    line-height: 1.5;
+    font-size: 0.95em;
+    font-style: italic;
+}
+
+.lesson-page .highlight {
+    background: #fff3cd;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: #856404;
+}
+
+.lesson-page .footer {
+    background: #f8f9fa;
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid #ddd;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.lesson-page .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    margin: 15px 0;
+    overflow: hidden;
+}
+
+.lesson-page .progress-fill {
+    height: 100%;
+    background: #2a5298;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.lesson-page .concept-box {
+    background: #e3f2fd;
+    border: 2px solid #2196f3;
+    padding: 15px;
+    border-radius: 8px;
+    margin: 15px 0;
+}
+
+.lesson-page .intro-box-inner {
+    background: #e3f2fd;
+    border: 2px solid #2196f3;
+    padding: 18px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+}
+
+.lesson-page .intro-box-inner h2 {
+    color: #1565c0;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+    border: none;
+    padding: 0;
+}
+
+.lesson-page .learning-objectives {
+    background: #f0f4ff;
+    padding: 18px;
+    border-left: 4px solid #2a5298;
+    margin: 18px 0;
+    border-radius: 8px;
+}
+
+.lesson-page .learning-objectives h3 {
+    color: #1e3c72;
+    margin-bottom: 12px;
+}
+
+.lesson-page .learning-objectives ul {
+    list-style: none;
+    margin-left: 0;
+}
+
+.lesson-page .learning-objectives li {
+    padding: 6px 0 6px 28px;
+    position: relative;
+}
+
+.lesson-page .learning-objectives li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #2a5298;
+    font-weight: bold;
+}
+
+.lesson-page .recap-box {
+    background: #f0f4ff;
+    padding: 20px;
+    border-left: 4px solid #2a5298;
+    border-radius: 8px;
+}
+
+.lesson-page .flow-diagram {
+    background: #f5f5f5;
+    padding: 18px;
+    border-radius: 8px;
+    margin: 15px 0;
+    border: 2px solid #2a5298;
+}
+
+.lesson-page .flow-arrow {
+    text-align: center;
+    color: #2a5298;
+    margin: 8px 0;
+}
+
+.lesson-page .section-body ul {
+    margin-left: 28px;
+}
+
+.lesson-page .sidebar-meta {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    font-size: 0.85em;
+    color: #666;
+    text-align: center;
+    line-height: 1.6;
+}
+
+@media (max-width: 1024px) {
+    .lesson-page .content {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .lesson-page .slides {
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .lesson-page .sidebar.lesson-sidebar {
+        border-left: none;
+        flex: 1 1 auto;
+        max-width: none;
+    }
+}

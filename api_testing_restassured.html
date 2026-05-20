@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Testing — RestAssured Automation</title>
+    <style>
+* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            display: flex;
+            height: 750px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #1e3c72;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #2a5298;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #2a5298;
+            font-size: 1.4em;
+            margin-top: 22px;
+            margin-bottom: 15px;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.8;
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 12px;
+        }
+
+        .slide ul {
+            margin-left: 30px;
+        }
+
+        .code-example {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            max-height: 280px;
+            border-left: 4px solid #2a5298;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #2a5298;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            max-height: 220px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 8px;
+        }
+
+        .sidebar {
+            flex: 0 0 380px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 82, 152, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #138496;
+        }
+
+        .btn-stop {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #475569;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #2a5298;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #0c4a6e;
+            line-height: 1.5;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #856404;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #2a5298;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffe8e8;
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #c92a2a;
+            font-size: 0.95em;
+        }
+
+        .success {
+            background: #d3f9d8;
+            border-left: 4px solid #51cf66;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #2f7d42;
+            font-size: 0.95em;
+        }
+
+        .tip {
+            background: #fff4e6;
+            border-left: 4px solid #ff922b;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 5px;
+            color: #d9480f;
+            font-size: 0.95em;
+        }
+
+        .locator-example {
+            background: #f5f5f5;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #2a5298;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.85em;
+        }
+
+        .nav-links li {
+            padding: 4px 0;
+        }
+
+        .nav-links a {
+            color: #2a5298;
+            text-decoration: none;
+            display: block;
+            padding: 6px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #2a5298;
+            color: white;
+        }
+
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .concept-box h4 {
+            color: #1565c0;
+            margin-bottom: 8px;
+        }
+
+        .diagram {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-family: monospace;
+            font-size: 0.9em;
+            white-space: pre;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 14px;
+            margin: 15px 0;
+            border-radius: 6px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .learning-objectives {
+            background: #f0f8ff;
+            border: 2px solid #2a5298;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .learning-objectives h4 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+        .learning-objectives ul {
+            margin-left: 20px;
+        }
+        .recap-box {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .intro-box-inner {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .slide h4 {
+            color: #2a5298;
+            font-size: 1.15em;
+            margin-top: 16px;
+            margin-bottom: 10px;
+        }
+
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+</head>
+<body data-tts-page="api3">
+    <div class="container">
+        <div class="header">
+            <h1>⚡ API Testing — RestAssured</h1>
+            <p>RestAssured Framework · TestNG · POM · Data-Driven</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+<!-- SLIDE 1: GIỚI THIỆU & MỤC TIÊU -->
+            <div class="slide active">
+                <h2>📌 Giới Thiệu & Mục Tiêu Khóa Học</h2>
+
+                <h3>Chào các bạn! 👋</h3>
+                <p>Tôi là một Senior QA Engineer với 10 năm kinh nghiệm, trong đó 8 năm tôi làm manual testing Postman. Nhưng sau đó, tôi nhận ra: <span class="keyword-highlight">Postman tuyệt vời nhưng không thể scale</span>. Vì vậy tôi học RestAssured - và cuộc đời tôi thay đổi.</p>
+
+                <h3>🎯 Trong 2 buổi này, chúng ta sẽ học:</h3>
+                <div class="learning-objectives">
+                    <ul>
+                        <li>RestAssured là gì? Tại sao cần nó?</li>
+                        <li>Setup project từ 0 (Maven + dependencies)</li>
+                        <li>Cú pháp cơ bản: Given-When-Then (BDD pattern)</li>
+                        <li>GET, POST, PUT, DELETE requests</li>
+                        <li>Response validation & assertions</li>
+                        <li>Authentication & Authorization</li>
+                        <li>Page Object Model cho APIs</li>
+                        <li>TestNG framework</li>
+                        <li>Data-driven testing</li>
+                        <li>Reporting (Extent, Allure)</li>
+                        <li>CI/CD integration (Jenkins)</li>
+                    </ul>
+                </div>
+
+                <h3>📊 Kết Quả Sau 2 Buổi:</h3>
+                <div class="success-box">
+                    <p>✅ Viết được 50+ test cases tự động</p>
+                    <p>✅ Hiểu rõ RestAssured architecture</p>
+                    <p>✅ Có thể implement Page Object Model</p>
+                    <p>✅ Chạy parallel tests & generate reports</p>
+                    <p>✅ Integrate với CI/CD pipelines</p>
+                </div>
+
+                <div class="narration-box">🔊 "Các bạn xin chào! Tôi là một QA engineer, đã làm automation testing trong 10 năm. Lúc đầu, tôi chỉ biết manual testing với Postman. Postman rất tuyệt vời, dễ dùng, visual, không cần code. Nhưng khi công ty tôi có 500 test cases, 1000 test cases cần chạy, tôi nhận ra: Postman không thể scale . Maintain 1000+ test cases bằng Postman? Không thể. Version control? Không có. CI/CD integration? Khó khăn. Vậy tôi học RestAssured - một framework automation cho Java. Và hôm nay, tôi sẽ dạy bạn tất cả những gì tôi biết. Không phải từ sách. Từ kinh nghiệm thực tế 8 năm làm automation. Từ bugs mà tôi catch được. Từ mistakes mà tôi học được. Trong 2 buổi này, từ 0 đến 100, chúng ta sẽ có một automation framework hoàn chỉnh. Chúng ta sẽ viết 50+ test cases. Chúng ta sẽ setup CI/CD. Chúng ta sẽ sẵn sàng cho job tiếp theo. Hãy sẵn sàng. Hãy focus. Hãy ask questions. Let's go!"</div>
+            </div>
+
+                <!-- SLIDE 2: TẠI SAO CẦN RESTASSURED? -->
+            <div class="slide">
+                <h2>❓ Tại Sao Cần RestAssured?</h2>
+
+                <h3>Scenario: Chúng ta là QA engineer ở một Fintech startup</h3>
+                <div class="info-box">
+                    <p>Công ty có một REST API với 50+ endpoints. Mỗi ngày release code 3-4 lần. QA team cần test toàn bộ API trước mỗi release. Sử dụng Postman manual testing:</p>
+                    <p>❌ Mất 2 tiếng mỗi lần test (50+ endpoints × 2 minutes = 100 minutes)</p>
+                    <p>❌ Dễ có sai sót (tay trượt, quên test cái gì)</p>
+                    <p>❌ Không có version control (Postman collection v1, v2, v3... mess)</p>
+                    <p>❌ Không integrate CI/CD (release phải tạm dừng chờ manual testing)</p>
+                    <p>❌ Maintain khó khăn khi API change</p>
+                </div>
+
+                <h3>✅ Với RestAssured Automation:</h3>
+                <div class="success-box">
+                    <p>✅ Chạy tất cả test trong 2 PHÚT (parallel execution)</p>
+                    <p>✅ 100% consistent (không có human error)</p>
+                    <p>✅ Version control đầy đủ (Git workflow)</p>
+                    <p>✅ CI/CD integration (Jenkins tự động chạy)</p>
+                    <p>✅ Easy to maintain (code-based, reusable)</p>
+                    <p>✅ Beautiful reports (Extent/Allure)</p>
+                </div>
+
+                <h3>📊 So Sánh Postman vs RestAssured:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Tiêu Chí</th>
+                        <th>Postman (Manual)</th>
+                        <th>RestAssured (Automation)</th>
+                    </tr>
+                    <tr>
+                        <td>Học & Setup</td>
+                        <td>5 phút</td>
+                        <td>2 giờ</td>
+                    </tr>
+                    <tr>
+                        <td>Viết 1 test case</td>
+                        <td>3 phút (GUI)</td>
+                        <td>10 phút (code)</td>
+                    </tr>
+                    <tr>
+                        <td>Chạy 50 tests</td>
+                        <td>100 phút (manual)</td>
+                        <td>2 phút (parallel)</td>
+                    </tr>
+                    <tr>
+                        <td>Version Control</td>
+                        <td>❌ Khó</td>
+                        <td>✅ Tuyệt vời</td>
+                    </tr>
+                    <tr>
+                        <td>CI/CD Integration</td>
+                        <td>❌ Khó</td>
+                        <td>✅ Dễ dàng</td>
+                    </tr>
+                    <tr>
+                        <td>Scalability (1000+ tests)</td>
+                        <td>❌ Không thể</td>
+                        <td>✅ Dễ dàng</td>
+                    </tr>
+                    <tr>
+                        <td>Maintain</td>
+                        <td>❌ Nightmare</td>
+                        <td>✅ Clean code</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">🔊 "Okay, tôi biết nhiều bạn đang nghĩ: 'Sao phải learn code? Postman vừa dễ vừa có sẵn?' Câu hỏi tốt. Tôi sẽ giải thích. Imagine bạn đang làm QA ở một startup có REST API. Mỗi ngày release 3-4 lần. Mỗi lần release, bạn phải test 50+ endpoints. Nếu dùng Postman manual, mỗi lần test mất 2 tiếng. Release 3 lần = 6 tiếng testing mỗi ngày. Đó là 30 tiếng/tuần! Đó là cả ngày mất để test. Ngoài ra, làm manual testing rất dễ có lỗi. Quên test endpoint nào đó. Typo ở parameters. Click sai. Postman collection version control cũng rất mess - v1, v2, v3, cuối cùng không biết ai dùng cái nào. Nhưng nếu dùng RestAssured automation: chúng ta viết code, code chạy 50 tests trong 2 phút. 100% consistent. Không có human error. Version control ngàn lần tốt hơn. CI/CD integration? Dễ. Jenkins trigger automated tests mỗi commit. Vậy nên đây là investment: spend 2 giờ learn RestAssured, setup framework, write 50 tests. Sau đó, save 100+ giờ mỗi năm. Worth it? Absolutely. Nhìn vào bảng so sánh: Postman cho manual exploration. RestAssured cho automation at scale. Chúng ta cần cả hai - Postman để hiểu API, RestAssured để automate testing."</div>
+            </div>
+
+                <!-- SLIDE 3: SETUP RESTASSURED PROJECT -->
+            <div class="slide">
+                <h2>🔧 Setup RestAssured Project từ 0</h2>
+
+                <h3>STEP 1: Tạo Maven Project</h3>
+                <p>Maven là build tool cho Java. Nó manage dependencies (thư viện), compile code, chạy tests.</p>
+                
+                <div class="code-example">mkdir api-testing-automation
+cd api-testing-automation
+mvn archetype:generate \
+  -DgroupId=com.qa \
+  -DartifactId=api-tests \
+  -DarchetypeArtifactId=maven-archetype-quickstart
+</div>
+
+                <h3>STEP 2: Add Dependencies to pom.xml</h3>
+                <p>pom.xml là file config Maven - nó định nghĩa dependencies (thư viện) project cần dùng.</p>
+
+                <div class="code-example"><span class="keyword">&lt;dependencies&gt;</span>
+  <span class="comment">&lt;!-- RestAssured for API testing --&gt;</span>
+  <span class="keyword">&lt;dependency&gt;</span>
+    <span class="keyword">&lt;groupId&gt;</span>io.rest-assured<span class="keyword">&lt;/groupId&gt;</span>
+    <span class="keyword">&lt;artifactId&gt;</span>rest-assured<span class="keyword">&lt;/artifactId&gt;</span>
+    <span class="keyword">&lt;version&gt;</span>5.4.0<span class="keyword">&lt;/version&gt;</span>
+  <span class="keyword">&lt;/dependency&gt;</span>
+
+  <span class="comment">&lt;!-- TestNG for test execution --&gt;</span>
+  <span class="keyword">&lt;dependency&gt;</span>
+    <span class="keyword">&lt;groupId&gt;</span>org.testng<span class="keyword">&lt;/groupId&gt;</span>
+    <span class="keyword">&lt;artifactId&gt;</span>testng<span class="keyword">&lt;/artifactId&gt;</span>
+    <span class="keyword">&lt;version&gt;</span>7.8.1<span class="keyword">&lt;/version&gt;</span>
+    <span class="keyword">&lt;scope&gt;</span>test<span class="keyword">&lt;/scope&gt;</span>
+  <span class="keyword">&lt;/dependency&gt;</span>
+
+  <span class="comment">&lt;!-- JSON parsing --&gt;</span>
+  <span class="keyword">&lt;dependency&gt;</span>
+    <span class="keyword">&lt;groupId&gt;</span>com.fasterxml.jackson.core<span class="keyword">&lt;/groupId&gt;</span>
+    <span class="keyword">&lt;artifactId&gt;</span>jackson-databind<span class="keyword">&lt;/artifactId&gt;</span>
+    <span class="keyword">&lt;version&gt;</span>2.16.0<span class="keyword">&lt;/version&gt;</span>
+  <span class="keyword">&lt;/dependency&gt;</span>
+<span class="keyword">&lt;/dependencies&gt;</span></div>
+
+                <h3>STEP 3: Project Structure</h3>
+                <div class="diagram">api-testing-automation/
+├── pom.xml
+├── src/
+│   ├── main/java/com/qa/
+│   │   ├── config/          (Cấu hình base URL, timeout)
+│   │   ├── utils/           (Helper methods, utilities)
+│   │   ├── models/          (Request/Response POJOs)
+│   │   ├── api/             (API endpoints - Page Object)
+│   │   └── constants/       (Constants, enums)
+│   │
+│   └── test/java/com/qa/
+│       ├── tests/           (Actual test cases)
+│       ├── base/            (BaseTest class)
+│       ├── listeners/       (Test listeners for reporting)
+│       └── resources/
+│           ├── testdata.json (Test data)
+│           └── config.properties (Configuration)
+</div>
+
+                <h3>STEP 4: Chạy Maven Commands</h3>
+                <div class="code-example"><span class="comment"># Compile & test</span>
+mvn clean test
+
+<span class="comment"># Run specific test class</span>
+mvn test -Dtest=UserAPITest
+
+<span class="comment"># Generate reports</span>
+mvn allure:report
+allure serve target/allure-results</div>
+
+                <div class="narration-box">🔊 "Alright, bây giờ chúng ta setup project. Đừng sợ command line! Nó khó nhìn nhưng thực ra simple. Maven là gì? Maven là 'package manager' cho Java. Giống như npm cho Node, pip cho Python. Maven giúp manage dependencies (thư viện project cần), compile code, chạy tests. pom.xml là file config Maven. Nó nói: 'Hey Maven, project này cần dependencies nào?' Chúng ta define dependencies ở đây. Maven sẽ auto download từ internet. Dependencies chúng ta cần: 1. RestAssured 5.4.0 - main library cho API testing 2. TestNG 7.8.1 - test framework (alternative to JUnit) 3. Jackson 2.16.0 - JSON parsing library 4. SLF4J - logging Project structure rất important. Chúng ta separate concerns: - API objects ở folder 'api' (Page Object Model) - Test cases ở folder 'tests' - Test data ở folder 'resources' - Utilities &amp; helpers ở folder 'utils' Tại sao? Vì clean code = maintainable code = easy to scale. Maven commands: - `mvn clean test` = delete old build, compile, run tests - `mvn clean test -Dtest=UserAPITest` = run specific test class - `mvn allure:report` = generate beautiful report Setup này mất 1 giờ lần đầu. Sau đó, mỗi project mới chỉ copy paste pom.xml. Done."</div>
+            </div>
+
+                <!-- SLIDE 4: RESTASSURED BASIC SYNTAX - PART 1 -->
+            <div class="slide">
+                <h2>📝 RestAssured Basic Syntax - Hello World</h2>
+
+                <h3>RestAssured Pattern: Given-When-Then (BDD)</h3>
+                <p>RestAssured dùng <span class="keyword-highlight">Fluent Interface</span> - cú pháp giống English, dễ đọc.</p>
+
+                <h3>Ví Dụ 1: Simple GET Request</h3>
+                <div class="code-example"><span class="keyword">import static</span> io.rest_assured.RestAssured.*;
+<span class="keyword">import</span> org.testng.annotations.Test;
+
+<span class="keyword">public class</span> <span class="method">UserAPITest</span> {
+    
+    @Test
+    <span class="keyword">public void</span> <span class="method">testSimpleGetRequest</span>() {
+        <span class="comment">// Test GET /api/users endpoint</span>
+        
+        <span class="method">given</span>()
+            <span class="comment">// ARRANGE: Chuẩn bị (setup URL, headers, params)</span>
+            .baseUri(<span class="string">"https://jsonplaceholder.typicode.com"</span>)
+            .basePath(<span class="string">"/users"</span>)
+        
+        .<span class="method">when</span>()
+            <span class="comment">// ACT: Thực thi (gửi request)</span>
+            .<span class="method">get</span>()
+        
+        .<span class="method">then</span>()
+            <span class="comment">// ASSERT: Verify (check response)</span>
+            .statusCode(200)
+            .body(<span class="string">"size()"</span>, <span class="method">greaterThan</span>(0));
+    }
+}</div>
+
+                <h3>Giải Thích Pattern:</h3>
+                <div class="info-box">
+                    <p><strong>given()</strong> = Chuẩn bị setup</p>
+                    <ul>
+                        <li>.baseUri() = Base URL (https://api.example.com)</li>
+                        <li>.basePath() = Path (/users, /products)</li>
+                        <li>.header() = HTTP headers</li>
+                        <li>.queryParam() = Query parameters</li>
+                        <li>.body() = Request body (POST, PUT)</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>when()</strong> = Thực thi HTTP request</p>
+                    <ul>
+                        <li>.get() = GET request</li>
+                        <li>.post() = POST request</li>
+                        <li>.put() = PUT request</li>
+                        <li>.delete() = DELETE request</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>then()</strong> = Kiểm tra response</p>
+                    <ul>
+                        <li>.statusCode(200) = Check HTTP status</li>
+                        <li>.body("path", matcher) = Check response body</li>
+                        <li>.header("Content-Type", containsString("json")) = Check headers</li>
+                    </ul>
+                </div>
+
+                <h3>Output Khi Chạy Test:</h3>
+                <div class="code-example"><span class="comment"># Test PASS:</span>
+Tests run: 1, Failures: 0, Skipped: 0, Time: 1.234s ✅
+
+<span class="comment"># Test FAIL:</span>
+Tests run: 1, Failures: 1, Skipped: 0
+AssertionError: expected status code <200> but was <404>
+</div>
+
+                <div class="narration-box">🔊 "Đây là 'Hello World' của RestAssured. Rất simple. given-when-then là BDD pattern (Behavior Driven Development). Nó make code readable - một tester non-technical cũng có thể hiểu. given() = Chuẩn bị. Bạn nói với RestAssured: 'Tôi muốn test cái gì? Với URL nào? Header nào?' when() = Hành động. Bạn gửi request: GET /users then() = Kiểm tra. Bạn check: Response trả về status 200 chưa? Response body có dữ liệu chưa? baseUri = Base URL (https://api.example.com) basePath = Path (/users) Combine = https://api.example.com/users statusCode(200) = HTTP status code phải là 200 (OK). Nếu là 404 (Not Found), test fail. .body(\"size()\", greaterThan(0)) = Response array phải có size &gt; 0 (có ít nhất 1 user). Cú pháp `\"size()\"` là JSONPath - để extract dữ liệu từ JSON response. Xong, chúng ta chạy `mvn clean test` - test sẽ run. Pass or Fail. Done!"</div>
+            </div>
+
+                <!-- SLIDE 5: RESTASSURED BASIC SYNTAX - PART 2 -->
+            <div class="slide">
+                <h2>📝 GET Request với Query Parameters</h2>
+
+                <h3>Ví Dụ: GET /api/users?status=active&limit=10</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testGetUsersWithFilters</span>() {
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users"</span>)
+        .queryParam(<span class="string">"status"</span>, <span class="string">"active"</span>)
+        .queryParam(<span class="string">"limit"</span>, 10)
+        .queryParam(<span class="string">"page"</span>, 1)
+    
+    .<span class="method">when</span>()
+        .<span class="method">get</span>()
+    
+    .<span class="method">then</span>()
+        .statusCode(200)
+        .body(<span class="string">"data.size()"</span>, equalTo(10))
+        .body(<span class="string">"data[0].status"</span>, equalTo(<span class="string">"active"</span>))
+        .body(<span class="string">"data[0].id"</span>, notNullValue());
+}
+</div>
+
+                <h3>Giải Thích:</h3>
+                <div class="info-box">
+                    <p><strong>.queryParam("status", "active")</strong> = Thêm query parameter</p>
+                    <p>Kết quả URL: https://api.example.com/users<strong>?status=active&limit=10&page=1</strong></p>
+                    <p><strong>.body("data.size()", equalTo(10))</strong> = Check response array 'data' có size = 10</p>
+                    <p><strong>.body("data[0].status", equalTo("active"))</strong> = Check phần tử đầu tiên, field 'status' = "active"</p>
+                </div>
+
+                <h3>Response JSON Example:</h3>
+                <div class="code-example">{
+  <span class="string">"data"</span>: [
+    { <span class="string">"id"</span>: 1, <span class="string">"name"</span>: <span class="string">"John"</span>, <span class="string">"status"</span>: <span class="string">"active"</span> },
+    { <span class="string">"id"</span>: 2, <span class="string">"name"</span>: <span class="string">"Jane"</span>, <span class="string">"status"</span>: <span class="string">"active"</span> },
+    ...
+  ],
+  <span class="string">"total"</span>: 10
+}
+</div>
+
+                <h3>Common Matchers:</h3>
+                <div class="info-box">
+                    <p>equalTo(value) - bằng nhau</p>
+                    <p>notNullValue() - không null</p>
+                    <p>containsString("text") - chứa text</p>
+                    <p>greaterThan(5) - lớn hơn 5</p>
+                    <p>lessThan(10) - nhỏ hơn 10</p>
+                    <p>hasItems(item1, item2) - array chứa items</p>
+                </div>
+
+                <div class="narration-box">🔊 "Bây giờ chúng ta add query parameters. Query parameters là '?status=active&amp;limit=10' - tham số truyền ở URL. .queryParam() method thêm query parameter. JSONPath là khái niệm important. Để extract dữ liệu từ JSON response, chúng ta dùng JSONPath syntax: - \"size()\" = array size - \"[0]\" = phần tử đầu tiên - \"data[0].status\" = first user's status Matchers là tools để compare values: - equalTo(value) = exact match - containsString() = substring match - greaterThan() = numeric comparison So chúng ta test: 1. Status code = 200 (OK) 2. Array size = 10 3. First user status = 'active' 4. First user id không null Nếu bất kỳ assertion nào fail, test fail. That's how automation works."</div>
+            </div>
+
+                <!-- SLIDE 6: POST REQUEST -->
+            <div class="slide">
+                <h2>📝 POST Request - Create Resource</h2>
+
+                <h3>Ví Dụ 1: POST với String Body</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testCreateUser</span>() {
+    String requestBody = <span class="string">"""
+        {
+            "name": "John Doe",
+            "email": "john@example.com",
+            "password": "SecurePass@123",
+            "role": "user"
+        }
+    """</span>;
+    
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users"</span>)
+        .contentType(<span class="string">"application/json"</span>)
+        .body(requestBody)
+    
+    .<span class="method">when</span>()
+        .<span class="method">post</span>()
+    
+    .<span class="method">then</span>()
+        .statusCode(201)  <span class="comment">// 201 Created</span>
+        .body(<span class="string">"id"</span>, notNullValue())
+        .body(<span class="string">"name"</span>, equalTo(<span class="string">"John Doe"</span>))
+        .body(<span class="string">"email"</span>, equalTo(<span class="string">"john@example.com"</span>));
+}
+</div>
+
+                <h3>Ví Dụ 2: POST với Map (Cleaner)</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testCreateUserWithMap</span>() {
+    Map&lt;String, Object&gt; requestBody = <span class="keyword">new</span> HashMap&lt;&gt;();
+    requestBody.put(<span class="string">"name"</span>, <span class="string">"John Doe"</span>);
+    requestBody.put(<span class="string">"email"</span>, <span class="string">"john@example.com"</span>);
+    requestBody.put(<span class="string">"password"</span>, <span class="string">"SecurePass@123"</span>);
+    
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users"</span>)
+        .contentType(<span class="string">"application/json"</span>)
+        .body(requestBody)
+    
+    .<span class="method">when</span>()
+        .<span class="method">post</span>()
+    
+    .<span class="method">then</span>()
+        .statusCode(201)
+        .body(<span class="string">"id"</span>, notNullValue());
+}
+</div>
+
+                <h3>Important: HTTP Status Codes</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Code</th>
+                        <th>Meaning</th>
+                        <th>Khi Nào</th>
+                    </tr>
+                    <tr>
+                        <td><strong>200</strong></td>
+                        <td>OK</td>
+                        <td>GET request thành công</td>
+                    </tr>
+                    <tr>
+                        <td><strong>201</strong></td>
+                        <td>Created</td>
+                        <td>POST request tạo resource thành công</td>
+                    </tr>
+                    <tr>
+                        <td><strong>204</strong></td>
+                        <td>No Content</td>
+                        <td>DELETE request thành công (no response body)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>400</strong></td>
+                        <td>Bad Request</td>
+                        <td>Request data invalid (missing fields, wrong format)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>401</strong></td>
+                        <td>Unauthorized</td>
+                        <td>Không có authentication (quên token)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>403</strong></td>
+                        <td>Forbidden</td>
+                        <td>Không có quyền (wrong role)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>404</strong></td>
+                        <td>Not Found</td>
+                        <td>Resource không tồn tại</td>
+                    </tr>
+                    <tr>
+                        <td><strong>500</strong></td>
+                        <td>Internal Server Error</td>
+                        <td>Server error (bug ở backend)</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">🔊 "POST request = tạo resource mới. Ví dụ tạo user mới ở API. .contentType(\"application/json\") = nói với server: 'Tôi gửi JSON data'. Server sẽ hiểu. .body() = request body. Có 2 cách: 1. String: \"{ \\\"name\\\": \\\"John\\\" }\" 2. Map: requestBody.put(\"name\", \"John\") Mình recommend Map - cleaner, easier to maintain. statusCode(201) = HTTP 201 Created. Nếu server trả về 200 or 400, test fail. HTTP Status Codes rất important: - 2xx = Success (200, 201, 204) - 4xx = Client error (400, 401, 403, 404) - 5xx = Server error (500) Ví dụ: - POST create user successful = 201 - POST with missing email = 400 (bad request) - DELETE user without auth token = 401 (unauthorized) - DELETE user with wrong role = 403 (forbidden) Good API test phải test cả happy path (success) lẫn error cases (failures). We'll talk more about this later."</div>
+            </div>
+
+                <!-- SLIDE 7: PUT & DELETE -->
+            <div class="slide">
+                <h2>📝 PUT & DELETE Requests</h2>
+
+                <h3>PUT Request - Update Resource</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testUpdateUser</span>() {
+    Map&lt;String, Object&gt; updateBody = <span class="keyword">new</span> HashMap&lt;&gt;();
+    updateBody.put(<span class="string">"name"</span>, <span class="string">"Jane Doe"</span>);
+    updateBody.put(<span class="string">"email"</span>, <span class="string">"jane@example.com"</span>);
+    
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users"</span>)
+        .pathParam(<span class="string">"id"</span>, 123)
+        .contentType(<span class="string">"application/json"</span>)
+        .body(updateBody)
+    
+    .<span class="method">when</span>()
+        .<span class="method">put</span>(<span class="string">"/{id}"</span>)
+    
+    .<span class="method">then</span>()
+        .statusCode(200)
+        .body(<span class="string">"name"</span>, equalTo(<span class="string">"Jane Doe"</span>))
+        .body(<span class="string">"email"</span>, equalTo(<span class="string">"jane@example.com"</span>));
+}
+</div>
+
+                <h3>DELETE Request</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testDeleteUser</span>() {
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users"</span>)
+        .pathParam(<span class="string">"id"</span>, 123)
+    
+    .<span class="method">when</span>()
+        .<span class="method">delete</span>(<span class="string">"/{id}"</span>)
+    
+    .<span class="method">then</span>()
+        .statusCode(204);  <span class="comment">// No content returned</span>
+}
+</div>
+
+                <h3>Giải Thích Path Parameters:</h3>
+                <div class="info-box">
+                    <p><strong>.pathParam("id", 123)</strong> = định nghĩa path parameter</p>
+                    <p><strong>.put("/{id}")</strong> = dùng path parameter trong URL</p>
+                    <p><strong>Kết quả:</strong> https://api.example.com/users/123</p>
+                </div>
+
+                <h3>Toàn Bộ CRUD Operations:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Operation</th>
+                        <th>HTTP Method</th>
+                        <th>URL</th>
+                        <th>Status Code</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Create</strong></td>
+                        <td>POST</td>
+                        <td>/users</td>
+                        <td>201</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Read</strong></td>
+                        <td>GET</td>
+                        <td>/users/123</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Update</strong></td>
+                        <td>PUT</td>
+                        <td>/users/123</td>
+                        <td>200</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Delete</strong></td>
+                        <td>DELETE</td>
+                        <td>/users/123</td>
+                        <td>204</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">🔊 "PUT = update resource. .pathParam() = path parameter. Dùng khi cần truyền ID hoặc identifier ở URL. Ví dụ: PUT /users/{id} - chúng ta muốn update user với ID = 123. .pathParam(\"id\", 123) nói: 'Replace {id} with 123' Kết quả: PUT /users/123 DELETE = xóa resource. DELETE /users/123 = xóa user với ID 123. Status code 204 = No Content. Server xóa thành công, không return data. Test chỉ check status = 204, không check body (vì không có body). CRUD = Create, Read, Update, Delete - CREATE = POST /users (201) - READ = GET /users/123 (200) - UPDATE = PUT /users/123 (200) - DELETE = DELETE /users/123 (204) Đây là standard REST API pattern. Mỗi API phải follow này (hoặc similar)."</div>
+            </div>
+
+                <!-- SLIDE 8: AUTHENTICATION & HEADERS -->
+            <div class="slide">
+                <h2>🔐 Authentication & Request Headers</h2>
+
+                <h3>ví Dụ: Bearer Token Authentication</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testWithAuthentication</span>() {
+    String token = <span class="string">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</span>;
+    
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users/me"</span>)
+        .header(<span class="string">"Authorization"</span>, <span class="string">"Bearer "</span> + token)
+        .header(<span class="string">"Accept"</span>, <span class="string">"application/json"</span>)
+    
+    .<span class="method">when</span>()
+        .<span class="method">get</span>()
+    
+    .<span class="method">then</span>()
+        .statusCode(200)
+        .body(<span class="string">"id"</span>, notNullValue());
+}
+</div>
+
+                <h3>Better Approach: Get Token Từ Login</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testGetTokenAndUseIt</span>() {
+    <span class="comment">// STEP 1: Login - get token</span>
+    String token = <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/auth/login"</span>)
+        .body(Map.of(<span class="string">"email"</span>, <span class="string">"user@ex.com"</span>, <span class="string">"password"</span>, <span class="string">"pass"</span>))
+        .contentType(<span class="string">"application/json"</span>)
+    .<span class="method">when</span>()
+        .<span class="method">post</span>()
+    .<span class="method">then</span>()
+        .statusCode(200)
+    .<span class="method">extract</span>()
+        .path(<span class="string">"token"</span>);
+    
+    <span class="comment">// STEP 2: Use token to get user profile</span>
+    <span class="method">given</span>()
+        .baseUri(<span class="string">"https://api.example.com"</span>)
+        .basePath(<span class="string">"/users/me"</span>)
+        .header(<span class="string">"Authorization"</span>, <span class="string">"Bearer "</span> + token)
+    .<span class="method">when</span>()
+        .<span class="method">get</span>()
+    .<span class="method">then</span>()
+        .statusCode(200)
+        .body(<span class="string">"id"</span>, notNullValue());
+}
+</div>
+
+                <h3>Giải Thích: extract()</h3>
+                <div class="info-box">
+                    <p><strong>.extract()</strong> = extract dữ liệu từ response để dùng sau</p>
+                    <p><strong>.path("token")</strong> = extract field 'token' từ response body</p>
+                    <p>Token sau đó dùng để gửi request tiếp theo (authorization)</p>
+                </div>
+
+                <h3>Common HTTP Headers:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Header</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>Authorization</td>
+                        <td>Authentication token</td>
+                        <td>Bearer eyJhbGc...</td>
+                    </tr>
+                    <tr>
+                        <td>Content-Type</td>
+                        <td>Request body format</td>
+                        <td>application/json</td>
+                    </tr>
+                    <tr>
+                        <td>Accept</td>
+                        <td>Expected response format</td>
+                        <td>application/json</td>
+                    </tr>
+                    <tr>
+                        <td>X-API-Key</td>
+                        <td>API key for authentication</td>
+                        <td>abc123xyz</td>
+                    </tr>
+                    <tr>
+                        <td>User-Agent</td>
+                        <td>Client identifier</td>
+                        <td>RestAssured/5.4</td>
+                    </tr>
+                </table>
+
+                <div class="narration-box">🔊 "Authentication rất important. 90% real-world APIs cần authentication. Token = credential . Sau khi user login, server trả về token. Token này prove: 'This request is from authenticated user'. .header() method thêm HTTP header. .header(\"Authorization\", \"Bearer \" + token) nói: 'Hey server, this request is from authenticated user with this token' Approach 1 = hardcode token. Cách nhanh nhưng không real. Untuk production test phải get token từ login API. Approach 2 = login first, extract token, use token. Real-world approach. .extract() = extract dữ liệu từ response. .extract().path(\"token\") = từ response JSON, extract field 'token'. Ví dụ response: { \"token\": \"abc123\", \"userId\": 1 } .path(\"token\") sẽ extract \"abc123\" Stateful testing = test1 output = test2 input. STEP 1: Login API → get token STEP 2: Use token → call profile API Ini common pattern dalam automation - especially dalam workflow testing."</div>
+            </div>
+
+                <!-- SLIDE 9: RESPONSE EXTRACTION & ASSERTIONS -->
+            <div class="slide">
+                <h2>📊 Response Extraction & Complex Assertions</h2>
+
+                <h3>Ví Dụ: Extract Multiple Values từ Response</h3>
+                <div class="code-example"><span class="keyword">@Test</span>
+<span class="keyword">public void</span> <span class="method">testExtractResponseData</span>() {
+    <span class="comment">// Make request & extract multiple fields</span>
+    Response response = <span class="method">given</span>()
+        .baseUri(<span class="string">"https://jsonplaceholder.typicode.com"</span>)
+        .basePath(<span class="string">"/users"</span>)
+        .pathParam(<span class="string">"id"</span>, 1)
+    .<span class="method">when</span>()
+        .<span class="method">get</span>(<span class="string">"/{id}"</span>)
+    .<span class="method">then</span>()
+        .statusCode(200)
+    .<span class="method">extract</span>()
+        .response();
+    
+    <span class="comment">// Extract individual fields</span>
+    <span class="keyword">int</span> userId = response.path(<span class="string">"id"</span>);
+    String userName = response.path(<span class="string">"name"</span>);
+    String userEmail = response.path(<span class="string">"email"</span>);
+    String userPhone = response.path(<span class="string">"phone"</span>);
+    
+    <span class="comment">// Use extracted data in logic</span>
+    System.out.<span class="method">println</span>(<span class="string">"User: "</span> + userName + <span class="string">" - "</span> + userEmail);
+    Assert.<span class="method">assertTrue</span>(userEmail.contains(<span class="string">"@"</span>));
+}
+</div>
+
+                <h3>JSONPath Syntax Examples:</h3>
+                <div class="info-box">
+                    <p><strong>.path("name")</strong> → extract top-level field 'name'</p>
+                    <p><strong>.path("address.city")</strong> → nested object (address.city)</p>
+                    <p><strong>.path("items[0].id")</strong> → first item in array</p>
+                    <p><strong>.path("items.collect{it.id}")</strong> → extract all ids from array</p>
+                </div>
+
+                <h3>Response Object Methods:</h3>
+                <div class="code-example"><span class="comment">// Get response body as String</span>
+String body = response.<span class="method">getBody</span>().asString();
+
+<span class="comment">// Get response as JSON</span>
+JsonPath jsonBody = response.<span class="method">jsonPath</span>();
+<span class="keyword">int</span> id = jsonBody.<span class="method">getInt</span>(<span class="string">"id"</span>);
+
+<span class="comment">// Get specific header</span>
+String contentType = response.<span class="method">getHeader</span>(<span class="string">"Content-Type"</span>);
+
+<span class="comment">// Get all headers</span>
+Headers headers = response.<span class="method">getHeaders</span>();</div>
+
+                <h3>Advanced Assertions:</h3>
+                <div class="code-example"><span class="keyword">import</span> <span class="keyword">static</span> org.hamcrest.Matchers.*;
+
+<span class="method">given</span>()...
+.<span class="method">then</span>()
+    <span class="comment">// String assertions</span>
+    .body(<span class="string">"email"</span>, containsString(<span class="string">"@example.com"</span>))
+    .body(<span class="string">"email"</span>, matchesPattern(<span class="string">"^[\\w\\.-]+@example\\.com$"</span>))
+    
+    <span class="comment">// Collection assertions</span>
+    .body(<span class="string">"items"</span>, hasSize(5))
+    .body(<span class="string">"items.id"</span>, hasItems(1, 2, 3))
+    
+    <span class="comment">// Numeric assertions</span>
+    .body(<span class="string">"age"</span>, greaterThanOrEqualTo(18))
+    .body(<span class="string">"score"</span>, between(0, 100))
+    
+    <span class="comment">// Null/Empty assertions</span>
+    .body(<span class="string">"id"</span>, notNullValue())
+    .body(<span class="string">"errors"</span>, empty());
+</div>
+
+                <div class="narration-box">🔊 "Sekarang chúng ta talk about complex assertions - không chỉ check status code mà check response data carefully. .extract() = powerful. Sau response, chúng ta bisa extract individual fields và dùng dalam logic. Contoh: 1. POST create user → extract userId 2. Use userId → call GET /users/{id} 3. Verify user details Response object = response dari API. Kita bisa extract: - Body as String - Body as JSON (JsonPath) - Headers - Status code JSONPath adalah powerful. Think of it as 'XPath for JSON'. - \"name\" = top-level field - \"address.city\" = nested (address object → city field) - \"[0]\" = array index - \"items[0].id\" = first item → id field Hamcrest Matchers = library untuk complex assertions. - containsString() = substring match - hasSize() = array/list size - greaterThan() = numeric comparison - matchesPattern() = regex match Why use these? Because simple assertion tidak cukup. Kita perlu: - Verify email format (regex) - Check array memiliki exact items - Check number dalam range - Check data tidak null/empty Professional automation berarti detailed assertions, bukan hanya status code."</div>
+            </div>
+
+                <!-- SLIDE 10: PAGE OBJECT MODEL FOR APIS -->
+            <div class="slide">
+                <h2>🏗️ Page Object Model (POM) for APIs</h2>
+
+                <h3>Kenapa POM?</h3>
+                <div class="info-box">
+                    <p><strong>Problem:</strong> Test code menjadi messy jika semua API calls langsung di test class</p>
+                    <p><strong>Solution:</strong> Pisahkan API objects dari test logic</p>
+                </div>
+
+                <h3>STEP 1: Buat API Object Class</h3>
+                <div class="code-example"><span class="keyword">public class</span> <span class="method">UserAPI</span> {
+    <span class="keyword">private static final</span> String BASE_URL = <span class="string">"https://api.example.com"</span>;
+    <span class="keyword">private static final</span> String USER_ENDPOINT = <span class="string">"/users"</span>;
+    
+    <span class="keyword">private</span> RequestSpecification spec;
+    <span class="keyword">private</span> Response response;
+    
+    <span class="keyword">public</span> <span class="method">UserAPI</span>() {
+        <span class="keyword">this</span>.spec = given()
+            .baseUri(BASE_URL)
+            .basePath(USER_ENDPOINT)
+            .contentType(<span class="string">"application/json"</span>);
+    }
+    
+    <span class="comment">// Get all users</span>
+    <span class="keyword">public</span> UserAPI <span class="method">getAllUsers</span>() {
+        <span class="keyword">this</span>.response = spec.when().get();
+        <span class="keyword">return this</span>;
+    }
+    
+    <span class="comment">// Get user by ID</span>
+    <span class="keyword">public</span> UserAPI <span class="method">getUserById</span>(<span class="keyword">int</span> userId) {
+        <span class="keyword">this</span>.response = spec
+            .pathParam(<span class="string">"id"</span>, userId)
+            .when()
+            .get(<span class="string">"/{id}"</span>);
+        <span class="keyword">return this</span>;
+    }
+    
+    <span class="comment">// Create user</span>
+    <span class="keyword">public</span> UserAPI <span class="method">createUser</span>(Map&lt;String, Object&gt; userData) {
+        <span class="keyword">this</span>.response = spec
+            .body(userData)
+            .when()
+            .post();
+        <span class="keyword">return this</span>;
+    }
+    
+    <span class="comment">// Assertions</span>
+    <span class="keyword">public</span> UserAPI <span class="method">statusCodeShouldBe</span>(<span class="keyword">int</span> expectedCode) {
+        response.then().statusCode(expectedCode);
+        <span class="keyword">return this</span>;
+    }
+    
+    <span class="keyword">public</span> UserAPI <span class="method">nameEqualsTo</span>(String expectedName) {
+        response.then().body(<span class="string">"name"</span>, equalTo(expectedName));
+        <span class="keyword">return this</span>;
+    }
+    
+    <span class="comment">// Get response data</span>
+    <span class="keyword">public</span> <span class="keyword">int</span> <span class="method">getUserId</span>() {
+        <span class="keyword">return</span> response.path(<span class="string">"id"</span>);
+    }
+}
+</div>
+
+                <h3>STEP 2: Clean Test Class dengan POM</h3>
+                <div class="code-example"><span class="keyword">public class</span> <span class="method">UserAPITest</span> {
+    
+    <span class="keyword">private</span> UserAPI userAPI;
+    
+    @BeforeMethod
+    <span class="keyword">public void</span> <span class="method">setup</span>() {
+        userAPI = <span class="keyword">new</span> UserAPI();
+    }
+    
+    @Test
+    <span class="keyword">public void</span> <span class="method">testGetAllUsers</span>() {
+        userAPI.getAllUsers()
+            .statusCodeShouldBe(200);
+    }
+    
+    @Test
+    <span class="keyword">public void</span> <span class="method">testCreateAndGetUser</span>() {
+        <span class="comment">// Create user</span>
+        userAPI.createUser(Map.of(
+            <span class="string">"name"</span>, <span class="string">"John"</span>,
+            <span class="string">"email"</span>, <span class="string">"john@ex.com"</span>
+        ))
+        .statusCodeShouldBe(201);
+        
+        <span class="comment">// Get created user ID</span>
+        <span class="keyword">int</span> userId = userAPI.getUserId();
+        
+        <span class="comment">// Get user details</span>
+        userAPI.getUserById(userId)
+            .statusCodeShouldBe(200)
+            .nameEqualsTo(<span class="string">"John"</span>);
+    }
+}
+</div>
+
+                <h3>Benefits:</h3>
+                <div class="success-box">
+                    <p>✅ <strong>Readability:</strong> Test methods jadi sangat clean dan readable</p>
+                    <p>✅ <strong>Reusability:</strong> Banyak tests bisa reuse API methods</p>
+                    <p>✅ <strong>Maintainability:</strong> API change? Update UserAPI class sahaja, tests tetap sama</p>
+                    <p>✅ <strong>Scalability:</strong> Mudah add endpoint baru</p>
+                </div>
+
+                <div class="narration-box">🔊 "POM = Page Object Model - sebenarnya adalah pattern untuk separate concerns. Problem tanpa POM: Setiap test class full dengan given-when-then code. API call logic tersebar di test. Jika API change (URL, headers, params), harus update semua tests. Maintenance nightmare. Solution dengan POM: Buat API object class (UserAPI, ProductAPI). Semua API calls ada di class ini. Test class hanya call methods dari API object. Clean, readable, maintainable. UserAPI class: - Define base URL &amp; endpoints - Create RequestSpecification (reusable setup) - Methods untuk operations: getAllUsers(), getUserById(), createUser() - Methods untuk assertions: statusCodeShouldBe(), nameEqualsTo() - Methods untuk extract: getUserId() Fluent interface pattern: Setiap method return 'this', jadi bisa chain methods. .createUser(...).statusCodeShouldBe(201).nameEqualsTo(\"John\") Test class dengan POM: Sangat clean! Tidak ada given-when-then detail, hanya business logic. Advantage: - API URL change? Update UserAPI, tests automatic ok - Add new header? Update spec di UserAPI - New endpoint? Add method ke UserAPI - Tests don't care - mereka hanya call methods Ini adalah professional automation pattern. Besar projects semua use ini."</div>
+            </div>
+
+                <!-- SLIDE 11: TESTNG FRAMEWORK -->
+            <div class="slide">
+                <h2>🧪 TestNG Framework Basics</h2>
+
+                <h3>TestNG vs JUnit</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Feature</th>
+                        <th>JUnit</th>
+                        <th>TestNG</th>
+                    </tr>
+                    <tr>
+                        <td>Setup/Teardown</td>
+                        <td>@Before/@After</td>
+                        <td>@BeforeMethod/@AfterMethod</td>
+                    </tr>
+                    <tr>
+                        <td>Class-level setup</td>
+                        <td>@BeforeClass/@AfterClass</td>
+                        <td>@BeforeClass/@AfterClass</td>
+                    </tr>
+                    <tr>
+                        <td>Data-driven tests</td>
+                        <td>Parameterized (kompleks)</td>
+                        <td>@DataProvider (simple)</td>
+                    </tr>
+                    <tr>
+                        <td>Test groups</td>
+                        <td>❌ No</td>
+                        <td>✅ @Test(groups={"smoke"})</td>
+                    </tr>
+                    <tr>
+                        <td>Priority</td>
+                        <td>❌ No</td>
+                        <td>✅ @Test(priority=1)</td>
+                    </tr>
+                    <tr>
+                        <td>Soft Assertions</td>
+                        <td>❌ No</td>
+                        <td>✅ SoftAssert</td>
+                    </tr>
+                    <tr>
+                        <td>Parallel execution</td>
+                        <td>❌ Kompleks</td>
+                        <td>✅ Simple (XML config)</td>
+                    </tr>
+                </table>
+
+                <h3>TestNG Annotations:</h3>
+                <div class="code-example"><span class="keyword">public class</span> <span class="method">UserAPITest</span> {
+    
+    <span class="comment">// Run ONCE before ALL tests in class</span>
+    @BeforeClass
+    <span class="keyword">public void</span> <span class="method">setupClass</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Setup class - run ONCE"</span>);
+    }
+    
+    <span class="comment">// Run BEFORE EACH test</span>
+    @BeforeMethod
+    <span class="keyword">public void</span> <span class="method">setupMethod</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Setup method - run before each test"</span>);
+    }
+    
+    <span class="comment">// ACTUAL TEST</span>
+    @Test(priority=1, groups={"smoke"})
+    <span class="keyword">public void</span> <span class="method">testGetAllUsers</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Test get all users"</span>);
+    }
+    
+    @Test(priority=2)
+    <span class="keyword">public void</span> <span class="method">testCreateUser</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Test create user"</span>);
+    }
+    
+    <span class="comment">// Run AFTER EACH test</span>
+    @AfterMethod
+    <span class="keyword">public void</span> <span class="method">teardownMethod</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Teardown method - cleanup"</span>);
+    }
+    
+    <span class="comment">// Run ONCE after ALL tests</span>
+    @AfterClass
+    <span class="keyword">public void</span> <span class="method">teardownClass</span>() {
+        System.out.<span class="method">println</span>(<span class="string">"Teardown class"</span>);
+    }
+}
+</div>
+
+                <h3>Execution Order:</h3>
+                <div class="diagram">@BeforeClass → run ONCE
+  ↓
+@BeforeMethod → run before test1
+Test1
+@AfterMethod → run after test1
+  ↓
+@BeforeMethod → run before test2
+Test2
+@AfterMethod → run after test2
+  ↓
+@AfterClass → run ONCE
+</div>
+
+                <h3>Hard Assert vs Soft Assert:</h3>
+                <div class="code-example"><span class="comment">// HARD ASSERT - fail immediately</span>
+@Test
+<span class="keyword">public void</span> <span class="method">testWithHardAssert</span>() {
+    Assert.<span class="method">assertEquals</span>(actual, expected);  <span class="comment">// Fail? Stop here</span>
+    Assert.<span class="method">assertTrue</span>(condition);         <span class="comment">// Won't run if above fails</span>
+}
+
+<span class="comment">// SOFT ASSERT - collect all failures</span>
+@Test
+<span class="keyword">public void</span> <span class="method">testWithSoftAssert</span>() {
+    SoftAssert softAssert = <span class="keyword">new</span> SoftAssert();
+    softAssert.<span class="method">assertEquals</span>(actual1, expected1);
+    softAssert.<span class="method">assertEquals</span>(actual2, expected2);
+    softAssert.<span class="method">assertTrue</span>(condition);
+    softAssert.<span class="method">assertAll</span>();  <span class="comment">// Fail at end if any failed</span>
+}
+</div>
+
+                <div class="narration-box">🔊 "TestNG adalah test framework untuk Java. Seperti JUnit, tapi lebih powerful. @BeforeClass = setup satu kali sebelum semua tests di class. Contoh: setup database, read configuration @BeforeMethod = setup sebelum SETIAP test. Contoh: reset data, login user @Test = actual test case. Ini yang dijalankan oleh TestNG. Priority = order of execution. priority=1 run dulu, priority=2 kemudian. Groups = kategorisasi tests. @Test(groups={\"smoke\"}) = test ini bagian dari 'smoke' group Mengapa? Jadi kita bisa run subset of tests. mvn test -Dgroups=smoke = run hanya smoke tests (2 menit) mvn test -Dgroups=regression = run semua tests (30 menit) Hard Assert = fail immediately. Test stop. Next assertion tidak run. Soft Assert = collect semua failures, report at end. Better untuk detailed bug reports. Contoh: POST create user dengan missing fields. Hard assert: fail di field 1 check, tidak check field 2-5 Soft assert: check semua fields, report semua failures @AfterMethod&lt;/strong = cleanup setelah SETIAP test. Contoh: delete created data, logout user Ini very important untuk test isolation - setiap test independent, tidak affect test lain."</div>
+            </div>
+
+                <!-- SLIDE 12: DATA-DRIVEN TESTING -->
+            <div class="slide">
+                <h2>📊 Data-Driven Testing dengan @DataProvider</h2>
+
+                <h3>Apa itu Data-Driven Testing?</h3>
+                <div class="info-box">
+                    <p>Satu test method, banyak data sets. Contoh: testCreateUser dengan 10 user data - run 10 kali dengan data berbeda.</p>
+                    <p><strong>Benefit:</strong> Reduce code duplication, test banyak scenarios dengan satu method</p>
+                </div>
+
+                <h3>Ví Dụ 1: Simple @DataProvider</h3>
+                <div class="code-example"><span class="keyword">public class</span> <span class="method">UserAPITest</span> {
+    
+    <span class="comment">// Data provider - return test data</span>
+    @DataProvider(<span class="string">name="userDataProvider"</span>)
+    <span class="keyword">public</span> Object[][] <span class="method">provideUserData</span>() {
+        <span class="keyword">return new</span> Object[][] {
+            { <span class="string">"John Doe"</span>, <span class="string">"john@ex.com"</span> },
+            { <span class="string">"Jane Smith"</span>, <span class="string">"jane@ex.com"</span> },
+            { <span class="string">"Bob Wilson"</span>, <span class="string">"bob@ex.com"</span> },
+            { <span class="string">"Alice Brown"</span>, <span class="string">"alice@ex.com"</span> }
+        };
+    }
+    
+    <span class="comment">// Test with data provider</span>
+    @Test(dataProvider=<span class="string">"userDataProvider"</span>)
+    <span class="keyword">public void</span> <span class="method">testCreateUserMultipleScenarios</span>(
+        String name, String email) {
+        
+        Map&lt;String, Object&gt; userData = Map.of(
+            <span class="string">"name"</span>, name,
+            <span class="string">"email"</span>, email
+        );
+        
+        userAPI.createUser(userData)
+            .statusCodeShouldBe(201)
+            .nameEqualsTo(name);
+    }
+}
+</div>
+
+                <h3>Result: 4 Tests Run dengan Satu Method</h3>
+                <div class="code-example">[TestNG] Running:
+  Test 1: testCreateUserMultipleScenarios(John Doe, john@ex.com) ✅
+  Test 2: testCreateUserMultipleScenarios(Jane Smith, jane@ex.com) ✅
+  Test 3: testCreateUserMultipleScenarios(Bob Wilson, bob@ex.com) ✅
+  Test 4: testCreateUserMultipleScenarios(Alice Brown, alice@ex.com) ✅
+
+Tests run: 4, Failures: 0 ✅
+</div>
+
+                <h3>Ví Dụ 2: Complex Data Objects</h3>
+                <div class="code-example"><span class="comment">// Custom data class</span>
+<span class="keyword">class</span> <span class="method">UserTestData</span> {
+    <span class="keyword">public</span> String name, email, phone, role;
+    <span class="keyword">public int</span> expectedStatusCode;
+    
+    <span class="keyword">public</span> <span class="method">UserTestData</span>(String name, String email, String phone, 
+                           String role, <span class="keyword">int</span> expectedStatusCode) {
+        <span class="keyword">this</span>.name = name;
+        <span class="keyword">this</span>.email = email;
+        <span class="keyword">this</span>.phone = phone;
+        <span class="keyword">this</span>.role = role;
+        <span class="keyword">this</span>.expectedStatusCode = expectedStatusCode;
+    }
+}
+
+<span class="comment">// Data provider with objects</span>
+@DataProvider
+<span class="keyword">public</span> Object[][] <span class="method">provideComplexUserData</span>() {
+    <span class="keyword">return new</span> Object[][] {
+        { <span class="keyword">new</span> UserTestData(<span class="string">"John"</span>, <span class="string">"john@ex.com"</span>, <span class="string">"123456"</span>, <span class="string">"user"</span>, 201) },
+        { <span class="keyword">new</span> UserTestData(<span class="string">"Jane"</span>, <span class="string">"invalid-email"</span>, <span class="string">"123456"</span>, <span class="string">"user"</span>, 400) },
+        { <span class="keyword">new</span> UserTestData(<span class="string">"Bob"</span>, <span class="string">"bob@ex.com"</span>, <span class="string">"123456"</span>, <span class="string">"admin"</span>, 201) }
+    };
+}
+
+@Test(dataProvider=<span class="string">"provideComplexUserData"</span>)
+<span class="keyword">public void</span> <span class="method">testWithComplexData</span>(UserTestData testData) {
+    Map&lt;String, Object&gt; userData = Map.of(
+        <span class="string">"name"</span>, testData.name,
+        <span class="string">"email"</span>, testData.email,
+        <span class="string">"phone"</span>, testData.phone,
+        <span class="string">"role"</span>, testData.role
+    );
+    
+    userAPI.createUser(userData)
+        .statusCodeShouldBe(testData.expectedStatusCode);
+}
+</div>
+
+                <div class="narration-box">🔊 "Data-driven testing = parameterized testing. Satu method, banyak data. @DataProvider = return test data. Method ini return 2D array Object[][]. Setiap row = satu test case. Contoh: return new Object[][] { { \"John\", \"john@ex.com\" }, ← Test case 1 { \"Jane\", \"jane@ex.com\" } ← Test case 2 } TestNG akan run testCreateUserMultipleScenarios 2 kali: 1st run dengan (\"John\", \"john@ex.com\") 2nd run dengan (\"Jane\", \"jane@ex.com\") Benefit: 1. Reduce code duplication - tidak perlu 4 methods, 1 method with 4 data sets 2. Easy to add more data - edit DataProvider array 3. Clear test intent - \"test create user with these 4 scenarios\" Complex data: Jika data complex (multiple fields, conditions), buat custom class (UserTestData). Return objects dari DataProvider. Real-world example: Test login dengan 5 invalid passwords, 10 valid emails, 20 password edge cases. Bukan 20 methods - 20 data rows, 1 method! Ini powerful untuk boundary testing, edge cases, negative testing. We'll use this extensively later."</div>
+            </div>
+
+                <!-- SLIDE 13: BASETEST CLASS & CONFIGURATION -->
+            <div class="slide">
+                <h2>🔧 BaseTest Class & Configuration Management</h2>
+
+                <h3>Why BaseTest?</h3>
+                <div class="info-box">
+                    <p>Setiap test class punya setup/teardown yang sama - initialization, cleanup, etc.</p>
+                    <p>Daripada repeat code, buat <span class="keyword-highlight">BaseTest</span> - parent class dengan shared logic.</p>
+                </div>
+
+                <h3>BaseTest Class Implementation:</h3>
+                <div class="code-example"><span class="keyword">public class</span> <span class="method">BaseTest</span> {
+    
+    <span class="keyword">protected</span> UserAPI userAPI;
+    <span class="keyword">protected</span> ProductAPI productAPI;
+    <span class="keyword">protected</span> OrderAPI orderAPI;
+    
+    <span class="keyword">protected</span> String authToken;
+    <span class="keyword">protected</span> <span class="keyword">int</span> testUserId;
+    
+    <span class="comment">// Load configuration from properties file</span>
+    <span class="keyword">protected</span> <span class="keyword">static</span> String BASE_URL;
+    <span class="keyword">protected</span> <span class="keyword">static</span> String API_KEY;
+    <span class="keyword">protected</span> <span class="keyword">static</span> String TEST_EMAIL;
+    <span class="keyword">protected</span> <span class="keyword">static</span> String TEST_PASSWORD;
+    
+    @BeforeClass
+    <span class="keyword">public static void</span> <span class="method">loadConfig</span>() {
+        Properties props = <span class="keyword">new</span> Properties();
+        <span class="keyword">try</span> {
+            props.<span class="method">load</span>(<span class="keyword">new</span> FileInputStream(
+                <span class="string">"src/test/resources/config.properties"</span>));
+        } <span class="keyword">catch</span> (IOException e) {
+            e.<span class="method">printStackTrace</span>();
+        }
+        
+        BASE_URL = props.<span class="method">getProperty</span>(<span class="string">"base.url"</span>);
+        API_KEY = props.<span class="method">getProperty</span>(<span class="string">"api.key"</span>);
+        TEST_EMAIL = props.<span class="method">getProperty</span>(<span class="string">"test.email"</span>);
+        TEST_PASSWORD = props.<span class="method">getProperty</span>(<span class="string">"test.password"</span>);
+    }
+    
+    @BeforeMethod
+    <span class="keyword">public void</span> <span class="method">setUp</span>() {
+        <span class="comment">// Initialize API objects</span>
+        userAPI = <span class="keyword">new</span> UserAPI(BASE_URL, API_KEY);
+        productAPI = <span class="keyword">new</span> ProductAPI(BASE_URL, API_KEY);
+        orderAPI = <span class="keyword">new</span> OrderAPI(BASE_URL, API_KEY);
+        
+        <span class="comment">// Login & get token</span>
+        authToken = userAPI.login(TEST_EMAIL, TEST_PASSWORD);
+    }
+    
+    @AfterMethod
+    <span class="keyword">public void</span> <span class="method">tearDown</span>() {
+        <span class="comment">// Cleanup after test</span>
+        <span class="keyword">if</span> (testUserId > 0) {
+            userAPI.deleteUser(testUserId);
+        }
+    }
+}
+</div>
+
+                <h3>Test Class Extending BaseTest:</h3>
+                <div class="code-example"><span class="keyword">public class</span> <span class="method">UserAPITest extends</span> <span class="method">BaseTest</span> {
+    
+    @Test
+    <span class="keyword">public void</span> <span class="method">testGetAllUsers</span>() {
+        <span class="comment">// userAPI, authToken sudah available dari BaseTest</span>
+        userAPI.getAllUsers()
+            .statusCodeShouldBe(200);
+    }
+    
+    @Test
+    <span class="keyword">public void</span> <span class="method">testCreateUser</span>() {
+        <span class="comment">// No setup needed, BaseTest setup sudah run</span>
+        userAPI.createUser(Map.of(
+            <span class="string">"name"</span>, <span class="string">"Test User"</span>,
+            <span class="string">"email"</span>, <span class="string">"test@ex.com"</span>
+        ))
+        .statusCodeShouldBe(201);
+    }
+}
+</div>
+
+                <h3>Configuration File (config.properties):</h3>
+                <div class="code-example"><span class="comment"># Base URL</span>
+base.url=https://api.example.com
+
+<span class="comment"># API credentials</span>
+api.key=sk_test_abc123xyz
+
+<span class="comment"># Test data</span>
+test.email=qa@example.com
+test.password=SecurePass@123
+
+<span class="comment"># Timeout (ms)</span>
+request.timeout=10000
+response.timeout=10000
+
+<span class="comment"># Logging</span>
+log.level=INFO
+log.file=logs/test.log
+</div>
+
+                <h3>Benefits:</h3>
+                <div class="success-box">
+                    <p>✅ <strong>DRY (Don't Repeat Yourself):</strong> Setup code shared across all test classes</p>
+                    <p>✅ <strong>Configuration:</strong> URL, credentials centralized - easy to switch dev/staging/prod</p>
+                    <p>✅ <strong>Maintenance:</strong> Change setup logic once, all tests benefit</p>
+                    <p>✅ <strong>Reusability:</strong> New test class just extends BaseTest</p>
+                </div>
+
+                <div class="narration-box">🔊 "BaseTest adalah pattern untuk share common logic across test classes. Imagine 10 test classes. Setiap kelas punya: - Initialize API objects - Load configuration - Login user - Cleanup Repeat code 10 kali? No! Buat BaseTest, extend dari situ. BaseTest punya: 1. Protected API objects (userAPI, productAPI, orderAPI) 2. Configuration loading (BASE_URL, API_KEY) 3. Setup logic (@BeforeMethod) 4. Teardown logic (@AfterMethod) Test classes extend BaseTest, inherit semua ini. Configuration file (properties): External, tidak hardcode. base.url=https://api.example.com Ngapa? Soalnya environment berbeda (dev, staging, prod) punya URL berbeda. Development: https://api.dev.example.com Staging: https://api.staging.example.com Production: https://api.example.com Jadi, same test code, change properties file = test against different environment. Test isolation: Setiap test @BeforeMethod run, @AfterMethod cleanup. Contoh: Test create user, teardown delete user. Next test start dengan clean state. Professional automation semua use ini pattern. If you master ini, banyak project siap accept you."</div>
+            </div>
+
+                <!-- SLIDE 14: PRACTICAL EXERCISE & SUMMARY -->
+            <div class="slide">
+                <h2>✏️ Practical Exercise: Build Real Automation</h2>
+
+                <h3>Exercise: Test JSONPlaceholder API (Free Public API)</h3>
+                <div class="info-box">
+                    <p><strong>API URL:</strong> https://jsonplaceholder.typicode.com</p>
+                    <p><strong>Endpoints:</strong> /posts, /comments, /users, /todos</p>
+                    <p><strong>No authentication needed (perfect untuk learning)</strong></p>
+                </div>
+
+                <h3>Task 1: Test GET /posts</h3>
+                <div class="code-example"><span class="comment">// Write test:</span>
+<span class="comment">// GET /posts</span>
+<span class="comment">// Verify: status 200, response has posts, first post has id</span>
+
+@Test
+<span class="keyword">public void</span> <span class="method">testGetAllPosts</span>() {
+    <span class="comment">// TODO: Write test</span>
+}</div>
+
+                <h3>Task 2: Test POST /posts</h3>
+                <div class="code-example"><span class="comment">// Write test:</span>
+<span class="comment">// POST /posts with body {title, body, userId}</span>
+<span class="comment">// Verify: status 201, response has id, title matches</span>
+
+@Test
+<span class="keyword">public void</span> <span class="method">testCreatePost</span>() {
+    <span class="comment">// TODO: Write test</span>
+}</div>
+
+                <h3>Task 3: Test GET /posts/{id}</h3>
+                <div class="code-example"><span class="comment">// Write test:</span>
+<span class="comment">// GET /posts/1</span>
+<span class="comment">// Verify: status 200, post title contains "qui"</span>
+
+@Test
+<span class="keyword">public void</span> <span class="method">testGetPostById</span>() {
+    <span class="comment">// TODO: Write test</span>
+}</div>
+
+                <h3>Solution Hints:</h3>
+                <div class="warning-box">
+                    <p>1️⃣ Use given-when-then pattern</p>
+                    <p>2️⃣ Check status codes (200, 201, 404)</p>
+                    <p>3️⃣ Use JSONPath to extract/verify fields</p>
+                    <p>4️⃣ Use matchers (equalTo, containsString, notNullValue)</p>
+                    <p>5️⃣ Create PostAPI object class (POM)</p>
+                    <p>6️⃣ Extend BaseTest if needed</p>
+                </div>
+
+                <div class="narration-box">🔊 "Alright, sekarang practice time. Ini adalah real-world exercise. JSONPlaceholder adalah free public API - perfect untuk learning tanpa setup database atau backend. Task 1: GET all posts, verify response status &amp; data Task 2: POST create post, verify status 201 &amp; response data Task 3: GET specific post by ID, verify title Expectations: 1. Use RestAssured syntax (given-when-then) 2. Create PostAPI object class (Page Object Model) 3. Use TestNG framework (@Test, assertions) 4. Use matchers untuk assertions 5. Extract response data jika diperlukan Time: 30 minutes untuk complete semua 3 tasks. Di rumah: Jangan hanya copy-paste solution! Code sendiri. Debug errors. Try different matchers. Experiment dengan response. Paham? Next buah kami akan discuss solution, common mistakes, best practices."</div>
+            </div>
+
+                <!-- SLIDE 15: SUMMARY & KEY TAKEAWAYS -->
+            <div class="slide">
+                <h2>🎓 Summary & Key Takeaways</h2>
+
+                <h3>Apa yang kita learned dalam 2 buah:</h3>
+                <div class="learning-objectives">
+                    <h4>Concept & Theory:</h4>
+                    <ul>
+                        <li>Tại sao RestAssured? Scalability, maintainability, CI/CD</li>
+                        <li>REST API basics & HTTP methods (GET, POST, PUT, DELETE)</li>
+                        <li>HTTP status codes & request/response structure</li>
+                        <li>Authentication & headers</li>
+                    </ul>
+                </div>
+
+                <div class="learning-objectives">
+                    <h4>Practical Implementation:</h4>
+                    <ul>
+                        <li>Maven setup & dependency management</li>
+                        <li>RestAssured syntax (given-when-then pattern)</li>
+                        <li>Response assertions & JSONPath</li>
+                        <li>Page Object Model for APIs</li>
+                        <li>TestNG framework & annotations</li>
+                        <li>Data-driven testing (@DataProvider)</li>
+                        <li>BaseTest & configuration management</li>
+                    </ul>
+                </div>
+
+                <h3>Must-Remember Points:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Concept</th>
+                        <th>Remember</th>
+                    </tr>
+                    <tr>
+                        <td><strong>given-when-then</strong></td>
+                        <td>Pattern untuk readable tests - setup, execute, verify</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Status Codes</strong></td>
+                        <td>201=created, 400=bad request, 401=auth, 403=forbidden, 404=not found</td>
+                    </tr>
+                    <tr>
+                        <td><strong>JSONPath</strong></td>
+                        <td>Extract/verify JSON: "field", "object.field", "[0].field"</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Page Object Model</strong></td>
+                        <td>Separate API calls from test logic - maintainable code</td>
+                    </tr>
+                    <tr>
+                        <td><strong>@DataProvider</strong></td>
+                        <td>One method, many data sets - reduce duplication</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BaseTest</strong></td>
+                        <td>Share setup/teardown logic - DRY principle</td>
+                    </tr>
+                </table>
+
+                <h3>Next Steps:</h3>
+                <div class="success-box">
+                    <p>✅ Practice exercises với JSONPlaceholder API</p>
+                    <p>✅ Build PostAPI, ProductAPI, UserAPI objects</p>
+                    <p>✅ Write 20+ test cases dengan different scenarios</p>
+                    <p>✅ Implement BaseTest & configuration</p>
+                    <p>✅ Use @DataProvider untuk test multiple data sets</p>
+                </div>
+
+                <h3>Interview Prep - Key Statements:</h3>
+                <div class="info-box">
+                    <p>💡 "I use RestAssured for API automation because it's scalable, integrates with CI/CD, and follows code versioning."</p>
+                    <p>💡 "I implement Page Object Model to separate API calls from test logic - makes code maintainable."</p>
+                    <p>💡 "I use @DataProvider for data-driven testing - one method, multiple scenarios."</p>
+                    <p>💡 "I create BaseTest class for shared setup - follows DRY principle."</p>
+                </div>
+
+                <div class="narration-box">🔊 "Alright, let me recap apa yang kita belajar dalam 2 buah ini. Dari 0 sampai 100: - Tahu kenapa perlu automation (scalability) - Setup Maven project dari scratch - Understand given-when-then pattern - Write GET, POST, PUT, DELETE tests - Handle authentication &amp; headers - Extract &amp; validate response data - Implement Page Object Model - Master TestNG framework - Data-driven testing - Configuration management Key points untuk ingatkan: 1. given-when-then = setup, execute, verify 2. Status codes mattering (201=created, 400=error) 3. JSONPath untuk extract JSON data 4. Page Object Model = professional code 5. BaseTest = share logic, reduce duplication Untuk interview: Jangan bilang 'I write tests'. Bilang 'I design automation frameworks, implement POM, follow best practices'. Homework: Practice 3 exercises. Build PostAPI. Write 20+ tests. Review notes. Buah depan kami akan discuss advanced scenarios - error handling, edge cases, performance testing, CI/CD integration. Sekarang, any questions?"</div>
+            </div>
+
+                <!-- SLIDE 16: FINAL RESOURCES & NEXT STEPS -->
+            <div class="slide">
+                <h2>📚 Resources & Next Steps</h2>
+
+                <h3>Reference Documentation:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Resource</th>
+                        <th>Link</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td>RestAssured Docs</td>
+                        <td>rest-assured.io</td>
+                        <td>Official documentation</td>
+                    </tr>
+                    <tr>
+                        <td>TestNG Docs</td>
+                        <td>testng.org</td>
+                        <td>TestNG framework guide</td>
+                    </tr>
+                    <tr>
+                        <td>JSONPlaceholder</td>
+                        <td>jsonplaceholder.typicode.com</td>
+                        <td>Free API for practice</td>
+                    </tr>
+                    <tr>
+                        <td>REST API Best Practices</td>
+                        <td>restfulapi.net</td>
+                        <td>REST design principles</td>
+                    </tr>
+                </table>
+
+                <h3>Recommended Practice Tools:</h3>
+                <table class="comparison-table">
+                    <tr>
+                        <th>Tool</th>
+                        <th>Purpose</th>
+                        <th>Free?</th>
+                    </tr>
+                    <tr>
+                        <td>Postman</td>
+                        <td>API exploration & manual testing</td>
+                        <td>✅ Yes (free version)</td>
+                    </tr>
+                    <tr>
+                        <td>VS Code + REST Client</td>
+                        <td>Lightweight API testing</td>
+                        <td>✅ Free</td>
+                    </tr>
+                    <tr>
+                        <td>IntelliJ IDEA</td>
+                        <td>Java IDE (best for automation)</td>
+                        <td>❌ Paid (free community)</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub</td>
+                        <td>Version control & collaboration</td>
+                        <td>✅ Free</td>
+                    </tr>
+                </table>
+
+                <h3>Tuần 7-8 (Advanced Topics):</h3>
+                <div class="success-box">
+                    <p>✅ Error handling & edge cases (boundary testing)</p>
+                    <p>✅ Performance testing (load, stress)</p>
+                    <p>✅ Security testing automation</p>
+                    <p>✅ Mocking & stubbing (WireMock)</p>
+                    <p>✅ Contract testing (Pact)</p>
+                    <p>✅ Complex workflow testing</p>
+                    <p>✅ Jenkins CI/CD integration</p>
+                    <p>✅ Allure & Extent Reports</p>
+                </p>
+                </div>
+
+                <h3>Assignments (Due Next Week):</h3>
+                <div class="warning-box">
+                    <p>📋 Implement PostAPI class (Page Object Model)</p>
+                    <p>📋 Write 10 test cases (GET, POST, GET by ID, PUT, DELETE)</p>
+                    <p>📋 Use @DataProvider untuk test 5 different data sets</p>
+                    <p>📋 Create BaseTest class with setup/teardown</p>
+                    <p>📋 Document test cases & expected results</p>
+                    <p>📋 Run tests & generate TestNG report</p>
+                </div>
+
+                <div class="narration-box">🔊 "Alright, I know ini intense. A lot of information dalam 2 buah. But you'll be fine. Resources yang saya kasih - gunakan. RestAssured docs adalah bible untuk API testing. JSONPlaceholder adalah free API yang bagus untuk practice. Tidak perlu setup database, authentication complex. Just use it. Tuần depan kami akan advanced - error handling, edge cases, performance. But foundation ini is critical. Master ini dulu. Assignments saya give - do them. Jangan copy-paste dari internet. Code yourself, debug, understand. That's how you learn. Questions? Ask now or in next session. I'm here untuk help. Until next week - code hard, debug harder, and remember: automation is not about writing tests, it's about building frameworks. See you!"</div>
+            </div>
+
+            </div>
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Trước</button>
+                    <button class="btn-primary" id="nextBtn">Tiếp ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Đặt lại</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 16</div>
+                </div>
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress"></div>
+                </div>
+                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. GIỚI THIỆU & MỤC TIÊU</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. TẠI SAO CẦN RESTASSURED?</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. SETUP RESTASSURED PROJECT</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. RESTASSURED BASIC SYNTAX - PART 1</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. RESTASSURED BASIC SYNTAX - PART 2</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. POST REQUEST</a></li>
+                        <li><a href="#" onclick="return goToSlide(6)">6. PUT & DELETE</a></li>
+                        <li><a href="#" onclick="return goToSlide(7)">7. AUTHENTICATION & HEADERS</a></li>
+                        <li><a href="#" onclick="return goToSlide(8)">8. RESPONSE EXTRACTION & ASSERTIONS</a></li>
+                        <li><a href="#" onclick="return goToSlide(9)">9. PAGE OBJECT MODEL FOR APIS</a></li>
+                        <li><a href="#" onclick="return goToSlide(10)">10. TESTNG FRAMEWORK</a></li>
+                        <li><a href="#" onclick="return goToSlide(11)">11. DATA-DRIVEN TESTING</a></li>
+                        <li><a href="#" onclick="return goToSlide(12)">12. BASETEST CLASS & CONFIGURATION</a></li>
+                        <li><a href="#" onclick="return goToSlide(13)">13. PRACTICAL EXERCISE & SUMMARY</a></li>
+                        <li><a href="#" onclick="return goToSlide(14)">14. SUMMARY & KEY TAKEAWAYS</a></li>
+                        <li><a href="#" onclick="return goToSlide(15)">15. FINAL RESOURCES & NEXT STEPS</a></li>
+                    </ul>
+                </div>
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~4 giờ<br>
+                        📚 API Testing · Tuần 5-6<br>
+                        🤖 Automation
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>© 2025 Automation Testing & Java Core | API Testing — RestAssured | Tất cả quyền được bảo lưu</p>
+        </div>
+    </div>
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js?v=4"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.toggle('active', index === currentSlide);
+            });
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+        function nextSlide() { if (currentSlide < totalSlides - 1) { currentSlide++; updateSlide(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateSlide(); } }
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) { currentSlide = index; updateSlide(); }
+            return false;
+        }
+        function speak() {
+            if (!slides[currentSlide].querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+        function reset() { currentSlide = 0; updateSlide(); }
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+        updateSlide();
+    </script>
+</body>
+</html>

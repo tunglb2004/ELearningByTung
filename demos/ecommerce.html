@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Cửa hàng</title>
+    <link rel="stylesheet" href="demo-base.css">
+    <style>
+        .shop-head { display: flex; gap: 8px; margin-bottom: 12px; }
+        .shop-head input { flex: 1; min-width: 0; padding: 9px 11px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        .shop-head button { padding: 9px 14px; background: #1e293b; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .cart { font-size: 0.8rem; color: #64748b; margin-bottom: 10px; }
+        .products { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .product { padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; cursor: pointer; background: #f8fafc; text-align: left; }
+        .product:hover { border-color: #3b82f6; background: #eff6ff; }
+        .product h3 { font-size: 0.85rem; margin-bottom: 4px; }
+        .product .price { font-size: 0.8rem; color: #059669; font-weight: 700; }
+        #detail { display: none; }
+        #detail.show { display: block; }
+        .qty-row { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+        #qty { width: 56px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; }
+        #add-cart { flex: 1; padding: 9px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        #product-name { font-weight: 700; color: #1e3c72; margin-bottom: 4px; }
+    </style>
+</head>
+<body>
+    <div class="demo-shell">
+        <div class="demo-card">
+            <h1>Cửa hàng trực tuyến</h1>
+            <p class="lead">Tìm sản phẩm → chọn → đặt số lượng → thêm giỏ.</p>
+            <div class="shop-head">
+                <input type="text" id="search" placeholder="Laptop">
+                <button type="button" id="search-btn">Tìm</button>
+            </div>
+            <p class="cart">Giỏ hàng: <strong id="cart-count">0</strong> sản phẩm</p>
+            <div id="list-view">
+                <div class="products" id="product-list"></div>
+            </div>
+            <div id="detail">
+                <p id="product-name">Dell XPS 13</p>
+                <p id="product-price" style="font-size:0.85rem;color:#64748b;margin-bottom:8px">$999</p>
+                <div class="qty-row">
+                    <label for="qty" style="font-size:0.8rem">SL</label>
+                    <input type="number" id="qty" value="1" min="1">
+                    <button type="button" id="add-cart">Thêm vào giỏ</button>
+                </div>
+                <button type="button" class="demo-btn secondary" id="back-btn" style="margin-top:10px">← Quay lại danh sách</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        var products = [
+            { name: 'Dell XPS 13', price: 999 },
+            { name: 'Laptop Pro 15', price: 1299 }
+        ];
+        var cart = 0, current = null, filtered = products.slice();
+        function renderList() {
+            var el = document.getElementById('product-list');
+            el.innerHTML = '';
+            filtered.forEach(function (p, i) {
+                var d = document.createElement('div');
+                d.className = 'product';
+                d.innerHTML = '<h3>' + p.name + '</h3><p class="price">$' + p.price + '</p>';
+                d.onclick = function () { showDetail(p); };
+                el.appendChild(d);
+            });
+        }
+        function showDetail(p) {
+            current = p;
+            document.getElementById('product-name').textContent = p.name;
+            document.getElementById('product-price').textContent = '$' + p.price;
+            document.getElementById('list-view').style.display = 'none';
+            document.getElementById('detail').classList.add('show');
+        }
+        document.getElementById('back-btn').onclick = function () {
+            document.getElementById('detail').classList.remove('show');
+            document.getElementById('list-view').style.display = 'block';
+        };
+        document.getElementById('search-btn').onclick = function () {
+            var q = document.getElementById('search').value.toLowerCase();
+            filtered = products.filter(function (p) {
+                return !q || p.name.toLowerCase().indexOf(q) >= 0 || (q.indexOf('laptop') >= 0);
+            });
+            if (!filtered.length) filtered = products.slice();
+            renderList();
+            document.getElementById('detail').classList.remove('show');
+            document.getElementById('list-view').style.display = 'block';
+        };
+        document.getElementById('add-cart').onclick = function () {
+            var q = parseInt(document.getElementById('qty').value, 10) || 1;
+            cart += q;
+            document.getElementById('cart-count').textContent = cart;
+        };
+        renderList();
+    </script>
+</body>
+</html>

@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lộ Trình Automation Testing</title>
+    <style>
+        :root {
+            --primary: #1e3c72;
+            --primary-light: #2a5298;
+            --accent: #17a2b8;
+            --bg: linear-gradient(135deg, #0f172a 0%, #1e3c72 45%, #2a5298 100%);
+            --card-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            color: #1e293b;
+            line-height: 1.7;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 48px;
+        }
+
+        .hero {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+
+        .hero-top {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 48px 40px 40px;
+            text-align: center;
+        }
+
+        .hero-top .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.85em;
+            margin-bottom: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero-top h1 {
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
+            margin-bottom: 12px;
+        }
+
+        .hero-top p {
+            font-size: 1.1em;
+            opacity: 0.92;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        .hero-body {
+            padding: 36px 40px;
+        }
+
+        .hero-body h2 {
+            color: var(--primary);
+            font-size: 1.35em;
+            margin-bottom: 14px;
+        }
+
+        .hero-body p {
+            margin-bottom: 14px;
+            color: #334155;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .stat {
+            background: #f1f5f9;
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 1.5em;
+            color: var(--primary-light);
+        }
+
+        .stat span {
+            font-size: 0.88em;
+            color: #64748b;
+        }
+
+        .intro-speech {
+            background: #e7f5ff;
+            border-left: 4px solid #1e88e5;
+            padding: 16px 18px;
+            border-radius: 8px;
+            margin-top: 20px;
+            color: #0c4a6e;
+            font-style: italic;
+        }
+
+        .speech-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+            align-items: center;
+        }
+
+        .btn-speak {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-speak:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.45);
+        }
+
+        .btn-speak.stop {
+            background: #64748b;
+        }
+
+        .btn-quiz-entry {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+        }
+
+        .btn-quiz-entry:hover {
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.45);
+        }
+
+        .speech-hint {
+            font-size: 0.88em;
+            color: #64748b;
+        }
+
+        .modules-overview {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            padding: 22px 24px;
+            margin-bottom: 28px;
+        }
+
+        .modules-overview h2 {
+            color: var(--primary);
+            font-size: 1.15em;
+            margin-bottom: 6px;
+        }
+
+        .modules-overview > p {
+            color: #64748b;
+            font-size: 0.92em;
+            margin-bottom: 18px;
+        }
+
+        .modules-overview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .module-block {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: #f8fafc;
+        }
+
+        .module-block h3 {
+            font-size: 0.95em;
+            color: #1e3c72;
+            margin-bottom: 10px;
+        }
+
+        .module-lesson-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .module-lesson-links a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: #334155;
+            font-size: 0.9em;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .module-lesson-links a:hover {
+            background: #eef2ff;
+            border-color: #2a5298;
+            color: #1e3c72;
+        }
+
+        .module-lesson-links .chip {
+            flex: 0 0 auto;
+            font-weight: 700;
+            font-size: 0.78em;
+            padding: 3px 8px;
+            border-radius: 6px;
+            color: white;
+            background: linear-gradient(135deg, #1e40af, #7c3aed);
+        }
+
+        .module-block.api .chip {
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+        }
+
+        .module-block.auto .chip {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+        }
+
+        .section-title {
+            color: white;
+            font-size: 1.25em;
+            margin-bottom: 18px;
+            padding-left: 4px;
+        }
+
+        .lessons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 22px;
+            margin-bottom: 28px;
+        }
+
+        .lesson-card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.25s, box-shadow 0.25s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .lesson-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+        }
+
+        .lesson-card .card-head {
+            padding: 24px 24px 18px;
+            color: white;
+        }
+
+        .lesson-card:nth-child(1) .card-head {
+            background: linear-gradient(135deg, #0d9488, #14b8a6);
+        }
+
+        .lesson-card:nth-child(2) .card-head {
+            background: linear-gradient(135deg, #6d28d9, #8b5cf6);
+        }
+
+        .lesson-card:nth-child(3) .card-head {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+
+        .lesson-card:nth-child(4) .card-head {
+            background: linear-gradient(135deg, #ea580c, #fb923c);
+        }
+
+        .lesson-card:nth-child(5) .card-head {
+            background: linear-gradient(135deg, #dc2626, #f59e0b);
+        }
+
+        .lesson-card.java-core .card-head {
+            background: linear-gradient(135deg, #1e40af, #7c3aed);
+        }
+
+        .java-core-lessons .lesson-card:nth-child(1) .card-head {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+        }
+
+        .java-core-lessons .lesson-card:nth-child(2) .card-head {
+            background: linear-gradient(135deg, #5b21b6, #8b5cf6);
+        }
+
+        .java-core-lessons .lesson-card:nth-child(3) .card-head {
+            background: linear-gradient(135deg, #0f766e, #14b8a6);
+        }
+
+        .api-testing-lessons .lesson-card .card-head {
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+        }
+
+        .api-testing-lessons .lesson-card:nth-child(1) .card-head {
+            background: linear-gradient(135deg, #0f4c75, #3282b8);
+        }
+
+        .api-testing-lessons .lesson-card:nth-child(2) .card-head {
+            background: linear-gradient(135deg, #1a472a, #4caf50);
+        }
+
+        .api-testing-lessons .lesson-card:nth-child(3) .card-head {
+            background: linear-gradient(135deg, #0f3460, #533483);
+        }
+
+        .lesson-card .phase {
+            font-size: 0.8em;
+            opacity: 0.9;
+            margin-bottom: 6px;
+        }
+
+        .lesson-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 6px;
+        }
+
+        .lesson-card .duration {
+            font-size: 0.88em;
+            opacity: 0.9;
+        }
+
+        .lesson-card .card-body {
+            padding: 20px 24px 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lesson-card ul {
+            list-style: none;
+            margin-bottom: 18px;
+            flex: 1;
+        }
+
+        .lesson-card li {
+            padding: 6px 0;
+            padding-left: 22px;
+            position: relative;
+            font-size: 0.95em;
+            color: #475569;
+        }
+
+        .lesson-card li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #22c55e;
+            font-weight: bold;
+        }
+
+        .lesson-card .cta {
+            display: inline-block;
+            text-align: center;
+            padding: 12px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            font-weight: 600;
+            color: var(--primary);
+            transition: background 0.2s;
+        }
+
+        .lesson-card:hover .cta {
+            background: #e2e8f0;
+        }
+
+        .footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.9em;
+            padding-top: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .hero-body,
+            .hero-top {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+</head>
+<body>
+    <div class="page">
+        <header class="hero">
+            <div class="hero-top">
+                <span class="badge">Java Core → Automation → API Testing</span>
+                <h1>Lộ Trình Automation & API Testing</h1>
+                <p>Java Core, Web UI Automation (Selenium), và API Testing — học theo slide, nghe thuyết minh tiếng Việt</p>
+            </div>
+            <div class="hero-body">
+                <h2>Giới thiệu khóa học</h2>
+                <p>
+                    Khóa học này dành cho người đã có nền tảng <strong>Java</strong> và kinh nghiệm
+                    <strong>manual testing</strong>, muốn chuyển sang automation một cách có hệ thống.
+                    Mỗi bài học là bộ slide tương tác: điều hướng từng trang, xem nội dung chi tiết,
+                    và bấm <strong>Đọc thuyết minh</strong> để nghe phần giảng bằng tiếng Việt.
+                </p>
+                <p>
+                    Có <strong>3 bài Java Core</strong>, <strong>5 bài Automation</strong> (PHASE 1–4), và <strong>3 bài API Testing</strong>.
+                    Nên học JC1 → JC3, automation bài 1 → 5, rồi API1 → API3.
+                </p>
+
+                <div class="stats">
+                    <div class="stat"><strong>11</strong><span>Bài học slide</span></div>
+                    <div class="stat"><strong>~20h</strong><span>Thời lượng ước tính</span></div>
+                    <div class="stat"><strong>100%</strong><span>HTML &amp; CSS (+ TTS trình duyệt)</span></div>
+                </div>
+
+                <div class="intro-speech" id="introNarration">
+                    🔊 "Chào mừng bạn đến với lộ trình Automation và API Testing. Học Java Core: OOP, Collections, Advanced Java. Tiếp theo automation: manual vs automation, Selenium, TestNG, POM, CI/CD. Cuối cùng API Testing: HTTP và REST, authentication, security, và RestAssured automation."
+                </div>
+                <div class="speech-controls intro-tts-wrap">
+                    <a href="quiz.html" class="btn-speak btn-quiz-entry" style="text-decoration:none;display:inline-flex;">🎯 Kiểm tra kiến thức</a>
+                    <button type="button" class="btn-speak" id="speakIntroBtn" aria-label="Đọc giới thiệu">🔊 Đọc giới thiệu</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <span class="speech-hint">Giọng Việt + Anh (Edge TTS) — có thanh tua &amp; tốc độ</span>
+                </div>
+
+                <div class="admin-panel" id="narrationAdminPanel">
+                    <h3>✏️ Quản lý script thuyết minh</h3>
+                    <p class="admin-hint">Chạy <strong>python server.py</strong> rồi mở <strong>http://localhost:5500</strong> (không dùng <code>python -m http.server</code>). Nút <strong>Tạo lại toàn bộ audio</strong> gồm intro + <strong>11 bài</strong> (Java Core ×3, Automation ×5, API Testing ×3) — mỗi slide có script thuyết minh.</p>
+                    <div id="serverOfflineBanner" class="server-offline-banner">
+                        Server chưa chạy. Mở terminal: <code>python server.py</code> rồi vào http://localhost:5500
+                    </div>
+                    <label for="introScriptEdit"><strong>Script giới thiệu (trang chủ)</strong></label>
+                    <textarea id="introScriptEdit" rows="5" aria-label="Script giới thiệu"></textarea>
+                    <div class="admin-actions">
+                        <button type="button" class="btn-admin btn-admin-save" id="saveIntroBtn">💾 Lưu intro &amp; tạo audio</button>
+                        <button type="button" class="btn-admin btn-admin-regen" id="regenerateAllBtn">🔄 Tạo lại audio (theo khóa / bài)</button>
+                        <span class="narration-save-status" id="adminStatus"></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="page-quick-nav" aria-label="Đi nhanh">
+            <a href="quiz.html">🎯 Kiểm tra kiến thức</a>
+            <a href="#courseRoadmap">📋 Lộ trình đầy đủ</a>
+            <a href="#java-core">☕ Java Core (3 bài)</a>
+            <a href="#api-testing">🔌 API Testing (3 bài)</a>
+            <a href="#automation">🤖 Automation (5 bài)</a>
+        </nav>
+
+        <section class="modules-overview" aria-label="Tất cả bài học">
+            <h2>📂 Toàn bộ 11 bài — chọn module</h2>
+            <p>Java Core (JC1–JC3), API Testing (API1–API3) và Automation (bài 1–5). Bấm để mở slide ngay.</p>
+            <div class="modules-overview-grid">
+                <div class="module-block java">
+                    <h3>☕ Java Core</h3>
+                    <ul class="module-lesson-links">
+                        <li><a href="part1_oop_principles.html"><span class="chip">JC1</span> OOP Principles</a></li>
+                        <li><a href="java_core_phase2_collections.html"><span class="chip">JC2</span> Collections</a></li>
+                        <li><a href="java_core_phase3_4_advanced.html"><span class="chip">JC3</span> Advanced Java</a></li>
+                    </ul>
+                </div>
+                <div class="module-block api">
+                    <h3>🔌 API Testing</h3>
+                    <ul class="module-lesson-links">
+                        <li><a href="api_testing_buoi1_fundamentals.html"><span class="chip">API1</span> Fundamentals &amp; HTTP</a></li>
+                        <li><a href="api_testing_advanced_auth.html"><span class="chip">API2</span> Auth &amp; Security</a></li>
+                        <li><a href="api_testing_restassured.html"><span class="chip">API3</span> RestAssured</a></li>
+                    </ul>
+                </div>
+                <div class="module-block auto">
+                    <h3>🤖 Automation</h3>
+                    <ul class="module-lesson-links">
+                        <li><a href="video1_manual_vs_automation.html"><span class="chip">1</span> Manual vs Automation</a></li>
+                        <li><a href="video2_4_types_testing.html"><span class="chip">2</span> 4 Loại Test</a></li>
+                        <li><a href="phase2_selenium_webdriver.html"><span class="chip">3</span> Selenium WebDriver</a></li>
+                        <li><a href="phase3_testng_pom.html"><span class="chip">4</span> TestNG &amp; POM</a></li>
+                        <li><a href="phase4_advanced_cicd.html"><span class="chip">5</span> Advanced &amp; CI/CD</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="courseRoadmap" class="course-roadmap" aria-label="Lộ trình khóa học">
+            <h2>📋 Lộ trình học (theo thứ tự)</h2>
+            <p class="roadmap-hint">Học <strong>JC1 → JC3</strong>, rồi <strong>API1 → API3</strong>, sau đó Automation <strong>bài 1 → 5</strong>.</p>
+            <div class="course-roadmap-group">
+                <h3 class="course-roadmap-group-title">☕ Java Core (3 bài)</h3>
+                <ol class="course-roadmap-list">
+                    <li><a class="course-roadmap-item java-core" href="part1_oop_principles.html"><span class="course-roadmap-num">JC1</span><span class="course-roadmap-body"><span class="course-roadmap-module">Java Core · Phần 1</span><span class="course-roadmap-title">OOP Principles</span><span class="course-roadmap-meta">~35 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item java-core" href="java_core_phase2_collections.html"><span class="course-roadmap-num">JC2</span><span class="course-roadmap-body"><span class="course-roadmap-module">Java Core · Phần 2</span><span class="course-roadmap-title">Collections</span><span class="course-roadmap-meta">~40 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item java-core" href="java_core_phase3_4_advanced.html"><span class="course-roadmap-num">JC3</span><span class="course-roadmap-body"><span class="course-roadmap-module">Java Core · Phần 3–4</span><span class="course-roadmap-title">Advanced Java</span><span class="course-roadmap-meta">~45 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                </ol>
+            </div>
+            <div class="course-roadmap-group">
+                <h3 class="course-roadmap-group-title">🤖 Automation Testing (5 bài)</h3>
+                <ol class="course-roadmap-list">
+                    <li><a class="course-roadmap-item" href="video1_manual_vs_automation.html"><span class="course-roadmap-num">1</span><span class="course-roadmap-body"><span class="course-roadmap-module">PHASE 1</span><span class="course-roadmap-title">Manual vs Automation</span><span class="course-roadmap-meta">~25 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item" href="video2_4_types_testing.html"><span class="course-roadmap-num">2</span><span class="course-roadmap-body"><span class="course-roadmap-module">PHASE 1</span><span class="course-roadmap-title">4 Loại Test</span><span class="course-roadmap-meta">~30 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item" href="phase2_selenium_webdriver.html"><span class="course-roadmap-num">3</span><span class="course-roadmap-body"><span class="course-roadmap-module">PHASE 2</span><span class="course-roadmap-title">Selenium WebDriver</span><span class="course-roadmap-meta">~70 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item" href="phase3_testng_pom.html"><span class="course-roadmap-num">4</span><span class="course-roadmap-body"><span class="course-roadmap-module">PHASE 3</span><span class="course-roadmap-title">TestNG &amp; POM</span><span class="course-roadmap-meta">~90 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item" href="phase4_advanced_cicd.html"><span class="course-roadmap-num">5</span><span class="course-roadmap-body"><span class="course-roadmap-module">PHASE 4</span><span class="course-roadmap-title">Advanced &amp; CI/CD</span><span class="course-roadmap-meta">~120 phút</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                </ol>
+            </div>
+            <div class="course-roadmap-group">
+                <h3 class="course-roadmap-group-title">🔌 API Testing (3 bài)</h3>
+                <ol class="course-roadmap-list">
+                    <li><a class="course-roadmap-item api-testing" href="api_testing_buoi1_fundamentals.html"><span class="course-roadmap-num">API1</span><span class="course-roadmap-body"><span class="course-roadmap-module">API Testing · Buổi 1</span><span class="course-roadmap-title">Fundamentals &amp; HTTP</span><span class="course-roadmap-meta">~5 giờ</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item api-testing" href="api_testing_advanced_auth.html"><span class="course-roadmap-num">API2</span><span class="course-roadmap-body"><span class="course-roadmap-module">API Testing · Tuần 3-4</span><span class="course-roadmap-title">Auth &amp; Security</span><span class="course-roadmap-meta">~4 giờ</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                    <li><a class="course-roadmap-item api-testing" href="api_testing_restassured.html"><span class="course-roadmap-num">API3</span><span class="course-roadmap-body"><span class="course-roadmap-module">API Testing · RestAssured</span><span class="course-roadmap-title">RestAssured Automation</span><span class="course-roadmap-meta">~4 giờ</span></span><span class="course-roadmap-arrow" aria-hidden="true">→</span></a></li>
+                </ol>
+            </div>
+        </section>
+
+        <h2 id="java-core" class="section-title">☕ Java Core — nền tảng lập trình (3 bài)</h2>
+        <nav class="lessons java-core-lessons" aria-label="Java Core">
+            <a class="lesson-card java-core" href="part1_oop_principles.html">
+                <div class="card-head">
+                    <div class="phase">Java Core · Phần 1</div>
+                    <h3>OOP Principles</h3>
+                    <div class="duration">⏱️ ~35 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Encapsulation (đóng gói)</li>
+                        <li>Inheritance (kế thừa)</li>
+                        <li>Polymorphism (đa hình)</li>
+                        <li>Abstraction (trừu tượng)</li>
+                    </ul>
+                    <span class="cta">Bắt đầu phần 1 →</span>
+                </div>
+            </a>
+            <a class="lesson-card java-core" href="java_core_phase2_collections.html">
+                <div class="card-head">
+                    <div class="phase">Java Core · Phần 2</div>
+                    <h3>Collections</h3>
+                    <div class="duration">⏱️ ~40 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>List — ArrayList, LinkedList</li>
+                        <li>Set — HashSet, TreeSet</li>
+                        <li>Map — HashMap, TreeMap</li>
+                        <li>So sánh &amp; ví dụ test data</li>
+                    </ul>
+                    <span class="cta">Bắt đầu phần 2 →</span>
+                </div>
+            </a>
+            <a class="lesson-card java-core" href="java_core_phase3_4_advanced.html">
+                <div class="card-head">
+                    <div class="phase">Java Core · Phần 3–4</div>
+                    <h3>Advanced Java</h3>
+                    <div class="duration">⏱️ ~45 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Exception Handling</li>
+                        <li>Streams &amp; Lambda</li>
+                        <li>File I/O</li>
+                        <li>String Methods</li>
+                    </ul>
+                    <span class="cta">Bắt đầu phần 3–4 →</span>
+                </div>
+            </a>
+        </nav>
+
+        <h2 id="api-testing" class="section-title">🔌 API Testing — kiểm thử API (3 bài)</h2>
+        <nav class="lessons api-testing-lessons" aria-label="API Testing">
+            <a class="lesson-card" href="api_testing_buoi1_fundamentals.html">
+                <div class="card-head">
+                    <div class="phase">API Testing · Buổi 1</div>
+                    <h3>Fundamentals &amp; HTTP</h3>
+                    <div class="duration">⏱️ ~5 giờ</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>API, REST, SOAP, GraphQL</li>
+                        <li>HTTP Methods &amp; Status Codes</li>
+                        <li>Request/Response structure</li>
+                        <li>Test case design &amp; DB verify</li>
+                    </ul>
+                    <span class="cta">Bắt đầu API1 →</span>
+                </div>
+            </a>
+            <a class="lesson-card" href="api_testing_advanced_auth.html">
+                <div class="card-head">
+                    <div class="phase">API Testing · Tuần 3-4</div>
+                    <h3>Auth &amp; Security</h3>
+                    <div class="duration">⏱️ ~4 giờ</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Authentication vs Authorization</li>
+                        <li>Basic Auth &amp; Bearer JWT</li>
+                        <li>Authorization testing</li>
+                        <li>Security &amp; DB verification</li>
+                    </ul>
+                    <span class="cta">Bắt đầu API2 →</span>
+                </div>
+            </a>
+            <a class="lesson-card" href="api_testing_restassured.html">
+                <div class="card-head">
+                    <div class="phase">API Testing · RestAssured</div>
+                    <h3>RestAssured Automation</h3>
+                    <div class="duration">⏱️ ~4 giờ</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Setup RestAssured project</li>
+                        <li>GET/POST/PUT/DELETE</li>
+                        <li>TestNG &amp; POM for APIs</li>
+                        <li>Data-driven &amp; BaseTest</li>
+                    </ul>
+                    <span class="cta">Bắt đầu API3 →</span>
+                </div>
+            </a>
+        </nav>
+
+        <h2 id="automation" class="section-title">📚 Automation Testing — học theo thứ tự</h2>
+        <nav class="lessons" aria-label="Danh sách bài học automation">
+            <a class="lesson-card" href="video1_manual_vs_automation.html">
+                <div class="card-head">
+                    <div class="phase">Bài 1 · PHASE 1</div>
+                    <h3>Manual vs Automation Testing</h3>
+                    <div class="duration">⏱️ ~25 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Khái niệm manual &amp; automation</li>
+                        <li>So sánh ưu / nhược điểm</li>
+                        <li>Khi nào nên automation</li>
+                        <li>ROI &amp; Test Pyramid</li>
+                    </ul>
+                    <span class="cta">Bắt đầu bài 1 →</span>
+                </div>
+            </a>
+
+            <a class="lesson-card" href="video2_4_types_testing.html">
+                <div class="card-head">
+                    <div class="phase">Bài 2 · PHASE 1</div>
+                    <h3>4 Loại Test Automation</h3>
+                    <div class="duration">⏱️ ~30 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Unit Testing</li>
+                        <li>Integration Testing</li>
+                        <li>End-to-End (E2E)</li>
+                        <li>API Testing</li>
+                    </ul>
+                    <span class="cta">Bắt đầu bài 2 →</span>
+                </div>
+            </a>
+
+            <a class="lesson-card" href="phase2_selenium_webdriver.html">
+                <div class="card-head">
+                    <div class="phase">Bài 3 · PHASE 2</div>
+                    <h3>Selenium WebDriver</h3>
+                    <div class="duration">⏱️ ~70 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Setup &amp; WebDriver API</li>
+                        <li>Locators &amp; tương tác element</li>
+                        <li>Waits &amp; Advanced Actions</li>
+                        <li>Ví dụ Login &amp; Shopping</li>
+                    </ul>
+                    <span class="cta">Bắt đầu bài 3 →</span>
+                </div>
+            </a>
+
+            <a class="lesson-card" href="phase3_testng_pom.html">
+                <div class="card-head">
+                    <div class="phase">Bài 4 · PHASE 3</div>
+                    <h3>TestNG &amp; Page Object Model</h3>
+                    <div class="duration">⏱️ ~90 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>TestNG annotations &amp; XML</li>
+                        <li>Page Object Model (POM)</li>
+                        <li>Data-Driven Testing</li>
+                        <li>Parallel execution</li>
+                    </ul>
+                    <span class="cta">Bắt đầu bài 4 →</span>
+                </div>
+            </a>
+
+            <a class="lesson-card" href="phase4_advanced_cicd.html">
+                <div class="card-head">
+                    <div class="phase">Bài 5 · PHASE 4</div>
+                    <h3>Kiểm thử nâng cao &amp; CI/CD</h3>
+                    <div class="duration">⏱️ ~120 phút</div>
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Screenshots, logs, listeners</li>
+                        <li>Retry logic &amp; flaky tests</li>
+                        <li>Cross-browser</li>
+                        <li>CI/CD &amp; reporting</li>
+                    </ul>
+                    <span class="cta">Bắt đầu bài 5 →</span>
+                </div>
+            </a>
+        </nav>
+
+        <footer class="footer">
+            <p>© 2025 Automation Testing Tutorial · Chạy <strong>python server.py</strong> rồi mở <strong>http://localhost:5500</strong></p>
+        </footer>
+    </div>
+
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js?v=5"></script>
+    <script>
+        (function () {
+            document.getElementById('speakIntroBtn').addEventListener('click', function () {
+                VietnameseTTS.speak({ page: 'index', key: 'intro' });
+            });
+        })();
+    </script>
+</body>
+</html>

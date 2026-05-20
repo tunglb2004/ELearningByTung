@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHASE 4: Kiểm Thử Nâng Cao & CI/CD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+            color: white;
+            padding: 45px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 3.2em;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            display: flex;
+            height: 850px;
+        }
+
+        .slides {
+            flex: 1;
+            padding: 45px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .slide h2 {
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #ff6b6b;
+            padding-bottom: 15px;
+        }
+
+        .slide h3 {
+            color: #ee5a6f;
+            font-size: 1.6em;
+            margin-top: 28px;
+            margin-bottom: 18px;
+        }
+
+        .slide h4 {
+            color: #555;
+            font-size: 1.25em;
+            margin-top: 22px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .slide p, .slide li {
+            line-height: 1.95;
+            color: #333;
+            font-size: 1.08em;
+            margin-bottom: 16px;
+        }
+
+        .slide ul {
+            margin-left: 35px;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 22px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.92em;
+            line-height: 1.8;
+            max-height: 400px;
+            border-left: 5px solid #ff6b6b;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #569cd6; font-weight: bold; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .method { color: #dcdcaa; }
+        .number { color: #b5cea8; }
+
+        .explanation {
+            background: #fff3e0;
+            border-left: 5px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.85;
+        }
+
+        .explanation strong {
+            color: #ff6b6b;
+        }
+
+        .output-box {
+            background: #0d1117;
+            color: #58a6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.98em;
+            line-height: 1.8;
+            max-height: 280px;
+            overflow-y: auto;
+            border: 2px solid #58a6ff;
+            white-space: pre-wrap;
+        }
+
+        .sidebar {
+            flex: 0 0 340px;
+            padding: 30px;
+            background: white;
+            border-left: 1px solid #ddd;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        button {
+            padding: 14px 22px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.97em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ee5a6f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #feca57;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .btn-secondary:hover {
+            background: #fdb913;
+        }
+
+        .slide-counter {
+            text-align: center;
+            font-weight: bold;
+            color: #ff6b6b;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+
+        .narration-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #2e7d32;
+            line-height: 1.8;
+            font-size: 1.02em;
+            font-style: italic;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff6b6b;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .warning {
+            background: #ffebee;
+            border-left: 4px solid #ff6b6b;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #c62828;
+            font-size: 1.02em;
+        }
+
+        .success {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #2e7d32;
+            font-size: 1.02em;
+        }
+
+        .tip {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 18px;
+            margin: 20px 0;
+            border-radius: 5px;
+            color: #e65100;
+            font-size: 1.02em;
+        }
+
+        .concept-box {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1.02em;
+            line-height: 1.85;
+        }
+
+        .nav-links {
+            list-style: none;
+            font-size: 0.87em;
+        }
+
+        .nav-links li {
+            padding: 5px 0;
+        }
+
+        .nav-links a {
+            color: #ff6b6b;
+            text-decoration: none;
+            display: block;
+            padding: 7px;
+            border-radius: 3px;
+            transition: all 0.2s;
+        }
+
+        .nav-links a:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.98em;
+        }
+
+        .comparison-table th, .comparison-table td {
+            border: 1px solid #ddd;
+            padding: 14px;
+            text-align: left;
+        }
+
+        .comparison-table th {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 28px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            color: #666;
+            font-size: 0.98em;
+        }
+
+        @media (max-width: 1200px) {
+            .content {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .slides {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .sidebar {
+                border-left: none;
+            }
+        }
+
+        .emoji {
+            font-size: 1.4em;
+            margin-right: 8px;
+        }
+
+        .highlight {
+            background: #ffe082;
+            padding: 3px 8px;
+            border-radius: 3px;
+            color: #f57f17;
+            font-weight: bold;
+        }
+
+        .step {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #ff6b6b;
+            border-radius: 4px;
+        }
+
+        .step-number {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+    </style>
+    <link rel="stylesheet" href="narration-editor.css">
+    <link rel="stylesheet" href="course-audio-player.css">
+    <link rel="stylesheet" href="course-code-blocks.css">
+    <link rel="stylesheet" href="course-nav.css?v=2">
+    <link rel="stylesheet" href="course-ui-demos.css">
+</head>
+<body data-tts-page="phase4">
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PHASE 4: Kiểm Thử Nâng Cao & CI/CD</h1>
+            <p style="font-size: 1.25em; opacity: 0.95;">Tự Động Hóa Kiểm Thử Cấp Doanh Nghiệp</p>
+            <p style="margin-top: 14px;"><a href="index.html" style="color: white; text-decoration: none; opacity: 0.95;">🏠 Trang chủ</a></p>
+        </div>
+
+        <div style="display: flex; margin-bottom: 20px; padding: 0 30px; padding-top: 20px;">
+            <div style="flex: 1;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="slides" id="slidesContainer">
+                <!-- SLIDE 0: INTRO -->
+                <div class="slide active">
+                    <h2>🚀 PHASE 4: Kiểm Thử Nâng Cao</h2>
+                    
+                    <p style="font-size: 1.25em; margin-bottom: 35px;"><span class="highlight">Các Chủ Đề Cấp Doanh Nghiệp</span> để Tự Động Hóa Sản Xuất</p>
+
+                    <h3>Ở PHASE 1-3 chúng ta đã học:</h3>
+                    <ul>
+                        <li>✅ Nền tảng kiểm thử tự động (Unit, Integration, E2E, API)</li>
+                        <li>✅ Selenium WebDriver (tìm kiếm, tương tác, chờ)</li>
+                        <li>✅ TestNG Framework & Page Object Model</li>
+                    </ul>
+
+                    <h3>PHASE 4 chúng ta sẽ học:</h3>
+                    <ul>
+                        <li><span class="emoji">📸</span><strong>Ảnh Chụp & Nhật Ký</strong> - Chụp lỗi để sửa lỗi</li>
+                        <li><span class="emoji">🔄</span><strong>Logic Thử Lại</strong> - Tự động thử lại các kiểm thử không ổn định</li>
+                        <li><span class="emoji">🎧</span><strong>TestNG Listeners</strong> - Hook vào vòng đời kiểm thử</li>
+                        <li><span class="emoji">🌐</span><strong>Kiểm Thử Đa Trình Duyệt</strong> - Kiểm thử nhiều trình duyệt</li>
+                        <li><span class="emoji">📊</span><strong>Báo Cáo Kiểm Thử</strong> - Tạo báo cáo HTML chi tiết</li>
+                        <li><span class="emoji">🔗</span><strong>Tích Hợp CI/CD</strong> - Jenkins, GitHub Actions, GitLab CI</li>
+                        <li><span class="emoji">⚡</span><strong>Tối Ưu Hóa Hiệu Suất</strong> - Thực thi kiểm thử nhanh hơn</li>
+                    </ul>
+
+                    <div class="narration-box">🔊 "Chào mừng đến PHASE 4 — Kiểm thử nâng cao cho môi trường sản xuất. Trong phase này chúng ta học: screenshots, listeners, retry logic, cross-browser, CI/CD, reporting, performance, database testing, logging."</div>
+                </div>
+
+                <!-- SLIDE 1: SCREENSHOTS ON FAILURE -->
+                <div class="slide">
+                    <h2>📸 Ảnh Chụp & Nhật Ký Khi Thất Bại</h2>
+                    
+                    <h3>Tại Sao Cần Ảnh Chụp?</h3>
+                    <p>Khi kiểm thử thất bại, chỉ biết "<span class="highlight">kiểm thử thất bại</span>" là không đủ. Làm thế nào? Vì sao? Ở đâu?</p>
+                    <p>Ảnh chụp giúp:</p>
+                    <ul>
+                        <li>✅ <strong>Sửa lỗi trực quan:</strong> Xem trạng thái ứng dụng khi thất bại</li>
+                        <li>✅ <strong>Tái tạo lỗi:</strong> Nhà phát triển có thể thấy chính xác những gì đã xảy ra</li>
+                        <li>✅ <strong>Tài liệu:</strong> Ghi lại trạng thái ứng dụng cho báo cáo</li>
+                    </ul>
+
+                    <h3>Cách 1: TakesScreenshot Interface</h3>
+                    <div class="code-block">
+<span class="keyword">import</span> org.openqa.selenium.TakesScreenshot;
+<span class="keyword">import</span> org.openqa.selenium.OutputType;
+<span class="keyword">import</span> java.io.File;
+<span class="keyword">import</span> org.apache.commons.io.FileUtils;
+
+<span class="comment">/**
+ * lấyẢnhChụp - Chụp cửa sổ trình duyệt hiện tại
+ * 
+ * Cách hoạt động:
+ * 1. Chuyển WebDriver thành TakesScreenshot interface
+ * 2. Gọi getScreenshotAs(OutputType.FILE)
+ * 3. Sao chép file vào thư mục đích
+ * 4. Trả về đường dẫn file
+ */</span>
+<span class="keyword">public static</span> String lấyẢnhChụp(WebDriver driver, String tenẢnh) {
+    <span class="keyword">try</span> {
+        <span class="comment">// Bước 1: Chuyển driver thành TakesScreenshot</span>
+        <span class="comment">// Tại sao chuyển? WebDriver interface không có method để chụp</span>
+        <span class="comment">// TakesScreenshot interface này cung cấp method</span>
+        TakesScreenshot screenshot = (TakesScreenshot) driver;
+        
+        <span class="comment">// Bước 2: Chụp ảnh dưới dạng FILE</span>
+        <span class="comment">// getScreenshotAs(OutputType.FILE) trả về file tạm thời</span>
+        <span class="comment">// Chúng ta cần lưu nó vào vị trí vĩnh viễn</span>
+        File source = screenshot.getScreenshotAs(OutputType.FILE);
+        
+        <span class="comment">// Bước 3: Xác định đường dẫn đích</span>
+        <span class="comment">// Tạo thư mục: screenshots/ nếu không có</span>
+        String duongDanDich = <span class="string">"screenshots/"</span> + tenẢnh + <span class="string">".png"</span>;
+        
+        <span class="comment">// Bước 4: Sao chép file tạm thời vào đích</span>
+        <span class="comment">// FileUtils từ thư viện Apache Commons IO</span>
+        <span class="comment">// copyFile(source, destination) sao chép file từ nguồn đến đích</span>
+        FileUtils.copyFile(source, <span class="keyword">new</span> File(duongDanDich));
+        
+        <span class="comment">// Bước 5: Trả về đường dẫn để ghi nhật ký/báo cáo</span>
+        System.out.println(<span class="string">"✅ Ảnh chụp đã lưu: "</span> + duongDanDich);
+        <span class="keyword">return</span> duongDanDich;
+        
+    } <span class="keyword">catch</span> (Exception e) {
+        <span class="comment">// Nếu chụp ảnh thất bại, in lỗi nhưng đừng làm hỏng kiểm thử</span>
+        System.out.println(<span class="string">"❌ Không thể chụp ảnh: "</span> + e.getMessage());
+        <span class="keyword">return null</span>;
+    }
+}
+                    </div>
+
+                    <div class="explanation">
+                        <strong>Giải Thích Chi Tiết:</strong><br>
+                        • <strong>Chuyển TakesScreenshot:</strong> WebDriver interface không trực tiếp hỗ trợ ảnh chụp. Chúng ta chuyển thành TakesScreenshot interface có method để chụp.<br>
+                        • <strong>getScreenshotAs():</strong> Chụp ảnh chụp và trả về dưới dạng file/bytes. OutputType.FILE = trả về dưới dạng File object.<br>
+                        • <strong>FileUtils.copyFile():</strong> Selenium chụp trả về file tạm thời. Chúng ta sao chép vào vị trí vĩnh viễn (thư mục screenshots/) để giữ mãi mãi.<br>
+                        • <strong>Try-catch:</strong> Chụp ảnh có thể thất bại (vd: thư mục không tồn tại). Bắt exception và ghi nhật ký, đừng làm hỏng kiểm thử.
+                    </div>
+
+                    <h3>Cách 2: Ảnh Chụp Tự Động Khi Thất Bại Bằng Listener (Tốt Hơn!)</h3>
+                    <p>Thay vì chụp ảnh thủ công trong mỗi kiểm thử, sử dụng <span class="highlight">TestNG Listener</span> để chụp tự động</p>
+                    <div class="code-block">
+<span class="keyword">public class</span> NgheThiListener <span class="keyword">implements</span> ITestListener {
+    
+    <span class="comment">/**
+     * khi KiểmThửThấtBại - Gọi tự động khi @Test method THẤT BẠI
+     * 
+     * Tại sao hữu ích?
+     * - Chụp ảnh tự động khi kiểm thử thất bại
+     * - Không cần chụp ảnh thủ công trong mỗi kiểm thử
+     * - Nhất quán trên tất cả các kiểm thử
+     */</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> onTestFailure(ITestResult result) {
+        <span class="comment">// result.getThrowable() lấy exception gây ra thất bại</span>
+        System.out.println(<span class="string">"❌ Kiểm thử thất bại: "</span> + result.getName());
+        
+        <span class="comment">// Lấy instance WebDriver</span>
+        <span class="comment">// Cách làm: store trong static field, parameter injection, v.v.</span>
+        <span class="comment">// Giả sử WebDriver lưu trong static field DriverFactory.getDriver()</span>
+        WebDriver driver = DriverFactory.getDriver();
+        
+        <span class="comment">// Chụp ảnh với tên kiểm thử</span>
+        <span class="keyword">if</span> (driver != <span class="keyword">null</span>) {
+            lấyẢnhChụp(driver, result.getName() + <span class="string">"_THẤT_BẠI"</span>);
+        }
+    }
+    
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> onTestSuccess(ITestResult result) {
+        System.out.println(<span class="string">"✅ Kiểm thử thành công: "</span> + result.getName());
+    }
+}
+
+<span class="comment">// Đăng ký listener trong testng.xml</span>
+<span class="keyword">&lt;listeners&gt;</span>
+    <span class="keyword">&lt;listener</span> <span class="string">class-name</span>=<span class="string">"listeners.NgheThiListener"</span><span class="keyword">/&gt;</span>
+<span class="keyword">&lt;/listeners&gt;</span>
+                    </div>
+
+                    <div class="narration-box">🔊 "Khi test fail, screenshot very useful untuk understand what happened. Bapak dapat see aplikasi state, element positioning, error messages visually. TestNG tidak auto capture screenshots, jadi bapak perlu implement sendiri. Cara 1: manual screenshot di @AfterMethod. Setiap test method selesai, @AfterMethod trigger, capture screenshot. Cara 2: screenshot hanya kalo test fail - di catch block atau listener. Cara 3: listener pada failure - implementasi ITestListener interface, di onTestFailure() method, capture screenshot. Cara 1 simple but inefficient - screenshot terlalu banyak, makan storage. Cara 2 better - hanya save screenshot kalo ada masalah. Cara 3 best - automatic, tidak perlu manually call dalam setiap test. TakesScreenshot interface: cast driver ke TakesScreenshot, getScreenshotAs(OutputType.FILE), save ke file. Ví dụ: TakesScreenshot ts = (TakesScreenshot) driver. File screenshot = ts.getScreenshotAs(OutputType.FILE). String path = 'screenshots/' + System.currentTimeMillis() + '.png'. FileUtils.copyFile(screenshot, new File(path)). Selenium capture browser window saja, bukan full desktop. Jika bapak perlu capture lebih, gunakan third-party tools."</div>
+                </div>
+
+                <!-- SLIDE 2: TEST LISTENERS -->
+                <div class="slide">
+                    <h2>🎧 TestNG Listeners - Hook Vào Vòng Đời Kiểm Thử</h2>
+                    
+                    <h3>Listeners Là Gì?</h3>
+                    <p>Listeners = <span class="highlight">Interfaces hook vào các sự kiện vòng đời kiểm thử</span></p>
+                    <p>TestNG sẽ tự động gọi các method listener khi các sự kiện nhất định xảy ra:</p>
+                    <ul>
+                        <li>✅ Kiểm thử bắt đầu → onTestStart()</li>
+                        <li>✅ Kiểm thử thành công → onTestSuccess()</li>
+                        <li>✅ Kiểm thử thất bại → onTestFailure()</li>
+                        <li>✅ Kiểm thử bị bỏ qua → onTestSkipped()</li>
+                        <li>✅ Suite bắt đầu → onStart()</li>
+                        <li>✅ Suite kết thúc → onFinish()</li>
+                    </ul>
+
+                    <h3>Triển Khai Chi Tiết: Listener Để Ghi Nhật Ký & Báo Cáo</h3>
+                    <div class="code-block">
+<span class="keyword">import</span> org.testng.ITestListener;
+<span class="keyword">import</span> org.testng.ITestResult;
+
+<span class="comment">/**
+ * NgheThiTuyChonListener - Triển khai hook vòng đời để ghi nhật ký, chụp ảnh, báo cáo
+ */</span>
+<span class="keyword">public class</span> NgheThiTuyChonListener <span class="keyword">implements</span> ITestListener {
+    
+    <span class="comment">/**
+     * khi KiểmThửBắtĐầu - Gọi TRƯỚC @Test method bắt đầu
+     * Hữu ích cho: ghi nhật ký bắt đầu kiểm thử, thiết lập tài nguyên từng kiểm thử
+     */</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> onTestStart(ITestResult result) {
+        String tenKiểmThử = result.getName();
+        System.out.println(<span class="string">"[BẮTĐẦU] "</span> + tenKiểmThử);
+        System.out.println(<span class="string">"Lớp: "</span> + result.getTestClass().getRealClass().getSimpleName());
+    }
+    
+    <span class="comment">/**
+     * khi KiểmThửThànhCông - Gọi SAU @Test method THÀNH CÔNG
+     * 
+     * "Thành công" nghĩa là:
+     * - Tất cả assertion pass
+     * - Không có exception
+     */</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> onTestSuccess(ITestResult result) {
+        System.out.println(<span class="string">"✅ [THÀNH CÔNG] "</span> + result.getName());
+        
+        <span class="comment">// Lấy thời gian thực thi</span>
+        <span class="keyword">long</span> thoiGianThucThi = result.getEndMillis() - result.getStartMillis();
+        System.out.println(<span class="string">"Thời gian thực thi: "</span> + thoiGianThucThi + <span class="string">" ms"</span>);
+    }
+    
+    <span class="comment">/**
+     * khi KiểmThửThấtBại - Gọi SAU @Test method THẤT BẠI
+     * @param result - ITestResult chứa thông tin thất bại
+     * 
+     * "Thất bại" nghĩa là:
+     * - Assertion thất bại (assertion trả về false)
+     * - Exception không mong muốn (NoSuchElementException, v.v.)
+     */</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> onTestFailure(ITestResult result) {
+        System.out.println(<span class="string">"❌ [THẤT BẠI] "</span> + result.getName());
+        
+        <span class="comment">// Lấy exception/error</span>
+        Throwable exception = result.getThrowable();
+        System.out.println(<span class="string">"Thông báo lỗi: "</span> + exception.getMessage());
+        
+        <span class="comment">// Lấy WebDriver để chụp ảnh</span>
+        WebDriver driver = DriverFactory.getDriver();
+        
+        <span class="keyword">if</span> (driver != <span class="keyword">null</span>) {
+            <span class="comment">// Chụp ảnh với tên kiểm thử + "_THẤT_BẠI"</span>
+            String duongDanAnhChup = lấyẢnhChụp(driver, result.getName() + <span class="string">"_THẤT_BẠI"</span>);
+            System.out.println(<span class="string">"📸 Ảnh chụp đã lưu: "</span> + duongDanAnhChup);
+        }
+        
+        <span class="comment">// Thời gian thực thi cho kiểm thử thất bại</span>
+        <span class="keyword">long</span> thoiGianThucThi = result.getEndMillis() - result.getStartMillis();
+        System.out.println(<span class="string">"Thời gian thực thi: "</span> + thoiGianThucThi + <span class="string">" ms"</span>);
+    }
+    
+    <span class="comment">/**
+     * khi KiểmThửBịBỏQua - Gọi khi @Test method BỊ BỎ QUA
+     * Kiểm thử có thể bỏ qua vì: @Ignore, dependsOnMethods thất bại, điều kiện không đáp ứng, v.v.
+     */</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public void</span> onTestSkipped(ITestResult result) {
+        System.out.println(<span class="string">"⏭️  [BỊ BỎ QUA] "</span> + result.getName());
+    }
+}
+                    </div>
+
+                    <h3>Đăng Ký Listener Trong testng.xml:</h3>
+                    <div class="code-block">
+<span class="keyword">&lt;?xml version=</span><span class="string">"1.0"</span> <span class="keyword">encoding=</span><span class="string">"UTF-8"</span><span class="keyword">?&gt;</span>
+<span class="keyword">&lt;suite</span> <span class="string">name=</span><span class="string">"DangNhapTestSuite"</span><span class="keyword">&gt;</span>
+    
+    <span class="comment">&lt;!-- Đăng ký listeners --&gt;</span>
+    <span class="keyword">&lt;listeners&gt;</span>
+        <span class="comment">&lt;!-- NgheThiTuyChonListener sẽ tự động hook tất cả các kiểm thử --&gt;</span>
+        <span class="keyword">&lt;listener</span> <span class="string">class-name=</span><span class="string">"listeners.NgheThiTuyChonListener"</span><span class="keyword">/&gt;</span>
+    <span class="keyword">&lt;/listeners&gt;</span>
+    
+    <span class="keyword">&lt;test</span> <span class="string">name=</span><span class="string">"DangNhapTests"</span><span class="keyword">&gt;</span>
+        <span class="keyword">&lt;classes&gt;</span>
+            <span class="keyword">&lt;class</span> <span class="string">name=</span><span class="string">"tests.DangNhapTest"</span><span class="keyword">/&gt;</span>
+        <span class="keyword">&lt;/classes&gt;</span>
+    <span class="keyword">&lt;/test&gt;</span>
+    
+<span class="keyword">&lt;/suite&gt;</span>
+                    </div>
+
+                    <div class="narration-box">🔊 "Listeners adalah interface untuk hook ke test lifecycle events. ITestListener interface punya methods: onTestStart(), onTestSuccess(), onTestFailure(), onTestSkipped(). Ketika @Test method fail, TestNG automatically call onTestFailure(ITestResult result). Bapak bisa implement listener, override onTestFailure(), call screenshot method. Register listener di testng.xml: &lt;listeners&gt; &lt;listener class-name='listeners.MyTestListener'/&gt; &lt;/listeners&gt;. Atau @Listeners annotation di test class. Keuntungan listener: centralized logic, auto capture semua tests tanpa modifikasi test code, flexible - bisa implement custom logic (log, send email, update database). Ví dụ: public class MyTestListener implements ITestListener { @Override public void onTestFailure(ITestResult result) { WebDriver driver = result.getInstance()... atau get dari static field. captureScreenshot(driver, result.getName()). System.out.println('Test failed: ' + result.getName()). } }. Listener very powerful untuk cross-cutting concerns - logging, monitoring, reporting yang apply ke semua tests."</div>
+                </div>
+
+                <!-- SLIDE 3: RETRY LOGIC -->
+                <div class="slide">
+                    <h2>🔄 Logic Thử Lại - Xử Lý Các Kiểm Thử Không Ổn Định</h2>
+                    
+                    <h3>Kiểm Thử Không Ổn Định Là Gì?</h3>
+                    <p><span class="highlight">Kiểm thử không ổn định</span> = Kiểm thử đôi khi thành công, đôi khi thất bại mà không có thay đổi code</p>
+                    <p>Nguyên nhân:</p>
+                    <ul>
+                        <li>❌ <strong>Vấn đề thời gian:</strong> Element không load đúng lúc (mạng chậm)</li>
+                        <li>❌ <strong>Vấn đề môi trường:</strong> Database timeout, API không khả dụng</li>
+                        <li>❌ <strong>Race conditions:</strong> Cập nhật đồng thời gây xung đột</li>
+                    </ul>
+
+                    <h3>Giải Pháp: Logic Thử Lại</h3>
+                    <p>Nếu kiểm thử thất bại, tự động thử lại (vd: 3 lần). Nếu thành công ở lần thử lại, tính là thành công.</p>
+
+                    <div class="code-block">
+<span class="comment">/**
+ * NgheThiThử Lại - Triển khai IRetryAnalyzer
+ * TestNG gọi isRetryAvailable() sau khi kiểm thử thất bại
+ * Nếu trả về true, TestNG tự động thử lại kiểm thử
+ */</span>
+<span class="keyword">public class</span> NgheThiThửLạiAnalyzer <span class="keyword">implements</span> IRetryAnalyzer {
+    
+    <span class="keyword">private</span> <span class="keyword">int</span> soLanThuzLai = <span class="number">0</span>;
+    <span class="keyword">private static final int</span> MAX_THỬ_LẠI = <span class="number">3</span>;
+    
+    <span class="comment">/**
+     * retry - Gọi tự động bởi TestNG sau khi kiểm thử thất bại
+     * @param result - ITestResult chứa thông tin thất bại
+     * @return true nếu muốn thử lại, false nếu không
+     * 
+     * Logic:
+     * if (soLanThuzLai < MAX_THỬ_LẠI) {
+     *     soLanThuzLai++
+     *     return true  // Thử lại
+     * } else {
+     *     return false // Hết lần thử lại, đánh dấu là thất bại
+     * }
+     */</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">public boolean</span> retry(ITestResult result) {
+        <span class="keyword">if</span> (soLanThuzLai < MAX_THỬ_LẠI) {
+            System.out.println(<span class="string">"🔄 Thử lại: "</span> + result.getName() + 
+                <span class="string">" (Lần "</span> + (soLanThuzLai + <span class="number">1</span>) + <span class="string">")"</span>);
+            
+            <span class="comment">// Tăng bộ đếm thử lại</span>
+            soLanThuzLai++;
+            
+            <span class="comment">// Trả về true = tiếp tục thử lại</span>
+            <span class="keyword">return true</span>;
+        }
+        
+        <span class="comment">// Hết lần thử lại</span>
+        System.out.println(<span class="string">"❌ Hết lần thử lại cho: "</span> + result.getName());
+        <span class="keyword">return false</span>;
+    }
+}
+                    </div>
+
+                    <h3>Áp Dụng NgheThiThửLạiAnalyzer Vào Test Method:</h3>
+                    <div class="code-block">
+<span class="keyword">@Test</span>(retryAnalyzer = NgheThiThửLạiAnalyzer.<span class="keyword">class</span>)
+<span class="keyword">public void</span> testKhôngỔnĐịnh() {
+    <span class="comment">// Kiểm thử này sẽ được thử lại tới 3 lần nếu thất bại</span>
+    
+    <span class="comment">// Mô phỏng code phụ thuộc vào thời gian</span>
+    WebElement elem = wait.until(
+        ExpectedConditions.visibilityOfElementLocated(By.id(<span class="string">"dynamic"</span>))
+    );
+    
+    <span class="comment">// Đôi khi có thể timeout, nhưng thử lại sẽ giúp</span>
+    elem.click();
+}
+                    </div>
+
+                    <h3>Đầu Ra Với Thử Lại:</h3>
+                    <div class="output-box">
+[BẮTĐẦU] testKhôngỔnĐịnh
+Lần 1: TimeoutException - element không visible
+🔄 Thử lại: testKhôngỔnĐịnh (Lần 2)
+
+[BẮTĐẦU] testKhôngỔnĐịnh (LẦN THỨ 2)
+Lần 2: TimeoutException - element vẫn không visible
+🔄 Thử lại: testKhôngỔnĐịnh (Lần 3)
+
+[BẮTĐẦU] testKhôngỔnĐịnh (LẦN THỨ 3)
+Lần 3: THÀNH CÔNG! ✅
+✅ [THÀNH CÔNG] testKhôngỔnĐịnh (sau 3 lần)
+
+Tại sao?
+- Mạng chậm ở lần 1 & 2
+- Lần 3, mạng phục hồi, element load
+- Kiểm thử cuối cùng thành công
+                    </div>
+
+                    <div class="warning">
+                        ⚠️ <strong>Cảnh Báo:</strong> Thử lại là giải pháp tạm thời. Nếu kiểm thử thất bại liên tục, hãy sửa nguyên nhân gốc (cải thiện logic chờ, ổn định môi trường). Đừng chỉ dựa vào thử lại.
+                    </div>
+
+                    <div class="narration-box">🔊 "Flaky tests - tests yang sometimes pass sometimes fail tanpa code change. Cause: network latency, timing issues, environment instability. Solution: retry logic - retry test otomatis jika fail. IRetryAnalyzer interface - implement retry() method, return true jika retry, false jika tidak. Ví dụ: public class RetryAnalyzer implements IRetryAnalyzer { private int count = 0, maxRetry = 3. public boolean retry(ITestResult result) { if (count &lt; maxRetry) { count++. return true. } return false. } }. @Test(retryAnalyzer=RetryAnalyzer.class) public void testFlaky() { ... }. Jika test fail, TestNG call retry(), jika return true, run test lagi. Kalo berhasil retry, test mark as PASSED. Kalo fail semua retries, test mark as FAILED. Pro tip: jangan rely 100% pada retry - itu is band-aid solution. Root cause adalah usually: network slow, element tidak wait properly, timing assumption wrong. Improve dengan explicit waits, stabilize environment. Retry hanya untuk edge cases."</div>
+                </div>
+
+                <!-- SLIDE 4: CROSS-BROWSER TESTING -->
+                <div class="slide">
+                    <h2>🌐 Kiểm Thử Đa Trình Duyệt</h2>
+                    
+                    <h3>Kiểm Thử Đa Trình Duyệt Là Gì?</h3>
+                    <p>Kiểm thử ứng dụng trên <span class="highlight">nhiều trình duyệt</span> (Chrome, Firefox, Safari, Edge) để đảm bảo tương thích</p>
+                    <p>Tại sao? Hành vi ứng dụng có thể khác nhau trên mỗi trình duyệt:</p>
+                    <ul>
+                        <li>❌ CSS rendering khác nhau</li>
+                        <li>❌ Thực thi JavaScript khác nhau</li>
+                        <li>❌ Hiệu suất khác nhau</li>
+                        <li>❌ Vấn đề tương thích</li>
+                    </ul>
+
+                    <h3>Cách: Mẫu Factory WebDriver</h3>
+                    <div class="code-block">
+<span class="comment">/**
+ * DriverFactory - Mẫu Factory để tạo instance WebDriver
+ * 
+ * Tại sao mẫu factory?
+ * - Tập trung logic tạo driver
+ * - Dễ dàng chuyển đổi trình duyệt
+ * - Dễ dàng thêm tùy chọn driver
+ */</span>
+<span class="keyword">public class</span> DriverFactory {
+    
+    <span class="comment">/**
+     * lấyDriver - Tạo WebDriver dựa trên loại trình duyệt
+     * @param loạiTrìnhDuyệt - "chrome", "firefox", "safari", "edge"
+     * @return WebDriver instance
+     */</span>
+    <span class="keyword">public static</span> WebDriver lấyDriver(String loạiTrìnhDuyệt) {
+        WebDriver driver = <span class="keyword">null</span>;
+        
+        <span class="keyword">switch</span> (loạiTrìnhDuyệt.toLowerCase()) {
+            <span class="keyword">case</span> <span class="string">"chrome"</span>:
+                driver = lấyChromeDriver();
+                <span class="keyword">break</span>;
+                
+            <span class="keyword">case</span> <span class="string">"firefox"</span>:
+                driver = lấyFirefoxDriver();
+                <span class="keyword">break</span>;
+                
+            <span class="keyword">case</span> <span class="string">"safari"</span>:
+                driver = lấySafariDriver();
+                <span class="keyword">break</span>;
+                
+            <span class="keyword">case</span> <span class="string">"edge"</span>:
+                driver = lấyEdgeDriver();
+                <span class="keyword">break</span>;
+                
+            <span class="keyword">default</span>:
+                System.out.println(<span class="string">"❌ Trình duyệt không xác định: "</span> + loạiTrìnhDuyệt);
+                <span class="keyword">break</span>;
+        }
+        
+        <span class="keyword">return</span> driver;
+    }
+    
+    <span class="comment">/**
+     * lấyChromeDriver - Thiết lập Chrome driver với tùy chọn
+     */</span>
+    <span class="keyword">private static</span> WebDriver lấyChromeDriver() {
+        ChromeOptions options = <span class="keyword">new</span> ChromeOptions();
+        
+        <span class="comment">// Thêm tùy chọn/arguments</span>
+        options.addArguments(<span class="string">"--start-maximized"</span>); <span class="comment">// Bắt đầu toàn màn hình</span>
+        options.addArguments(<span class="string">"--disable-blink-features=AutomationControlled"</span>); <span class="comment">// Vô hiệu hóa phát hiện tự động</span>
+        
+        System.out.println(<span class="string">"🌐 Khởi tạo Trình Duyệt Chrome"</span>);
+        <span class="keyword">return new</span> ChromeDriver(options);
+    }
+    
+    <span class="comment">/**
+     * lấyFirefoxDriver - Thiết lập Firefox driver
+     */</span>
+    <span class="keyword">private static</span> WebDriver lấyFirefoxDriver() {
+        FirefoxOptions options = <span class="keyword">new</span> FirefoxOptions();
+        options.addArguments(<span class="string">"--start-maximized"</span>);
+        
+        System.out.println(<span class="string">"🌐 Khởi tạo Trình Duyệt Firefox"</span>);
+        <span class="keyword">return new</span> FirefoxDriver(options);
+    }
+    
+    <span class="comment">/**
+     * lấySafariDriver - Thiết lập Safari driver
+     * Lưu ý: Safari hỗ trợ hạn chế, chỉ macOS
+     */</span>
+    <span class="keyword">private static</span> WebDriver lấySafariDriver() {
+        System.out.println(<span class="string">"🌐 Khởi tạo Trình Duyệt Safari (chỉ macOS)"</span>);
+        <span class="keyword">return new</span> SafariDriver();
+    }
+    
+    <span class="comment">/**
+     * lấyEdgeDriver - Thiết lập Edge driver
+     */</span>
+    <span class="keyword">private static</span> WebDriver lấyEdgeDriver() {
+        EdgeOptions options = <span class="keyword">new</span> EdgeOptions();
+        options.addArguments(<span class="string">"--start-maximized"</span>);
+        
+        System.out.println(<span class="string">"🌐 Khởi tạo Trình Duyệt Edge"</span>);
+        <span class="keyword">return new</span> EdgeDriver(options);
+    }
+}
+                    </div>
+
+                    <h3>Test Đa Trình Duyệt Dựa Trên Dữ Liệu:</h3>
+                    <div class="code-block">
+<span class="keyword">public class</span> TestDangNhapĐaTrinhDuyệt {
+    
+    WebDriver driver;
+    LoginPage loginPage;
+    
+    <span class="comment">/**
+     * @DataProvider - Cung cấp tên trình duyệt để kiểm thử
+     * Trả về: [["chrome"], ["firefox"], ["safari"], ["edge"]]
+     * Kiểm thử sẽ chạy 4 lần, mỗi lần với trình duyệt khác
+     */</span>
+    <span class="keyword">@DataProvider</span>(name = <span class="string">"trìnhDuyệt"</span>)
+    <span class="keyword">public</span> Object[][] lấyTrìnhDuyệt() {
+        <span class="keyword">return new</span> Object[][] {
+            {<span class="string">"chrome"</span>},
+            {<span class="string">"firefox"</span>},
+            {<span class="string">"safari"</span>},
+            {<span class="string">"edge"</span>}
+        };
+    }
+    
+    <span class="keyword">@BeforeMethod</span>
+    <span class="keyword">public void</span> thiết(String tenTrìnhDuyệt) {
+        <span class="comment">// Lấy instance WebDriver từ DriverFactory</span>
+        <span class="comment">// Driver khác nhau dựa trên tham số tenTrìnhDuyệt</span>
+        driver = DriverFactory.lấyDriver(tenTrìnhDuyệt);
+        
+        <span class="comment">// Điều hướng tới ứng dụng</span>
+        driver.get(<span class="string">"https://example.com/login"</span>);
+        
+        <span class="comment">// Khởi tạo LoginPage</span>
+        loginPage = <span class="keyword">new</span> LoginPage(driver);
+    }
+    
+    <span class="comment">/**
+     * kiểmThửDangNhapTrênTấtCảTrìnhDuyệt - Kiểm thử đăng nhập trên tất cả trình duyệt
+     * @DataProvider sẽ chạy này 4 lần (1 trình duyệt)
+     */</span>
+    <span class="keyword">@Test</span>(dataProvider = <span class="string">"trìnhDuyệt"</span>)
+    <span class="keyword">public void</span> kiểmThửDangNhapTrênTấtCảTrìnhDuyệt(String tenTrìnhDuyệt) {
+        System.out.println(<span class="string">"Kiểm thử trên: "</span> + tenTrìnhDuyệt);
+        
+        <span class="comment">// Đăng nhập</span>
+        loginPage.login(<span class="string">"john@example.com"</span>, <span class="string">"password123"</span>);
+        
+        <span class="comment">// Xác minh thông báo chào mừng (trên trình duyệt này)</span>
+        String thongBaoChaoMung = loginPage.getWelcomeMessage();
+        Assert.assertTrue(
+            thongBaoChaoMung.contains(<span class="string">"Chào mừng"</span>),
+            <span class="string">"Đăng nhập nên hoạt động trên "</span> + tenTrìnhDuyệt
+        );
+        
+        System.out.println(<span class="string">"✅ Đăng nhập thành công trên "</span> + tenTrìnhDuyệt);
+    }
+    
+    <span class="keyword">@AfterMethod</span>
+    <span class="keyword">public void</span> dọnDẹp() {
+        <span class="keyword">if</span> (driver != <span class="keyword">null</span>) {
+            driver.quit();
+        }
+    }
+}
+                    </div>
+
+                    <div class="narration-box">🔊 "Real users pakai Chrome, Firefox, Safari, Edge. Aplikasi harus work di semua browsers. Cross-browser testing - test aplikasi di multiple browsers. Selenium support semua major browsers: ChromeDriver, GeckoDriver (Firefox), SafariDriver, EdgeDriver. Best practice: WebDriver factory pattern. Create DriverFactory class dengan static method getDriver(String browserName). Method check browserName, return appropriate driver. DriverFactory.getDriver('chrome') return ChromeDriver. getDriver('firefox') return FirefoxDriver. Combine dengan @DataProvider: provide array browser names. @DataProvider provide ['chrome', 'firefox', 'safari', 'edge']. @Test run 4 times, masing-masing browser. Benefits: single test logic, multiple browsers, easy add new browsers. Kalo 10 tests, 4 browsers = 40 test runs. Parallel execution dapat run 4 browsers simultaneously. Limitations: manage browsers locally adalah pain - need install ChromeDriver version match Chrome, GeckoDriver untuk Firefox, v.v. Solution: cloud services BrowserStack, Sauce Labs - remote browsers, no local setup. Tapi basic local testing: Firefox cukup untuk development, full cross-browser di CI/CD."</div>
+                </div>
+
+                <!-- SLIDE 5: CI/CD INTEGRATION -->
+                <div class="slide">
+                    <h2>🔗 Tích Hợp CI/CD - Jenkins & GitHub Actions</h2>
+                    
+                    <h3>CI/CD Là Gì?</h3>
+                    <p><span class="highlight">CI (Tích Hợp Liên Tục)</span> = Tự động chạy kiểm thử khi có thay đổi code</p>
+                    <p><span class="highlight">CD (Triển Khai Liên Tục)</span> = Tự động triển khai ứng dụng nếu kiểm thử thành công</p>
+
+                    <h3>Quy Trình Làm Việc:</h3>
+                    <ul>
+                        <li>1️⃣ Nhà phát triển push code lên Git</li>
+                        <li>2️⃣ CI/CD pipeline trigger (Jenkins, GitHub Actions, GitLab CI)</li>
+                        <li>3️⃣ Pipeline pull code mới nhất</li>
+                        <li>4️⃣ <span class="highlight">Pipeline chạy tất cả kiểm thử tự động</span></li>
+                        <li>5️⃣ Nếu kiểm thử thành công → triển khai. Nếu thất bại → chặn triển khai, thông báo cho nhà phát triển</li>
+                    </ul>
+
+                    <h3>Thiết Lập Jenkins Pipeline Cho Kiểm Thử Tự Động</h3>
+                    <div class="code-block">
+<span class="comment">/**
+ * Jenkinsfile - Xác định CI/CD pipeline cho Jenkins
+ * Vị trí: gốc dự án (cùng cấp với pom.xml)
+ */</span>
+<span class="keyword">pipeline</span> {
+    <span class="comment">// Chạy trên bất kỳ agent/node nào</span>
+    <span class="keyword">agent</span> <span class="keyword">any</span>
+    
+    <span class="comment">// Xác định các biến môi trường</span>
+    <span class="keyword">environment</span> {
+        <span class="comment">// URL cho ứng dụng kiểm thử</span>
+        ĐƯỜNG_DẪN_CƠ_SỞ = <span class="string">'https://staging-app.example.com'</span>
+        THƯ_MỤC_BÁO_CÁO = <span class="string">'test-reports'</span>
+    }
+    
+    <span class="comment">// ============ CÁC GIAI ĐOẠN BUILD ============</span>
+    <span class="keyword">stages</span> {
+        
+        <span class="comment">/**
+         * Giai Đoạn 1: Thanh Tra - Pull code mới nhất từ Git
+         */</span>
+        <span class="keyword">stage</span>(<span class="string">'Thanh Tra'</span>) {
+            <span class="keyword">steps</span> {
+                <span class="comment">// Thanh tra code mới nhất từ nhánh main</span>
+                git branch: <span class="string">'main'</span>,
+                    url: <span class="string">'https://github.com/company/automation-tests.git'</span>
+                
+                echo <span class="string">'✅ Code được thanh tra từ Git'</span>
+            }
+        }
+        
+        <span class="comment">/**
+         * Giai Đoạn 2: Xây Dựng - Biên Dịch Code Java
+         */</span>
+        <span class="keyword">stage</span>(<span class="string">'Xây Dựng'</span>) {
+            <span class="keyword">steps</span> {
+                echo <span class="string">'🔨 Đang xây dựng dự án...'</span>
+                
+                <span class="comment">// mvn clean compile: dọn sạch + biên dịch</span>
+                <span class="comment">// -DskipTests: bỏ qua kiểm thử đơn vị (chúng ta chạy kiểm thử tích hợp riêng biệt)</span>
+                sh <span class="string">'mvn clean compile -DskipTests'</span>
+                
+                echo <span class="string">'✅ Xây dựng thành công'</span>
+            }
+        }
+        
+        <span class="comment">/**
+         * Giai Đoạn 3: Kiểm Thử - Chạy tất cả kiểm thử tự động
+         */</span>
+        <span class="keyword">stage</span>(<span class="string">'Kiểm Thử Tự Động'</span>) {
+            <span class="keyword">steps</span> {
+                echo <span class="string">'🧪 Đang chạy kiểm thử tự động...'</span>
+                
+                <span class="comment">// mvn test: chạy tất cả kiểm thử trong src/test/java</span>
+                <span class="comment">// -Dsuites: chạy testng.xml cụ thể</span>
+                sh <span class="string">'mvn test -Dsuites=testng.xml -Dbrowser=chrome'</span>
+                
+                echo <span class="string">'✅ Kiểm thử hoàn thành'</span>
+            }
+        }
+        
+        <span class="comment">/**
+         * Giai Đoạn 4: Tạo Báo Cáo - Tạo báo cáo kiểm thử
+         */</span>
+        <span class="keyword">stage</span>(<span class="string">'Tạo Báo Cáo'</span>) {
+            <span class="keyword">steps</span> {
+                echo <span class="string">'📊 Đang tạo báo cáo kiểm thử...'</span>
+                
+                <span class="comment">// Tạo báo cáo HTML (được đề cập trong slide tiếp theo)</span>
+                <span class="comment">// Jenkins cũng tự động thu thập ảnh chụp</span>
+                
+                echo <span class="string">'✅ Báo cáo đã được tạo'</span>
+            }
+        }
+        
+        <span class="comment">/**
+         * Giai Đoạn 5: Xuất Bản Kết Quả - Xuất bản báo cáo & artifacts
+         */</span>
+        <span class="keyword">stage</span>(<span class="string">'Xuất Bản Kết Quả'</span>) {
+            <span class="keyword">steps</span> {
+                <span class="comment">// Xuất bản kết quả kiểm thử</span>
+                junit <span class="string">'target/surefire-reports/*.xml'</span>
+                
+                <span class="comment">// Lưu trữ báo cáo HTML</span>
+                publishHTML([
+                    reportDir: <span class="string">'test-reports'</span>,
+                    reportFiles: <span class="string">'index.html'</span>,
+                    reportName: <span class="string">'Báo Cáo Kiểm Thử Tự Động'</span>
+                ])
+                
+                <span class="comment">// Lưu trữ ảnh chụp</span>
+                archiveArtifacts artifacts: <span class="string">'screenshots/**'</span>,
+                    allowEmptyArchive: <span class="keyword">true</span>
+            }
+        }
+        
+        <span class="comment">/**
+         * Giai Đoạn 6: Triển Khai (Tùy Chọn) - Triển khai nếu kiểm thử thành công
+         */</span>
+        <span class="keyword">stage</span>(<span class="string">'Triển Khai'</span>) {
+            <span class="keyword">when</span> {
+                <span class="comment">// Chỉ triển khai nếu các giai đoạn trước thành công</span>
+                <span class="keyword">expression</span> { currentBuild.result == <span class="keyword">null</span> || currentBuild.result == <span class="string">'SUCCESS'</span> }
+            }
+            <span class="keyword">steps</span> {
+                echo <span class="string">'🚀 Đang triển khai ứng dụng...'</span>
+                <span class="comment">// Script triển khai ở đây</span>
+                sh <span class="string">'./deploy.sh'</span>
+            }
+        }
+    }
+    
+    <span class="comment">// ============ CÁC HÀNH ĐỘNG SAU BUILD ============</span>
+    <span class="keyword">post</span> {
+        <span class="comment">// Luôn chạy, bất kể thành công/thất bại</span>
+        <span class="keyword">always</span> {
+            echo <span class="string">'🏁 Pipeline hoàn thành'</span>
+        }
+        
+        <span class="comment">// Chạy nếu pipeline THẤT BẠI</span>
+        <span class="keyword">failure</span> {
+            echo <span class="string">'❌ Pipeline THẤT BẠI'</span>
+            
+            <span class="comment">// Gửi thông báo email</span>
+            emailext(
+                subject: <span class="string">'Kiểm Thử Tự Động THẤT BẠI'</span>,
+                body: <span class="string">'Kiểm tra Jenkins: $BUILD_URL'</span>,
+                to: <span class="string">'qa-team@company.com'</span>
+            )
+        }
+        
+        <span class="comment">// Chạy nếu pipeline THÀNH CÔNG</span>
+        <span class="keyword">success</span> {
+            echo <span class="string">'✅ Pipeline THÀNH CÔNG'</span>
+            
+            emailext(
+                subject: <span class="string">'Kiểm Thử Tự Động THÀNH CÔNG'</span>,
+                body: <span class="string">'Tất cả kiểm thử đã thành công! Sẵn sàng triển khai.'</span>,
+                to: <span class="string">'qa-team@company.com'</span>
+            )
+        }
+    }
+}
+                    </div>
+
+                    <h3>Quy Trình Thực Thi Jenkins Pipeline:</h3>
+                    <div class="output-box">
+[Pipeline Bắt Đầu] 
+Thanh Tra ✅ (Git pull code mới nhất)
+Xây Dựng ✅ (mvn clean compile)
+Kiểm Thử Tự Động ✅ (mvn test)
+  - testDangNhapHợpLệ ✅ THÀNH CÔNG
+  - testDangNhapKhôngHợpLệ ❌ THẤT BẠI (ảnh chụp được lưu)
+  - testĐăngXuất ✅ THÀNH CÔNG
+  - testĐăngXuấtVôiBrowserClose ✅ THÀNH CÔNG
+Tạo Báo Cáo ✅ (Báo cáo HTML được tạo)
+Xuất Bản Kết Quả ✅ (Báo cáo được xuất bản)
+Triển Khai ❌ BỊCHẶN (kiểm thử thất bại, không thể triển khai)
+
+Tóm Tắt:
+- Tổng Kiểm Thử: 4
+- Thành Công: 3
+- Thất Bại: 1
+- Tỷ Lệ Thành Công: 75%
+- Trạng Thái: THẤT BẠI (triển khai bị chặn)
+
+Email: qa-team@company.com
+Chủ Đề: Kiểm Thử Tự Động THẤT BẠI
+Nội Dung: Kiểm tra Jenkins để biết chi tiết
+                    </div>
+
+                    <div class="narration-box">🔊 "CI/CD - Continuous Integration/Deployment. Workflow: developer commit code → CI/CD trigger → run tests → report results → deploy jika tests pass. TestNG tests dapat integrate dengan Jenkins atau GitHub Actions. Jenkins setup: create Freestyle job atau Pipeline job. Pull latest code. Run Maven/Gradle để compile. Run TestNG tests: mvn test. Publish reports. GitHub Actions: create .github/workflows/tests.yml file. On push event, trigger workflow. Run tests: mvn test. Upload artifacts (reports, screenshots). Pipeline Benefits: automatic testing pada setiap commit. Developers immediately notified jika break tests. Jika tests fail, deployment blocked. Quality gate - code tidak deploy sampai tests pass. Dalam testng.xml, bisa specify: &lt;suite thread-count='8' parallel='methods'&gt; untuk run parallel di CI server. 10 tests × 5 seconds = 50 seconds sequential, parallel 8 threads = 6-7 seconds. Major speedup."</div>
+                </div>
+
+                <!-- SLIDE 6: TEST REPORTING -->
+                <div class="slide">
+                    <h2>📊 Báo Cáo Kiểm Thử - Tạo Báo Cáo HTML</h2>
+                    
+                    <h3>Báo Cáo Kiểm Thử Là Gì?</h3>
+                    <p>Báo cáo kiểm thử = <span class="highlight">Tóm tắt kết quả thực thi kiểm thử</span> (thành công, thất bại, bỏ qua, thời gian thực thi)</p>
+                    <p>Định Dạng:</p>
+                    <ul>
+                        <li>✅ <strong>Báo Cáo HTML:</strong> Trực quan, dễ đọc, bao gồm biểu đồ</li>
+                        <li>✅ <strong>Báo Cáo XML:</strong> Có thể đọc máy, để CI/CD phân tích</li>
+                        <li>✅ <strong>Báo Cáo PDF:</strong> Tài liệu chính thức, dễ chia sẻ</li>
+                        <li>✅ <strong>Báo Cáo Email:</strong> Tóm tắt được gửi qua email</li>
+                    </ul>
+
+                    <h3>TestNG Báo Cáo Tích Hợp</h3>
+                    <p>TestNG tự động tạo báo cáo XML. Vị trí: <span class="highlight">target/surefire-reports/</span></p>
+
+                    <h3>Trình Tạo Báo Cáo HTML Tùy Chỉnh</h3>
+                    <div class="code-block">
+<span class="comment">/**
+ * TạoBáoCáo - Tạo file HTML với kết quả kiểm thử
+ * Tại sao tùy chỉnh? Báo cáo tích hợp cơ bản. Báo cáo tùy chỉnh có thể:
+ * - Thêm ảnh chụp (liên kết trong báo cáo)
+ * - Tùy chỉnh kiểu dáng (màu sắc thương hiệu, logo)
+ * - Thêm metrics (thời gian thực thi trên mỗi kiểm thử, % thành công, v.v.)
+ */</span>
+<span class="keyword">public class</span> TạoBáoCáo {
+    
+    <span class="comment">/**
+     * tạoBáoCáo - Tạo file HTML với kết quả kiểm thử
+     * @param kếtQuảKiểmThử - List<KếtQuảKiểmThử> chứa tất cả thông tin kiểm thử
+     * @param duongDanBáoCáo - Nơi để lưu báo cáo HTML
+     */</span>
+    <span class="keyword">public static void</span> tạoBáoCáo(List<KếtQuảKiểmThử> kếtQuảKiểmThử, String duongDanBáoCáo) {
+        <span class="keyword">try</span> {
+            <span class="comment">// StringBuilder để xây dựng chuỗi HTML</span>
+            StringBuilder html = <span class="keyword">new</span> StringBuilder();
+            
+            <span class="comment">// ============ HTML HEAD ============</span>
+            html.append(<span class="string">"&lt;!DOCTYPE html&gt;&lt;html&gt;"</span>);
+            html.append(<span class="string">"&lt;head&gt;"</span>);
+            html.append(<span class="string">"&lt;title&gt;Báo Cáo Kiểm Thử Tự Động&lt;/title&gt;"</span>);
+            
+            <span class="comment">// Thêm kiểu CSS</span>
+            html.append(<span class="string">"&lt;style&gt;"</span>);
+            html.append(<span class="string">"body { font-family: Arial; margin: 20px; }"</span>);
+            html.append(<span class="string">"h1 { color: #333; }"</span>);
+            html.append(<span class="string">"table { border-collapse: collapse; width: 100%; }"</span>);
+            html.append(<span class="string">"th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }"</span>);
+            html.append(<span class="string">"th { background-color: #4CAF50; color: white; }"</span>);
+            html.append(<span class="string">".thanh-cong { color: green; font-weight: bold; }"</span>);
+            html.append(<span class="string">".that-bai { color: red; font-weight: bold; }"</span>);
+            html.append(<span class="string">"&lt;/style&gt;"</span>);
+            html.append(<span class="string">"&lt;/head&gt;"</span>);
+            
+            <span class="comment">// ============ HTML BODY ============</span>
+            html.append(<span class="string">"&lt;body&gt;"</span>);
+            
+            <span class="comment">// Tiêu đề & Tóm tắt</span>
+            html.append(<span class="string">"&lt;h1&gt;🧪 Báo Cáo Kiểm Thử Tự Động&lt;/h1&gt;"</span>);
+            html.append(<span class="string">"&lt;p&gt;Ngày Thực Thi: "</span> + <span class="keyword">new</span> Date() + <span class="string">"&lt;/p&gt;"</span>);
+            
+            <span class="comment">// Tính toán metrics</span>
+            <span class="keyword">int</span> tổngKiểmThử = kếtQuảKiểmThử.size();
+            <span class="keyword">long</span> kiểmThửThànhCông = kếtQuảKiểmThử.stream()
+                .filter(r -> r.làThànhCông()).count();
+            <span class="keyword">long</span> kiểmThửThấtBại = tổngKiểmThử - kiểmThửThànhCông;
+            <span class="keyword">double</span> tỷLệThànhCông = (kiểmThửThànhCông * <span class="number">100</span> / tổngKiểmThử);
+            
+            <span class="comment">// Phần tóm tắt</span>
+            html.append(<span class="string">"&lt;h2&gt;Tóm Tắt&lt;/h2&gt;"</span>);
+            html.append(<span class="string">"&lt;table&gt;"</span>);
+            html.append(<span class="string">"&lt;tr&gt;&lt;th&gt;Tổng Kiểm Thử&lt;/th&gt;&lt;td&gt;"</span> + tổngKiểmThử + <span class="string">"&lt;/td&gt;&lt;/tr&gt;"</span>);
+            html.append(<span class="string">"&lt;tr&gt;&lt;th&gt;Thành Công&lt;/th&gt;&lt;td class='thanh-cong'&gt;"</span> + kiểmThửThànhCông + <span class="string">"&lt;/td&gt;&lt;/tr&gt;"</span>);
+            html.append(<span class="string">"&lt;tr&gt;&lt;th&gt;Thất Bại&lt;/th&gt;&lt;td class='that-bai'&gt;"</span> + kiểmThửThấtBại + <span class="string">"&lt;/td&gt;&lt;/tr&gt;"</span>);
+            html.append(<span class="string">"&lt;tr&gt;&lt;th&gt;Tỷ Lệ Thành Công&lt;/th&gt;&lt;td&gt;"</span> + String.format(<span class="string">"%.2f"</span>, tỷLệThànhCông) + <span class="string">"%&lt;/td&gt;&lt;/tr&gt;"</span>);
+            html.append(<span class="string">"&lt;/table&gt;&lt;br/&gt;"</span>);
+            
+            <span class="comment">// Bảng chi tiết kiểm thử</span>
+            html.append(<span class="string">"&lt;h2&gt;Chi Tiết Kiểm Thử&lt;/h2&gt;"</span>);
+            html.append(<span class="string">"&lt;table&gt;"</span>);
+            html.append(<span class="string">"&lt;tr&gt;&lt;th&gt;Tên Kiểm Thử&lt;/th&gt;&lt;th&gt;Trạng Thái&lt;/th&gt;&lt;th&gt;Thời Gian (ms)&lt;/th&gt;&lt;th&gt;Ảnh Chụp&lt;/th&gt;&lt;/tr&gt;"</span>);
+            
+            <span class="comment">// Lặp qua mỗi kết quả kiểm thử</span>
+            <span class="keyword">for</span> (KếtQuảKiểmThử result : kếtQuảKiểmThử) {
+                html.append(<span class="string">"&lt;tr&gt;"</span>);
+                html.append(<span class="string">"&lt;td&gt;"</span> + result.getTênKiểmThử() + <span class="string">"&lt;/td&gt;"</span>);
+                
+                <span class="comment">// Trạng Thái: Thành Công (xanh) hoặc Thất Bại (đỏ)</span>
+                String lớpTrạngThái = result.làThànhCông() ? <span class="string">"thanh-cong"</span> : <span class="string">"that-bai"</span>;
+                String trạngThái = result.làThànhCông() ? <span class="string">"✅ THÀNH CÔNG"</span> : <span class="string">"❌ THẤT BẠI"</span>;
+                html.append(<span class="string">"&lt;td class='"</span> + lớpTrạngThái + <span class="string">"'&gt;"</span> + trạngThái + <span class="string">"&lt;/td&gt;"</span>);
+                
+                <span class="comment">// Thời gian thực thi</span>
+                html.append(<span class="string">"&lt;td&gt;"</span> + result.getThờiGianThựcThi() + <span class="string">"&lt;/td&gt;"</span>);
+                
+                <span class="comment">// Liên kết ảnh chụp (nếu có)</span>
+                String duongDanAnhChup = result.getDuongDanAnhChup();
+                <span class="keyword">if</span> (duongDanAnhChup != <span class="keyword">null</span> && !duongDanAnhChup.isEmpty()) {
+                    html.append(<span class="string">"&lt;td&gt;&lt;a href='"</span> + duongDanAnhChup + <span class="string">"'&gt;Xem&lt;/a&gt;&lt;/td&gt;"</span>);
+                } <span class="keyword">else</span> {
+                    html.append(<span class="string">"&lt;td&gt;-&lt;/td&gt;"</span>);
+                }
+                
+                html.append(<span class="string">"&lt;/tr&gt;"</span>);
+            }
+            
+            html.append(<span class="string">"&lt;/table&gt;"</span>);
+            html.append(<span class="string">"&lt;/body&gt;&lt;/html&gt;"</span>);
+            
+            <span class="comment">// Ghi HTML vào file</span>
+            FileWriter writer = <span class="keyword">new</span> FileWriter(duongDanBáoCáo);
+            writer.write(html.toString());
+            writer.close();
+            
+            System.out.println(<span class="string">"✅ Báo cáo được tạo: "</span> + duongDanBáoCáo);
+            
+        } <span class="keyword">catch</span> (IOException e) {
+            System.out.println(<span class="string">"❌ Không thể tạo báo cáo: "</span> + e.getMessage());
+        }
+    }
+}
+                    </div>
+
+                    <div class="narration-box">🔊 "TestNG auto generate default HTML report dalam test-output folder. Report contain: test summary (passed/failed/skipped), detailed test results, execution time, stack traces. Tapi custom report often needed untuk: include screenshots, better styling, custom metrics. Tools: ExtentReports (powerful, generate beautiful reports), Allure (modern, interactive). Atau write custom report generator: iterate through test results, generate HTML file, include screenshots, charts. Custom report bisa include: test name, status, execution time, screenshot on failure, log messages, assertions. Reporting important untuk: document test coverage, communicate results to stakeholders, track trends over time (pass rate decreasing? itu sign problems)."</div>
+                </div>
+
+                <!-- SLIDE 7: RECAP -->
+                <div class="slide">
+                    <h2>📚 Tóm Tắt: PHASE 4</h2>
+                    
+                    <h3>Chúng Ta Đã Học:</h3>
+                    <ul>
+                        <li>✅ <strong>Ảnh Chụp & Nhật Ký:</strong> Chụp ảnh khi kiểm thử thất bại</li>
+                        <li>✅ <strong>TestNG Listeners:</strong> Hook vào vòng đời kiểm thử</li>
+                        <li>✅ <strong>Logic Thử Lại:</strong> Tự động thử lại các kiểm thử không ổn định</li>
+                        <li>✅ <strong>Kiểm Thử Đa Trình Duyệt:</strong> Test nhiều trình duyệt</li>
+                        <li>✅ <strong>Tích Hợp CI/CD:</strong> Tích hợp với Jenkins/GitHub Actions</li>
+                        <li>✅ <strong>Báo Cáo Kiểm Thử:</strong> Tạo báo cáo HTML chi tiết</li>
+                    </ul>
+
+                    <h3>Tóm Tắt PHASE 4 - Các Chủ Đề Nâng Cao Đã Học:</h3>
+                    <table class="comparison-table">
+                        <tr>
+                            <th>Chủ Đề</th>
+                            <th>Nội Dung</th>
+                            <th>Tại Sao</th>
+                        </tr>
+                        <tr>
+                            <td><strong>Ảnh Chụp</strong></td>
+                            <td>Chụp màn hình khi thất bại</td>
+                            <td>Sửa lỗi các kiểm thử thất bại trực quan</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Listeners</strong></td>
+                            <td>Hook vào vòng đời kiểm thử</td>
+                            <td>Ghi nhật ký, ảnh chụp, báo cáo tự động</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Thử Lại</strong></td>
+                            <td>Thử lại kiểm thử không ổn định tự động</td>
+                            <td>Xử lý lỗi tạm thời (mạng, thời gian)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Đa Trình Duyệt</strong></td>
+                            <td>Kiểm thử nhiều trình duyệt</td>
+                            <td>Đảm bảo tương thích trên tất cả trình duyệt</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CI/CD</strong></td>
+                            <td>Tích hợp với Jenkins/GitHub Actions</td>
+                            <td>Tự động hóa kiểm thử trong pipeline</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Báo Cáo</strong></td>
+                            <td>Tạo báo cáo HTML kiểm thử</td>
+                            <td>Chia sẻ kết quả với stakeholders</td>
+                        </tr>
+                    </table>
+
+                    <h3>Chuyến Đi Kiểm Thử Tự Động Của Bạn Hoàn Chỉnh!</h3>
+                    <div class="concept-box">
+                        <p><strong>PHASE 1:</strong> Nền tảng kiểm thử tự động (Unit, Integration, E2E, API)</p>
+                        <p><strong>PHASE 2:</strong> Selenium WebDriver (tìm kiếm, tương tác, chờ)</p>
+                        <p><strong>PHASE 3:</strong> TestNG & Page Object Model (tổ chức, bảo trì)</p>
+                        <p><strong>PHASE 4:</strong> Các chủ đề nâng cao & CI/CD (sản xuất)</p>
+                        <p style="margin-top: 20px;"><strong>Kết Quả:</strong> Bây giờ bạn đã sẵn sàng để:</p>
+                        <ul>
+                            <li>✅ Thiết kế & triển khai kiểm thử tự động cấp doanh nghiệp</li>
+                            <li>✅ Bảo trì các bộ kiểm thử quy mô lớn (POM, các lớp Trang)</li>
+                            <li>✅ Xử lý các kịch bản phức tạp (đa trình duyệt, thực thi song song)</li>
+                            <li>✅ Tích hợp kiểm thử trong pipeline CI/CD</li>
+                            <li>✅ Tạo báo cáo chi tiết & thông tin gỡ lỗi</li>
+                            <li>✅ Làm việc trong các môi trường sản xuất</li>
+                        </ul>
+                    </div>
+
+                    <div class="narration-box">🔊 "Chúng ta đã travel dari PHASE 1 đến PHASE 4. PHASE 1: understand automation testing basics, 4 types tests, test pyramid. PHASE 2: Selenium WebDriver, 8 locators, element interactions, waits, advanced actions, windows/frames. PHASE 3: TestNG framework, annotations, assertions, testng.xml, parallel execution, Page Object Model, data-driven testing. PHASE 4: screenshots, listeners, retry logic, cross-browser, CI/CD, reporting, performance, database testing, logging. Sekarang bapak ready untuk build production-grade automation test suite. Test code clean (POM), maintainable (centralized locators), scalable (parallel, data-driven), robust (waits, error handling, retry), informative (logging, screenshots, reports). Kompleks? Ya. Tapi industry standard. Automated testing adalah skill yang berpermintaan tinggi, disini competitive advantage."</div>
+                </div>
+
+            </div>
+
+            <div class="sidebar">
+                <div class="controls">
+                    <button class="btn-primary" id="prevBtn">⬅️ Trước</button>
+                    <button class="btn-primary" id="nextBtn">Tiếp ➡️</button>
+                    <button class="btn-secondary" id="speakBtn">🔊 Đọc thuyết minh</button>
+                    <div id="ttsPlayerSlot" class="tts-player-slot" hidden>
+                        <audio id="courseAudio" controls preload="metadata"></audio>
+                        <div class="tts-rate-row">
+                            <label for="ttsRateSelect">Tốc độ</label>
+                            <select id="ttsRateSelect" aria-label="Tốc độ đọc">
+                                <option value="0.75">0.75×</option>
+                                <option value="1" selected>1× Bình thường</option>
+                                <option value="1.25">1.25×</option>
+                                <option value="1.5">1.5×</option>
+                                <option value="1.75">1.75×</option>
+                                <option value="2">2×</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn-secondary" id="resetBtn">🔄 Đặt lại</button>
+                    <button class="btn-secondary" id="toggleEditBtn" type="button">✏️ Sửa script</button>
+                </div>
+
+                <div class="slide-counter">
+                    <div id="slideCount">1 / 7</div>
+                </div>
+
+                <div class="progress-bar" style="margin: 20px 0;">
+                    <div class="progress-fill" id="sidebarProgress" style="width: 14%;"></div>
+                </div>
+
+                                <div data-course-nav></div>
+                <div class="slide-nav-section">
+                    <h3 class="slide-nav-heading">📑 Slide trong bài</h3>
+                    <ul class="nav-links">
+                        <li><a href="#" onclick="return goToSlide(0)">0. PHASE 4 Giới Thiệu</a></li>
+                        <li><a href="#" onclick="return goToSlide(1)">1. Ảnh Chụp & Nhật Ký</a></li>
+                        <li><a href="#" onclick="return goToSlide(2)">2. TestNG Listeners</a></li>
+                        <li><a href="#" onclick="return goToSlide(3)">3. Logic Thử Lại</a></li>
+                        <li><a href="#" onclick="return goToSlide(4)">4. Kiểm Thử Đa Trình Duyệt</a></li>
+                        <li><a href="#" onclick="return goToSlide(5)">5. Tích Hợp CI/CD</a></li>
+                        <li><a href="#" onclick="return goToSlide(6)">6. Báo Cáo Kiểm Thử</a></li>
+                        <li><a href="#" onclick="return goToSlide(7)">7. Hiệu Suất & Tóm Tắt</a></li>
+                    </ul>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ddd;">
+                    <p style="font-size: 0.85em; color: #666; text-align: center;">
+                        ⏱️ ~120+ phút<br>
+                        📚 PHASE 4<br>
+                        🚀 Nâng Cao & CI/CD
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 Hướng Dẫn Kiểm Thử Tự Động | PHASE 4: Các Chủ Đề Nâng Cao & CI/CD | Giải Thích Chi Tiết Từng Hàm, Logic, Ví Dụ Thực Tế</p>
+        </div>
+    </div>
+
+    <script src="vietnamese-tts.js"></script>
+    <script src="narration-editor.js?v=4"></script>
+    <script src="course-nav.js"></script>
+    <script src="course-ui-demos.js"></script>
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slides .slide');
+        const totalSlides = slides.length;
+        const ttsPage = document.body.dataset.ttsPage;
+
+        function updateSlide() {
+            VietnameseTTS.stop();
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            document.getElementById('slideCount').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('sidebarProgress').style.width = progress + '%';
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            const speakBtn = document.getElementById('speakBtn');
+            if (speakBtn) {
+                const nb = slides[currentSlide].querySelector('.narration-box');
+                speakBtn.disabled = !nb;
+            }
+
+            document.getElementById('slidesContainer').scrollTop = 0;
+            if (window.CourseNav && CourseNav.setActiveSlide) CourseNav.setActiveSlide(currentSlide);
+        }
+
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(index) {
+            if (index >= 0 && index < totalSlides) {
+                currentSlide = index;
+                updateSlide();
+            }
+            return false;
+        }
+
+        function speak() {
+            const slide = slides[currentSlide];
+            if (!slide.querySelector('.narration-box')) return;
+            VietnameseTTS.speakSlide(ttsPage, currentSlide);
+        }
+
+        function reset() {
+            currentSlide = 0;
+            updateSlide();
+        }
+
+        document.getElementById('nextBtn').addEventListener('click', nextSlide);
+        document.getElementById('prevBtn').addEventListener('click', prevSlide);
+        document.getElementById('speakBtn').addEventListener('click', speak);
+        document.getElementById('resetBtn').addEventListener('click', reset);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        updateSlide();
+    </script>
+</body>
+</html>
