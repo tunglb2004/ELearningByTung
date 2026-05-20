@@ -83,10 +83,8 @@
 
         if (ui.audioEl && !ui.audioEl.dataset.bound) {
             ui.audioEl.dataset.bound = '1';
-            ui.audioEl.addEventListener('ended', function () {
-                hidePlayer();
-                finish();
-            });
+            // Không thêm event listener 'ended' - để playSegmentQueue tự động xử lý
+            // ui.audioEl sẽ trigger onended từ hàm playSegmentQueue dưới đây
             ui.audioEl.addEventListener('pause', function () {
                 if (ui.audioEl.ended) return;
             });
@@ -111,6 +109,23 @@
             ui.audioEl.pause();
             ui.audioEl.removeAttribute('src');
             ui.audioEl.load();
+        }
+    }
+
+    function hidePlayerKeepBar() {
+        // Chỉ dừng phát âm thanh, nhưng giữ thanh player hiển thị
+        speaking = false;
+        onEndCallback = null;
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+            currentAudio.onended = null;
+            currentAudio.onerror = null;
+            currentAudio = null;
+        }
+        if (ui.audioEl) {
+            ui.audioEl.pause();
+            ui.audioEl.currentTime = 0;
         }
     }
 
@@ -156,7 +171,7 @@
         audio.onerror = function () {
             if (options.onMissing) options.onMissing(relativePath);
             else alert('Chưa có file âm thanh: ' + relativePath + '\n\nChạy "Tạo lại toàn bộ audio" trên trang chủ.');
-            hidePlayer();
+            hidePlayerKeepBar();
             finish();
         };
         audio.onended = function () {
@@ -167,7 +182,7 @@
         if (playPromise && playPromise.catch) {
             playPromise.catch(function () {
                 alert('Không phát được âm thanh. Mở trang qua http://localhost:5500');
-                hidePlayer();
+                hidePlayerKeepBar();
                 finish();
             });
         }
@@ -220,6 +235,12 @@
         return loadManifest();
     }
 
+    function resetOnPageChange() {
+        // Ẩn player khi chuyển trang
+        hidePlayer();
+        stop();
+    }
+
     global.VietnameseTTS = {
         speak: speak,
         speakSlide: speakSlide,
@@ -229,7 +250,8 @@
             return speaking;
         },
         preloadManifest: loadManifest,
-        reloadManifest: reloadManifest
+        reloadManifest: reloadManifest,
+        resetOnPageChange: resetOnPageChange
     };
 
     loadManifest();

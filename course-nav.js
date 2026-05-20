@@ -219,6 +219,16 @@
         if (document.querySelector('.slide-nav-section')) {
             initSlideNavLinks();
         }
+        
+        // Reset audio player khi chuyển trang
+        var lessonLinks = document.querySelectorAll('a[href*=".html"]');
+        for (var i = 0; i < lessonLinks.length; i++) {
+            lessonLinks[i].addEventListener('click', function () {
+                if (typeof VietnameseTTS !== 'undefined' && VietnameseTTS.resetOnPageChange) {
+                    VietnameseTTS.resetOnPageChange();
+                }
+            });
+        }
     }
 
     if (document.readyState === 'loading') {
